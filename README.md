@@ -4,7 +4,7 @@ Website đặt phòng trực tiếp cho F21 Hotel, khu biệt thự Hoa Phượn
 
 - Next.js 16 (App Router, Cache Components) + TypeScript
 - Chạy trên Cloudflare Workers qua [OpenNext](https://opennext.js.org/cloudflare)
-- Font: 1FTV International cho tiêu đề (file trong `src/app/fonts/`), STIX Two Text cho nội dung (giá, số dùng nét đậm). Màu theo Cẩm nang thương hiệu
+- Font: Trajan Pro 3 cho tiêu đề, in hoa (bản woff2 đã cắt trong `src/app/fonts/`), STIX Two Text cho nội dung (giá, số dùng nét đậm). Màu theo Cẩm nang thương hiệu
 
 ## Chạy ở máy
 

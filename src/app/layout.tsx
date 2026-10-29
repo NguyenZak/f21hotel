@@ -7,20 +7,15 @@ import { Header } from "@/components/Header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-// Font tiêu đề h1–h4 (1FTV International)
+// Font tiêu đề h1–h4: Trajan Pro 3, đã cắt chỉ giữ chữ Latin và tiếng Việt, định dạng woff2
 const heading = localFont({
-  src: "./fonts/1ftv-international.otf",
-  variable: "--font-1ftv",
-  display: "swap",
-  // Font thiếu các ký tự " # $ % & ' ( ) * + - / < = > [ \ ] ^ _ { | } ~ – — “ ” ‘ ’ … • · ′
-  // Loại chúng khỏi unicode-range để trình duyệt lấy từ STIX thay vì hiện ô trống
-  declarations: [
-    {
-      prop: "unicode-range",
-      value:
-        "U+0020-0021, U+002C, U+002E, U+0030-003B, U+003F-005A, U+0060-007A, U+00A0-00B6, U+00B8-2012, U+2015-2017, U+201A-201B, U+201E-2021, U+2023-2025, U+2027-2031, U+2033-FFFF",
-    },
+  src: [
+    { path: "./fonts/trajan-pro-3-regular.woff2", weight: "400" },
+    { path: "./fonts/trajan-pro-3-semibold.woff2", weight: "600" },
+    { path: "./fonts/trajan-pro-3-bold.woff2", weight: "700" },
   ],
+  variable: "--font-trajan",
+  display: "swap",
 });
 
 // Font nội dung; giá và số dùng nét đậm. Tự host qua next/font thay cho thẻ <link> Google Fonts

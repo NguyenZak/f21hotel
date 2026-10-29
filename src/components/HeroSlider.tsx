@@ -9,25 +9,18 @@ const INTERVAL = 6000;
 // Ảnh nền hero chuyển dần (crossfade); chữ và nút của hero nằm cố định phía trên
 export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
 
+  // Luôn tự chuyển; hẹn giờ lại mỗi khi đổi ảnh (kể cả khi bấm chấm).
+  // Chế độ giảm chuyển động chỉ tắt hiệu ứng phóng to qua CSS, không dừng slider.
   useEffect(() => {
-    if (paused || slides.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setTimeout(
-      () => setActive((i) => (i + 1) % slides.length),
-      INTERVAL,
-    );
+    if (slides.length < 2) return;
+    const id = window.setTimeout(() => setActive((i) => (i + 1) % slides.length), INTERVAL);
     return () => window.clearTimeout(id);
-  }, [active, paused, slides.length]);
+  }, [active, slides.length]);
 
   return (
     <>
-      <div
-        className="hero-media"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
+      <div className="hero-media">
         {slides.map((slide, i) => (
           <picture
             key={slide.src}
@@ -58,13 +51,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
               className={i === active ? "active" : undefined}
               onClick={() => setActive(i)}
             >
-              <span
-                style={
-                  i === active && !paused
-                    ? { animationDuration: `${INTERVAL}ms` }
-                    : undefined
-                }
-              />
+              <span style={i === active ? { animationDuration: `${INTERVAL}ms` } : undefined} />
             </button>
           ))}
         </div>

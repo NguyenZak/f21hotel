@@ -38,9 +38,8 @@ const guestTypes = [
 export default function HomePage() {
   return (
     <>
-      <section className="hero on-dark">
-        <HeroSlider slides={heroSlides} />
-        <div className="wrap">
+      <section className="hero">
+        <div className="hero-copy on-dark">
           <div className="hero-inner">
             <span className="eyebrow">Khu biệt thự Hoa Phượng · An Khánh · Hà Nội</span>
             <h1>
@@ -65,6 +64,9 @@ export default function HomePage() {
             </div>
             <p className="hero-note">Hotline {site.phoneDisplay} · Nghỉ ngày đêm từ 900.000đ, nghỉ giờ từ 300.000đ.</p>
           </div>
+        </div>
+        <div className="hero-visual">
+          <HeroSlider slides={heroSlides} />
         </div>
       </section>
 
