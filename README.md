@@ -4,7 +4,7 @@ Website đặt phòng trực tiếp cho F21 Hotel, khu biệt thự Hoa Phượn
 
 - Next.js 16 (App Router, Cache Components) + TypeScript
 - Chạy trên Cloudflare Workers qua [OpenNext](https://opennext.js.org/cloudflare)
-- Font: Playfair Display (tiêu đề, viết hoa chữ cái đầu), SVN-Audrey (nhãn, nút, menu, giá, in hoa), STIX Two Text (nội dung). Màu theo Cẩm nang thương hiệu
+- Font: Playfair Display (tiêu đề, giá, số) và STIX Two Text (nội dung, nhãn, nút). Màu theo Cẩm nang thương hiệu
 
 ## Chạy ở máy
 
@@ -51,7 +51,3 @@ Form gửi qua Server Action ([src/app/actions.ts](src/app/actions.ts)): kiểm 
 ## Đo lường
 
 [src/lib/track.ts](src/lib/track.ts) gửi các sự kiện `click_call`, `click_zalo`, `submit_booking` tới GA4 / Google Ads khi đã gắn `gtag` (chưa gắn).
-
-## Lưu ý về font SVN-Audrey
-
-Font không có các ký tự `< > @ _ \` { | } ~ © ® ° ² · × – — • … € ™`. Những ký tự này được loại khỏi `unicode-range` trong [src/app/layout.tsx](src/app/layout.tsx) để trình duyệt tự lấy từ font dự phòng, tránh hiện ô trống.
