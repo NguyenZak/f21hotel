@@ -1,19 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, STIX_Two_Text } from "next/font/google";
+import { STIX_Two_Text } from "next/font/google";
 import { ContactBar } from "@/components/ContactBar";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-// Font tiêu đề, giá và số
-const playfair = Playfair_Display({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-// Font phụ cho nội dung, tự host qua next/font thay cho thẻ <link> Google Fonts
+// Font duy nhất của site: nội dung dùng nét thường, tiêu đề, giá và số dùng nét đậm.
+// Tự host qua next/font thay cho thẻ <link> Google Fonts
 const stix = STIX_Two_Text({
   subsets: ["latin", "vietnamese"],
   style: ["normal", "italic"],
@@ -69,7 +63,7 @@ const hotelJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${playfair.variable} ${stix.variable}`}>
+    <html lang="vi" className={stix.variable}>
       <head>
         <script
           type="application/ld+json"

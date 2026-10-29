@@ -21,7 +21,7 @@
   --muted: #6f625c;
   --line: #e6dbc8;
 
-  --font-title: var(--font-playfair), Georgia, serif;
+  --font-title: var(--font-stix), Georgia, serif;
   --font-body: var(--font-stix), Georgia, "Times New Roman", serif;
 
   --radius: 6px;
@@ -56,10 +56,10 @@ a { color: var(--maroon); text-underline-offset: 3px; }
 a:hover { color: var(--maroon-deep); }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
-/* Tiêu đề: Playfair Display, viết hoa chữ cái đầu mỗi từ */
+/* Tiêu đề: STIX Two Text đậm, viết hoa chữ cái đầu mỗi từ */
 h1, h2, h3, h4 {
   font-family: var(--font-title);
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.15;
   margin: 0;
   text-wrap: balance;
@@ -67,9 +67,9 @@ h1, h2, h3, h4 {
   text-transform: capitalize;
   font-variant-numeric: lining-nums;
 }
-h1 { font-size: clamp(38px, 6vw, 74px); }
-h2 { font-size: clamp(30px, 4vw, 48px); color: var(--maroon); }
-h3 { font-size: clamp(21px, 2.2vw, 26px); }
+h1 { font-size: clamp(36px, 5.6vw, 70px); }
+h2 { font-size: clamp(30px, 3.8vw, 46px); color: var(--maroon); }
+h3 { font-size: clamp(21px, 2.1vw, 25px); }
 p { margin: 0; }
 
 .wrap { width: 100%; max-width: calc(var(--wrap) + 2 * var(--gutter)); margin: 0 auto; padding-inline: var(--gutter); }
@@ -174,7 +174,7 @@ p { margin: 0; }
   display: flex; flex-direction: column; line-height: 1.2; text-decoration: none; color: var(--ink);
 }
 .header-phone small { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
-.header-phone strong { font-family: var(--font-title); font-weight: 400; font-size: 18px; color: var(--maroon); letter-spacing: 0.04em; }
+.header-phone strong { font-family: var(--font-title); font-weight: 700; font-size: 18px; color: var(--maroon); letter-spacing: 0.04em; }
 .header-cta .btn { min-height: 44px; padding: 10px 20px; font-size: 14.5px; }
 
 .menu-toggle {
@@ -266,7 +266,7 @@ p { margin: 0; }
 .hero-lead { font-size: clamp(17px, 1.7vw, 20px); max-width: 560px; color: rgba(255, 255, 255, 0.9); }
 .hero-price {
   display: inline-flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  font-family: var(--font-title); letter-spacing: 0.04em;
+  font-family: var(--font-title); font-weight: 700; letter-spacing: 0.04em;
 }
 .hero-price small { font-size: 15px; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(255, 255, 255, 0.8); }
 .hero-price strong { font-weight: 400; font-size: clamp(30px, 3.4vw, 40px); }
@@ -325,7 +325,7 @@ p { margin: 0; }
   background: var(--paper); padding: 18px 22px; border-radius: var(--radius); box-shadow: var(--shadow);
   display: grid; gap: 2px; text-align: center; min-width: 150px;
 }
-.intro-media .badge strong { font-family: var(--font-title); font-weight: 400; font-size: 34px; color: var(--maroon); line-height: 1; }
+.intro-media .badge strong { font-family: var(--font-title); font-weight: 700; font-size: 34px; color: var(--maroon); line-height: 1; }
 .intro-media .badge span { font-size: 14px; color: var(--muted); }
 .intro-copy { display: grid; gap: 22px; }
 .intro-copy p { color: var(--muted); }
@@ -343,7 +343,7 @@ p { margin: 0; }
   background: var(--cream); color: var(--maroon); border: 1px solid var(--line);
 }
 .points .ic svg { width: 21px; height: 21px; }
-.points b { display: block; font-family: var(--font-title); text-transform: capitalize; font-weight: 400; font-size: 19px; letter-spacing: 0.02em; color: var(--ink); }
+.points b { display: block; font-family: var(--font-title); font-weight: 700; text-transform: capitalize; font-size: 19px; letter-spacing: 0.02em; color: var(--ink); }
 .points li p { font-size: 16px; color: var(--muted); }
 
 /* Khung ảnh vòm — gợi cửa sổ vòm của mặt tiền */
@@ -389,12 +389,12 @@ p { margin: 0; }
 .mini-prices { margin: 0; display: grid; border-top: 1px solid var(--line); }
 .mini-prices div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
 .mini-prices dt { font-size: 15px; color: var(--muted); }
-.mini-prices dd { margin: 0; font-family: var(--font-title); font-size: 18px; color: var(--maroon); white-space: nowrap; }
+.mini-prices dd { margin: 0; font-family: var(--font-title); font-weight: 700; font-size: 18px; color: var(--maroon); white-space: nowrap; }
 .mini-prices div:first-child dd { font-size: 21px; }
 .room-card .foot .btn { min-height: 42px; padding: 8px 18px; font-size: 14px; }
 .price { display: grid; line-height: 1.2; }
 .price small { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
-.price strong { font-family: var(--font-title); font-weight: 400; font-size: 26px; color: var(--ink); }
+.price strong { font-family: var(--font-title); font-weight: 700; font-size: 26px; color: var(--ink); }
 .price strong sub { font-family: var(--font-body); font-size: 14px; color: var(--muted); vertical-align: baseline; }
 @media (max-width: 1140px) { .rooms-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .rooms-grid { grid-template-columns: 1fr; } }
@@ -409,9 +409,9 @@ p { margin: 0; }
 }
 .price-table thead th small { display: block; font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-size: 12.5px; color: var(--gold-pale); margin-top: 3px; }
 .price-table tbody th { text-align: left; font-weight: 400; }
-.price-table tbody th a { font-family: var(--font-title); text-transform: capitalize; font-size: 19px; color: var(--maroon); text-decoration: none; }
+.price-table tbody th a { font-family: var(--font-title); font-weight: 700; text-transform: capitalize; font-size: 19px; color: var(--maroon); text-decoration: none; }
 .price-table tbody th small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-.price-table td { font-family: var(--font-title); font-size: 18px; white-space: nowrap; }
+.price-table td { font-family: var(--font-title); font-weight: 700; font-size: 18px; white-space: nowrap; }
 .price-table td.hl { background: rgba(243, 230, 189, 0.35); color: var(--maroon); }
 .price-table tbody tr:last-child > * { border-bottom: 0; }
 .price-table tbody tr:hover > * { background: var(--cream); }
@@ -451,7 +451,7 @@ p { margin: 0; }
 .spec-table { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .spec-table div { background: var(--paper); padding: 12px 16px; display: grid; gap: 2px; }
 .spec-table dt { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
-.spec-table dd { margin: 0; font-family: var(--font-title); font-size: 18px; }
+.spec-table dd { margin: 0; font-family: var(--font-title); font-weight: 700; font-size: 18px; }
 .amenities { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; font-size: 16px; }
 .amenities li { display: flex; gap: 10px; align-items: baseline; }
 .amenities li::before { content: ""; width: 6px; height: 6px; transform: rotate(45deg) translateY(-2px); background: var(--gold); flex: none; }
@@ -465,7 +465,7 @@ p { margin: 0; }
 /* ---------- Ưu đãi đặt trực tiếp ---------- */
 .perks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(226, 190, 73, 0.28); border: 1px solid rgba(226, 190, 73, 0.28); }
 .perk { background: var(--maroon-deep); padding: clamp(28px, 3.4vw, 44px); display: grid; gap: 14px; align-content: start; }
-.perk .num { font-family: var(--font-title); font-size: 48px; line-height: 1; }
+.perk .num { font-family: var(--font-title); font-weight: 700; font-size: 48px; line-height: 1; }
 .perk h3 { color: #fff; }
 .perk p { color: rgba(255, 255, 255, 0.78); font-size: 16px; }
 .perks-foot { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center; justify-content: space-between; margin-top: 36px; }
@@ -496,7 +496,7 @@ p { margin: 0; }
 }
 .distances { list-style: none; padding: 0; margin: 0; display: grid; }
 .distances li { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px dashed var(--line); font-size: 16.5px; }
-.distances li span:last-child { font-family: var(--font-title); color: var(--maroon); white-space: nowrap; letter-spacing: 0.02em; }
+.distances li span:last-child { font-family: var(--font-title); font-weight: 700; color: var(--maroon); white-space: nowrap; letter-spacing: 0.02em; }
 .map-frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: var(--sand); aspect-ratio: 4 / 3.4; box-shadow: var(--shadow); }
 .map-frame iframe { width: 100%; height: 100%; border: 0; display: block; filter: sepia(0.18) saturate(0.95); }
 .fine { font-size: 14px; color: var(--muted); font-style: italic; }
@@ -540,7 +540,7 @@ p { margin: 0; }
   padding-block: 36px; border-top: 1px solid var(--line);
 }
 .offer-row:last-child { border-bottom: 1px solid var(--line); }
-.offer-row .date { font-family: var(--font-title); color: var(--maroon); font-size: 20px; line-height: 1.3; }
+.offer-row .date { font-family: var(--font-title); font-weight: 700; color: var(--maroon); font-size: 20px; line-height: 1.3; }
 .offer-row .date small { display: block; font-family: var(--font-body); color: var(--muted); font-size: 14px; margin-top: 6px; }
 .offer-row .content { display: grid; gap: 12px; }
 .offer-row .content ul { margin: 0; padding-left: 1.1em; color: var(--muted); font-size: 16px; display: grid; gap: 4px; }
@@ -552,7 +552,7 @@ p { margin: 0; }
 .faq details { border-bottom: 1px solid var(--line); }
 .faq summary {
   list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 20px; align-items: center;
-  padding: 22px 2px; font-family: var(--font-title); font-size: clamp(19px, 2vw, 22px); letter-spacing: 0.01em;
+  padding: 22px 2px; font-family: var(--font-title); font-weight: 700; font-size: clamp(19px, 2vw, 22px); letter-spacing: 0.01em;
 }
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary::after {
@@ -652,7 +652,7 @@ p { margin: 0; }
 .contact-lines { display: grid; gap: 12px; }
 .contact-lines a, .contact-lines div { display: grid; grid-template-columns: 22px 1fr; gap: 12px; text-decoration: none; color: inherit; font-size: 16px; align-items: start; }
 .contact-lines svg { width: 20px; height: 20px; color: var(--gold); margin-top: 3px; }
-.contact-lines strong { font-family: var(--font-title); font-weight: 400; font-size: 19px; letter-spacing: 0.03em; }
+.contact-lines strong { font-family: var(--font-title); font-weight: 700; font-size: 19px; letter-spacing: 0.03em; }
 
 /* Bảng chính sách */
 .policy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
