@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lora } from "next/font/google";
+import { STIX_Two_Text } from "next/font/google";
 import localFont from "next/font/local";
 import { ContactBar } from "@/components/ContactBar";
 import { Footer } from "@/components/Footer";
@@ -24,10 +24,10 @@ const audrey = localFont({
 });
 
 // Font phụ cho nội dung, tự host qua next/font thay cho thẻ <link> Google Fonts
-const lora = Lora({
+const stix = STIX_Two_Text({
   subsets: ["latin", "vietnamese"],
   style: ["normal", "italic"],
-  variable: "--font-lora",
+  variable: "--font-stix",
   display: "swap",
 });
 
@@ -79,7 +79,7 @@ const hotelJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${audrey.variable} ${lora.variable}`}>
+    <html lang="vi" className={`${audrey.variable} ${stix.variable}`}>
       <head>
         <script
           type="application/ld+json"

@@ -22,7 +22,7 @@
   --line: #e6dbc8;
 
   --font-display: var(--font-audrey), Georgia, serif;
-  --font-body: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-stix), Georgia, "Times New Roman", serif;
 
   --radius: 6px;
   --wrap: 1400px;
