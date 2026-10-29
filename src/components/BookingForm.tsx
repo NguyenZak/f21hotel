@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { submitBooking } from "@/app/actions";
+import { submitBooking } from "@/app/(site)/actions";
 import { groupTypes, initialBookingState, type BookingField, type BookingKind } from "@/lib/booking";
 import { addDays, formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
 import { formatVnd, rooms, site, stayModes, telLink, zaloLink } from "@/lib/site";

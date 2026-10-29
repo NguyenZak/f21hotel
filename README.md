@@ -51,3 +51,27 @@ Form gửi qua Server Action ([src/app/actions.ts](src/app/actions.ts)): kiểm 
 ## Đo lường
 
 [src/lib/track.ts](src/lib/track.ts) gửi các sự kiện `click_call`, `click_zalo`, `submit_booking` tới GA4 / Google Ads khi đã gắn `gtag` (chưa gắn).
+
+## CMS (nhánh `cms`, đang làm)
+
+Trang quản trị: `/admin` (tiếng Việt). Dựng bằng [Payload CMS 3](https://payloadcms.com) chạy chung trong dự án Next.js này.
+
+- **Dữ liệu:** Cloudflare D1. Chạy ở máy thì wrangler tự giả lập, không cần tạo gì trên Cloudflare.
+- **Ảnh:** Cloudinary, qua bộ kết nối tự viết ở [src/payload/cloudinary.ts](src/payload/cloudinary.ts) (gọi REST API bằng `fetch`, chạy được trên Workers). Chưa khai báo `CLOUDINARY_*` thì bản dev lưu ảnh vào `media-uploads/`.
+- **Vai trò:** Chủ, Quản lý, Nhân viên. Bảng quyền ở [src/payload/access.ts](src/payload/access.ts). Tài khoản tạo đầu tiên luôn là Chủ.
+- **Nhật ký thao tác:** mọi thêm, sửa, xoá đều ghi lại người thực hiện ([src/payload/audit.ts](src/payload/audit.ts)).
+- **Bảng dữ liệu:** Tài khoản, Thư viện ảnh, Hạng phòng, Danh sách phòng, Ưu đãi, Đánh giá, Hỏi đáp, Nhật ký; cài đặt chung: Thông tin khách sạn, Giao diện (font).
+
+### Chạy ở máy
+
+```sh
+npm install
+# .env.local: PAYLOAD_SECRET (bắt buộc), SEED_PASSWORD (tuỳ chọn), CLOUDINARY_* (tuỳ chọn)
+npm run seed     # nạp dữ liệu từ src/lib/site.ts vào CMS; có SEED_PASSWORD thì tạo thêm 3 tài khoản thử nghiệm *@f21.test
+npm run dev      # mở http://localhost:3000/admin
+```
+
+Sau khi sửa bảng dữ liệu: `npm run generate:types` và `npm run generate:importmap`.
+
+### Lưu ý khi nâng cấp Payload
+Ba file trong `src/app/(payload)/` do Payload tạo ra đã được sửa thêm `await connection()` (và `export const instant = false` ở trang admin) để chạy với Cache Components của Next.js 16. Nếu Payload tạo lại các file này thì phải thêm lại.

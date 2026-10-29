@@ -15,6 +15,16 @@
 			"service": "f21-hotel-web"
 		}
 	],
+	// CMS: dữ liệu ở D1 (ảnh ở Cloudinary, khai báo qua secret CLOUDINARY_*).
+	// Trước khi deploy lần đầu: `npx wrangler d1 create f21-hotel-cms` rồi thay database_id.
+	// Chạy ở máy thì wrangler tự giả lập D1.
+	"d1_databases": [
+		{
+			"binding": "D1",
+			"database_name": "f21-hotel-cms",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	],
 	"observability": { "enabled": true }
 	// Secret (đặt bằng `npx wrangler secret put BOOKING_WEBHOOK_URL`):
 	//   BOOKING_WEBHOOK_URL — URL Google Apps Script nhận yêu cầu đặt phòng

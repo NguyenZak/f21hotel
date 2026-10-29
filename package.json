@@ -2,6 +2,7 @@
   "name": "f21-hotel-web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,11 +11,23 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "payload": "payload",
+    "generate:importmap": "payload generate:importmap",
+    "generate:types": "payload generate:types",
+    "seed": "payload run src/payload/seed.ts",
+    "migrate": "payload migrate"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.14",
+    "@payloadcms/db-d1-sqlite": "3.92.1",
+    "@payloadcms/next": "3.92.1",
+    "@payloadcms/plugin-cloud-storage": "3.92.1",
+    "@payloadcms/translations": "3.92.1",
+    "@payloadcms/ui": "3.92.1",
+    "graphql": "^16.14.2",
     "next": "16.4.3",
+    "payload": "3.92.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

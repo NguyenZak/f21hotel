@@ -45,3 +45,6 @@ next-env.d.ts
 .wrangler
 .dev.vars
 !.dev.vars.example
+
+# CMS: ảnh tải lên ở máy dev khi chưa cấu hình Cloudinary
+media-uploads/
