@@ -1,9 +1,19 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatVnd, site, telLink, zaloLink, type Room } from "@/lib/site";
+import { formatVnd, site, telLink, zaloLink, type Photo as PhotoData, type Room } from "@/lib/site";
 import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
 
-// Ảnh tạm, thay bằng <Image> khi có ảnh chụp thật
+// Ảnh phủ kín khung chứa; khung tự quy định tỉ lệ qua CSS
+export function Photo({ photo, sizes, priority }: { photo: PhotoData; sizes: string; priority?: boolean }) {
+  return (
+    <div className="photo">
+      <Image src={photo.src} alt={photo.alt} fill sizes={sizes} priority={priority} />
+    </div>
+  );
+}
+
+// Ảnh tạm khi chưa có ảnh chụp thật
 export function Placeholder({ label }: { label: string }) {
   return <div className="ph" data-label={label} role="img" aria-label={label} />;
 }
@@ -73,7 +83,7 @@ export function RoomCard({ room }: { room: Room }) {
   return (
     <article className="room-card">
       <div className="media">
-        <Placeholder label={`Ảnh ${room.name}`} />
+        <Photo photo={room.photos[0]} sizes="(max-width: 640px) 100vw, (max-width: 1140px) 50vw, 25vw" />
       </div>
       <div className="body">
         <h3>{room.name}</h3>

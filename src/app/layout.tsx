@@ -56,7 +56,7 @@ const hotelJsonLd = {
   name: site.name,
   description: site.description,
   url: site.url,
-  image: `${site.url}/img/mat-tien.jpg`,
+  image: `${site.url}/img/anh/mat-tien-ngay.webp`,
   logo: `${site.url}/img/logo-ngang.png`,
   telephone: site.phone,
   email: site.email,

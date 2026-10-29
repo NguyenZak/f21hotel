@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { IconBriefcase, IconCar, IconChat, IconHeart, IconRings, IconTicket, IconTree, IconClock } from "@/components/Icons";
 import { QuickBook } from "@/components/QuickBook";
-import { CtaBand, Faq, RoomCard, SectionHead } from "@/components/ui";
+import { CtaBand, Faq, Photo, RoomCard, SectionHead } from "@/components/ui";
 import { MapEmbed } from "@/components/MapEmbed";
-import { directPerks, distances, faqs, formatVnd, offers, rooms, site, zaloLink } from "@/lib/site";
+import { directPerks, distances, faqs, formatVnd, gallery, offers, rooms, site, zaloLink } from "@/lib/site";
 
 const guestTypes = [
   {
@@ -38,7 +38,15 @@ export default function HomePage() {
     <>
       <section className="hero on-dark">
         <div className="hero-media">
-          <Image src="/img/mat-tien.jpg" alt="Mặt tiền F21 Hotel lúc chiều tối" fill priority sizes="100vw" />
+          <picture>
+            <source media="(max-width: 900px)" srcSet="/img/anh/mat-tien-ngay-1200.webp" />
+            {/* Dùng <picture> để điện thoại tải ảnh nhỏ hơn */}
+            <img
+              src="/img/anh/mat-tien-ngay.webp"
+              alt="Mặt tiền F21 Hotel ở góc đường khu biệt thự Hoa Phượng"
+              fetchPriority="high"
+            />
+          </picture>
         </div>
         <div className="wrap">
           <div className="hero-inner">
@@ -76,12 +84,12 @@ export default function HomePage() {
           <div className="intro-media reveal">
             <div className="arch">
               <Image
-                src="/img/mat-tien-900.jpg"
-                alt="Toà nhà F21 Hotel kiến trúc tân cổ điển với ban công sắt và cửa vòm"
-                width={900}
-                height={605}
-                sizes="(max-width: 900px) 100vw, 50vw"
-                style={{ height: "100%", objectPosition: "50% 40%" }}
+                src="/img/anh/mat-tien-dem.webp"
+                alt="Toà nhà F21 Hotel kiến trúc tân cổ điển lên đèn buổi tối"
+                width={896}
+                height={1195}
+                sizes="(max-width: 900px) 100vw, 45vw"
+                style={{ height: "100%", objectPosition: "50% 45%" }}
               />
             </div>
             <div className="badge">
@@ -172,6 +180,20 @@ export default function HomePage() {
             <Link className="btn btn-gold" href="/dat-phong">
               Gửi yêu cầu đặt phòng
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Thư viện ảnh */}
+      <section className="section">
+        <div className="wrap">
+          <SectionHead eyebrow="Không gian" title="Bên trong F21 Hotel">
+            Sảnh lát đá cẩm thạch, phòng sàn gỗ, cửa sổ vòm nhìn ra hàng cây khu biệt thự.
+          </SectionHead>
+          <div className="gallery reveal-stagger">
+            {gallery.map((photo) => (
+              <Photo key={photo.src} photo={photo} sizes="(max-width: 700px) 50vw, 25vw" />
+            ))}
           </div>
         </div>
       </section>

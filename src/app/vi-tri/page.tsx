@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { IconPlay } from "@/components/Icons";
 import { MapEmbed } from "@/components/MapEmbed";
-import { CtaBand, PageHero, Placeholder, SectionHead } from "@/components/ui";
+import { CtaBand, PageHero, Photo, SectionHead } from "@/components/ui";
 import { distances, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -98,8 +98,19 @@ export default function LocationPage() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 28, aspectRatio: "21 / 6", borderRadius: 6, overflow: "hidden" }}>
-            <Placeholder label="Ảnh lối vào buổi tối · cập nhật sau" />
+          <div className="photo-strip reveal-stagger">
+            <Photo
+              photo={{ src: "/img/anh/duong-vao.webp", alt: "Góc đường trước F21 Hotel trong khu biệt thự Hoa Phượng" }}
+              sizes="(max-width: 700px) 100vw, 33vw"
+            />
+            <Photo
+              photo={{ src: "/img/anh/mat-tien-xa.webp", alt: "F21 Hotel nhìn từ đầu đường nội khu" }}
+              sizes="(max-width: 700px) 100vw, 33vw"
+            />
+            <Photo
+              photo={{ src: "/img/anh/mat-tien-dem.webp", alt: "Mặt tiền F21 Hotel lên đèn buổi tối" }}
+              sizes="(max-width: 700px) 100vw, 33vw"
+            />
           </div>
         </div>
       </section>

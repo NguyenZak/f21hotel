@@ -65,6 +65,8 @@ export const stayModes = [
 
 export type StayModeKey = (typeof stayModes)[number]["key"];
 
+export type Photo = { src: string; alt: string };
+
 export type Room = {
   slug: string;
   name: string;
@@ -74,6 +76,7 @@ export type Room = {
   guests: number;
   prices: Record<StayModeKey, number> & { extraHour: number };
   amenities: string[];
+  photos: Photo[];
 };
 
 // TODO: xác nhận tiện nghi trong phòng (điều hoà, wifi, TV, ban công…)
@@ -90,6 +93,11 @@ export const rooms: Room[] = [
     guests: 2,
     prices: { hourly: 300000, overnight: 600000, fullDay: 900000, extraHour: 50000 },
     amenities: baseAmenities,
+    photos: [
+      { src: "/img/anh/don-1.webp", alt: "Phòng Đơn với giường đôi và vách kính phòng tắm" },
+      { src: "/img/anh/don-2.webp", alt: "Phòng Đơn nhìn từ cửa, có TV và bàn làm việc" },
+      { src: "/img/anh/phong-tam-sen.webp", alt: "Phòng tắm vòi sen vách kính" },
+    ],
   },
   {
     slug: "don-vip",
@@ -101,6 +109,11 @@ export const rooms: Room[] = [
     guests: 2,
     prices: { hourly: 350000, overnight: 700000, fullDay: 1000000, extraHour: 50000 },
     amenities: baseAmenities,
+    photos: [
+      { src: "/img/anh/don-vip-1.webp", alt: "Phòng Đơn VIP với bồn tắm sau vách kính" },
+      { src: "/img/anh/don-vip-2.webp", alt: "Giường Phòng Đơn VIP cạnh bồn tắm" },
+      { src: "/img/anh/phong-tam-bon.webp", alt: "Phòng tắm có bồn tắm" },
+    ],
   },
   {
     slug: "doi",
@@ -112,6 +125,11 @@ export const rooms: Room[] = [
     guests: 3,
     prices: { hourly: 400000, overnight: 750000, fullDay: 1100000, extraHour: 70000 },
     amenities: baseAmenities,
+    photos: [
+      { src: "/img/anh/doi-1.webp", alt: "Phòng Đôi hai giường" },
+      { src: "/img/anh/doi-2.webp", alt: "Phòng Đôi nhìn từ góc khác" },
+      { src: "/img/anh/doi-3.webp", alt: "Phòng Đôi có ghế bành và TV" },
+    ],
   },
   {
     slug: "doi-4",
@@ -123,7 +141,24 @@ export const rooms: Room[] = [
     guests: 4,
     prices: { hourly: 450000, overnight: 800000, fullDay: 1200000, extraHour: 100000 },
     amenities: baseAmenities,
+    photos: [
+      { src: "/img/anh/doi-4-1.webp", alt: "Phòng Đôi 4 người với hai giường lớn" },
+      { src: "/img/anh/doi-4-2.webp", alt: "Phòng Đôi 4 người cạnh cửa sổ vòm" },
+      { src: "/img/anh/doi-4-3.webp", alt: "Phòng Đôi 4 người có phòng tắm vách kính" },
+    ],
   },
+];
+
+// Ảnh không gian chung cho thư viện ảnh trang chủ
+export const gallery: Photo[] = [
+  { src: "/img/anh/sanh-le-tan.webp", alt: "Sảnh lễ tân F21 Hotel lát đá cẩm thạch" },
+  { src: "/img/anh/goc-cua-vom.webp", alt: "Góc ghế cạnh cửa sổ vòm trong phòng" },
+  { src: "/img/anh/sanh-sofa.webp", alt: "Sofa chờ ở sảnh với biển F21 Hotel" },
+  { src: "/img/anh/phong-ban-cong.webp", alt: "Phòng có cửa ra ban công" },
+  { src: "/img/anh/goc-ghe-ban-cong.webp", alt: "Hai ghế bành bên cửa ban công" },
+  { src: "/img/anh/hanh-lang.webp", alt: "Hành lang tầng phòng" },
+  { src: "/img/anh/phong-ghe-co-dien.webp", alt: "Phòng có bộ ghế cổ điển" },
+  { src: "/img/anh/chi-tiet-ban.webp", alt: "Hoa hồng trên bàn làm việc trong phòng" },
 ];
 
 // Ghi chú trên bảng giá

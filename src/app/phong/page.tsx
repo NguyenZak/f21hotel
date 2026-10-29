@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CtaBand, PageHero, Placeholder, SectionHead } from "@/components/ui";
+import { CtaBand, PageHero, Photo, SectionHead } from "@/components/ui";
 import { formatVnd, priceNotes, rooms, site, stayModes } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -100,9 +100,9 @@ export default function RoomsPage() {
           {rooms.map((room) => (
             <article className="room-detail" id={room.slug} key={room.slug} style={{ scrollMarginTop: 90 }}>
               <div className="room-gallery reveal">
-                <Placeholder label={`${room.name} · ảnh chính`} />
-                <Placeholder label="Phòng tắm" />
-                <Placeholder label="Góc phòng" />
+                {room.photos.map((photo, i) => (
+                  <Photo key={photo.src} photo={photo} sizes={i === 0 ? "(max-width: 900px) 66vw, 36vw" : "(max-width: 900px) 33vw, 18vw"} />
+                ))}
               </div>
               <div className="room-info reveal">
                 <span className="eyebrow">Tối đa {room.guests} người</span>
