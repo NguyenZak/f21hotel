@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { STIX_Two_Text } from "next/font/google";
+import { Playfair_Display, STIX_Two_Text } from "next/font/google";
 import localFont from "next/font/local";
 import { ContactBar } from "@/components/ContactBar";
 import { Footer } from "@/components/Footer";
@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-// Font chính của thương hiệu (tiêu đề, nút, nhãn)
+// Font thương hiệu, luôn in hoa: nhãn, nút, menu, giá
 const audrey = localFont({
   src: "./fonts/SVN-Audrey.otf",
   variable: "--font-audrey",
@@ -21,6 +21,13 @@ const audrey = localFont({
         "U+0000-003B, U+003D, U+003F, U+0041-005E, U+0061-007A, U+00A0-00A8, U+00AA-00AD, U+00AF, U+00B1, U+00B3-00B6, U+00B8-00D6, U+00D8-2012, U+2015-2021, U+2023-2025, U+2027-20AB, U+20AD-2121, U+2123-FFFF",
     },
   ],
+});
+
+// Font tiêu đề h1–h4
+const playfair = Playfair_Display({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 // Font phụ cho nội dung, tự host qua next/font thay cho thẻ <link> Google Fonts
@@ -79,7 +86,7 @@ const hotelJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${audrey.variable} ${stix.variable}`}>
+    <html lang="vi" className={`${audrey.variable} ${playfair.variable} ${stix.variable}`}>
       <head>
         <script
           type="application/ld+json"
