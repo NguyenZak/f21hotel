@@ -2,15 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Gallery } from "@/components/Gallery";
 import { CtaBand, PageHero, SectionHead } from "@/components/ui";
-import { formatVnd, priceNotes, rooms, site, stayModes } from "@/lib/site";
+import { getPriceNotes, getRooms, getSite } from "@/lib/cms";
+import { formatVnd, stayModes } from "@/lib/site";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
   title: "Phòng & bảng giá",
   description: `Bảng giá ${site.name}: Phòng Đơn, Đơn VIP, Phòng Đôi 3 và 4 người. Qua đêm từ ${formatVnd(site.priceFrom)}, ngày đêm từ 900.000đ, nghỉ giờ từ 300.000đ.`,
   alternates: { canonical: "/phong" },
-};
+  };
+}
 
-export default function RoomsPage() {
+export default async function RoomsPage() {
+  const [rooms, priceNotes] = await Promise.all([getRooms(), getPriceNotes()]);
   return (
     <>
       <PageHero crumb="Phòng & giá" eyebrow="Phòng & bảng giá" title="Bốn hạng phòng, ba cách nghỉ">

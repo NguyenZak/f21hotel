@@ -803,8 +803,10 @@ html[data-lightbox-open] { overflow: hidden; }
 }
 .faq details[open] summary::after { transform: rotate(-135deg); }
 .faq details p { padding: 0 2px 24px; color: var(--muted); max-width: 72ch; }
-/* Mở, đóng câu trả lời mượt theo chiều cao. Trình duyệt chưa hỗ trợ thì mở bật như cũ */
-@supports (interpolate-size: allow-keywords) and selector(::details-content) {
+/* Mở, đóng câu trả lời mượt theo chiều cao. Trình duyệt chưa hỗ trợ thì mở bật như cũ.
+   Chỉ kiểm tra interpolate-size: bản build webpack (cho Cloudflare) không xử lý được selector() trong @supports;
+   trình duyệt thiếu ::details-content sẽ tự bỏ qua quy tắc dùng nó. */
+@supports (interpolate-size: allow-keywords) {
   .faq details { interpolate-size: allow-keywords; }
   .faq details::details-content {
     block-size: 0; overflow-y: clip;

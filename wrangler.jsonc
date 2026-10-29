@@ -25,6 +25,12 @@
 			"database_id": "00000000-0000-0000-0000-000000000000"
 		}
 	],
+	// Bộ nhớ đệm trang (OpenNext): một KV namespace cho cả hai binding.
+	// Trước khi deploy lần đầu: `npx wrangler kv namespace create f21-hotel-cache` rồi thay id.
+	"kv_namespaces": [
+		{ "binding": "NEXT_INC_CACHE_KV", "id": "00000000000000000000000000000000" },
+		{ "binding": "NEXT_TAG_CACHE_KV", "id": "00000000000000000000000000000000" }
+	],
 	"observability": { "enabled": true }
 	// Secret (đặt bằng `npx wrangler secret put BOOKING_WEBHOOK_URL`):
 	//   BOOKING_WEBHOOK_URL — URL Google Apps Script nhận yêu cầu đặt phòng

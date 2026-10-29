@@ -5,39 +5,33 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Motion } from "@/components/Motion";
 import { motionBootScript } from "@/lib/motion";
-import { site } from "@/lib/site";
-import { theme } from "@/lib/theme";
+import { getSite, getThemeFonts, type SiteData } from "@/lib/cms";
 import { fontVar, fontVariables } from "./fonts";
 import "./globals.css";
 
-// Trỏ từng vai trò chữ vào font đang chọn trong theme (sau này do CMS quyết định)
-const fontRoles = {
-  "--font-role-heading": fontVar(theme.fonts.heading),
-  "--font-role-hero": fontVar(theme.fonts.hero),
-  "--font-role-body": fontVar(theme.fonts.body),
-  "--font-role-ui": fontVar(theme.fonts.ui),
-} as CSSProperties;
-
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: `${site.name} – ${site.tagline} | An Khánh, gần Mỹ Đình`,
-    template: `%s | ${site.name}`,
-  },
-  description: site.description,
-  openGraph: {
-    type: "website",
-    locale: "vi_VN",
-    siteName: site.name,
-  },
-  alternates: { canonical: "/" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
+    metadataBase: new URL(site.url),
+    title: {
+      default: `${site.name} – ${site.tagline} | An Khánh, gần Mỹ Đình`,
+      template: `%s | ${site.name}`,
+    },
+    description: site.description,
+    openGraph: {
+      type: "website",
+      locale: "vi_VN",
+      siteName: site.name,
+    },
+    alternates: { canonical: "/" },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#8d191d",
 };
 
-const hotelJsonLd = {
+const hotelJsonLd = (site: SiteData) => ({
   "@context": "https://schema.org",
   "@type": "Hotel",
   name: site.name,
@@ -62,27 +56,34 @@ const hotelJsonLd = {
     name,
     value: true,
   })),
-};
+});
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const [site, fonts] = await Promise.all([getSite(), getThemeFonts()]);
+  // Trỏ từng vai trò chữ vào font chọn trong CMS (Cài đặt › Giao diện)
+  const fontRoles = {
+    "--font-role-heading": fontVar(fonts.heading),
+    "--font-role-hero": fontVar(fonts.hero),
+    "--font-role-body": fontVar(fonts.body),
+    "--font-role-ui": fontVar(fonts.ui),
+  } as CSSProperties;
+  const contact = { name: site.name, phoneDisplay: site.phoneDisplay, telLink: site.telLink, zaloLink: site.zaloLink };
+
   return (
     // data-motion được script trong <head> gắn trước khi React chạy
     <html lang="vi" className={fontVariables} style={fontRoles} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: motionBootScript }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelJsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelJsonLd(site)) }} />
       </head>
       <body>
         <a className="skip" href="#noi-dung">
           Bỏ qua tới nội dung
         </a>
-        <Header />
+        <Header contact={contact} />
         <main id="noi-dung">{children}</main>
         <Footer />
-        <ContactBar />
+        <ContactBar contact={contact} />
         <Motion />
       </body>
     </html>

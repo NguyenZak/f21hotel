@@ -2,15 +2,21 @@ import type { Metadata } from "next";
 import { BookingForm } from "@/components/BookingForm";
 import { IconChat, IconClock, IconMail, IconPhone, IconPin } from "@/components/Icons";
 import { PageHero, SectionHead } from "@/components/ui";
-import { directPerks, formatVnd, priceNotes, site, stayModes, telLink, zaloLink } from "@/lib/site";
+import { getPriceNotes, getRooms, getSite, toFormContact, toRoomOptions } from "@/lib/cms";
+import { directPerks, formatVnd, stayModes } from "@/lib/site";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
   title: "Đặt phòng & liên hệ",
   description: `Gửi yêu cầu đặt phòng ${site.name}, gọi hotline ${site.phoneDisplay} hoặc nhắn Zalo.`,
   alternates: { canonical: "/dat-phong" },
-};
+  };
+}
 
-export default function BookingPage() {
+export default async function BookingPage() {
+  const [site, priceNotes, rooms] = await Promise.all([getSite(), getPriceNotes(), getRooms()]);
+  const { telLink, zaloLink } = site;
   return (
     <>
       <PageHero crumb="Đặt phòng" eyebrow="Đặt phòng trực tiếp" title="Giữ phòng tại F21 Hotel">
@@ -19,7 +25,7 @@ export default function BookingPage() {
 
       <section className="section">
         <div className="wrap form-layout">
-          <BookingForm />
+          <BookingForm rooms={toRoomOptions(rooms)} contact={toFormContact(site)} />
 
           <aside className="side-stack">
             <div className="side-card">

@@ -9,6 +9,8 @@ import { fileURLToPath } from "url";
 import type { GetPlatformProxyOptions } from "wrangler";
 import { withAudit, withAuditGlobal } from "./payload/audit";
 import { cloudinaryAdapter, cloudinaryConfigFromEnv } from "./payload/cloudinary";
+import { withRevalidate, withRevalidateGlobal } from "./payload/revalidate";
+import { CMS_TAGS } from "./lib/cms-tags";
 import { AuditLogs } from "./payload/collections/AuditLogs";
 import { Faqs, Offers, Reviews, RoomTypes, Rooms } from "./payload/collections/Content";
 import { Media } from "./payload/collections/Media";
@@ -38,18 +40,21 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: " · F21 Hotel CMS" },
   },
-  // Mọi bảng (trừ nhật ký) đều ghi nhật ký thao tác
+  // Mọi bảng (trừ nhật ký) đều ghi nhật ký thao tác; bảng hiển thị trên website thì làm mới trang khi lưu
   collections: [
     withAudit(Users),
-    withAudit(Media),
-    withAudit(RoomTypes),
-    withAudit(Rooms),
-    withAudit(Offers),
-    withAudit(Reviews),
-    withAudit(Faqs),
+    withRevalidate(withAudit(Media), [CMS_TAGS.rooms]),
+    withRevalidate(withAudit(RoomTypes), [CMS_TAGS.rooms]),
+    withRevalidate(withAudit(Rooms), [CMS_TAGS.rooms]),
+    withRevalidate(withAudit(Offers), [CMS_TAGS.offers]),
+    withRevalidate(withAudit(Reviews), [CMS_TAGS.reviews]),
+    withRevalidate(withAudit(Faqs), [CMS_TAGS.faqs]),
     AuditLogs,
   ],
-  globals: [withAuditGlobal(SiteSettings), withAuditGlobal(ThemeSettings)],
+  globals: [
+    withRevalidateGlobal(withAuditGlobal(SiteSettings), [CMS_TAGS.settings]),
+    withRevalidateGlobal(withAuditGlobal(ThemeSettings), [CMS_TAGS.theme]),
+  ],
   // Trang quản trị bằng tiếng Việt
   i18n: { supportedLanguages: { vi }, fallbackLanguage: "vi" },
   secret: process.env.PAYLOAD_SECRET || "",

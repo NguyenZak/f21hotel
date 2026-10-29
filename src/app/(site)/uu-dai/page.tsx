@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/ui";
-import { directPerks, offers, site } from "@/lib/site";
+import { getOffers, getSite } from "@/lib/cms";
+import { directPerks } from "@/lib/site";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
   title: "Ưu đãi",
   description: `Ưu đãi đặt phòng trực tiếp tại ${site.name}: sự kiện Mỹ Đình, mùa cưới, giá doanh nghiệp, Noel và tất niên.`,
   alternates: { canonical: "/uu-dai" },
-};
+  };
+}
 
-export default function OffersPage() {
+export default async function OffersPage() {
+  const offers = await getOffers();
   return (
     <>
       <PageHero crumb="Ưu đãi" eyebrow="Ưu đãi" title="Ưu đãi theo dịp">

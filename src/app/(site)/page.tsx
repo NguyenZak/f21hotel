@@ -5,7 +5,8 @@ import { Gallery } from "@/components/Gallery";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CtaBand, Faq, RoomCard, SectionHead } from "@/components/ui";
 import { MapEmbed } from "@/components/MapEmbed";
-import { directPerks, distances, facadePhotos, faqs, gallery, heroSlides, offers, reviews, rooms, site } from "@/lib/site";
+import { getFaqs, getOffers, getReviews, getRooms, getSite } from "@/lib/cms";
+import { directPerks, distances, facadePhotos, gallery, heroSlides } from "@/lib/site";
 
 const guestTypes = [
   {
@@ -34,7 +35,8 @@ const guestTypes = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [site, rooms, offers, faqs, reviews] = await Promise.all([getSite(), getRooms(), getOffers(), getFaqs(), getReviews()]);
   return (
     <>
       <section className="hero">
@@ -249,7 +251,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Đánh giá: chỉ hiện khi đã nhập đánh giá thật trong site.ts */}
+      {/* Đánh giá: chỉ hiện khi CMS có đánh giá đã duyệt */}
       {reviews.length ? (
         <section className="section" id="danh-gia">
           <div className="wrap">

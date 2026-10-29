@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { telLink, zaloLink } from "@/lib/site";
+import type { Contact } from "@/lib/site";
 import { track } from "@/lib/track";
 import { IconCalendar, IconChat, IconPhone } from "./Icons";
 
 // Thanh Gọi / Zalo / Đặt phòng luôn hiện ở cuối màn hình điện thoại
-export function ContactBar() {
+export function ContactBar({ contact }: { contact: Contact }) {
+  const { telLink, zaloLink } = contact;
   return (
     <nav className="mobile-bar" aria-label="Liên hệ nhanh" style={{ viewTransitionName: "mobile-bar" }}>
       <a href={telLink} onClick={() => track("click_call", { from: "mobile_bar" })}>

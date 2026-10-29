@@ -1,7 +1,8 @@
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/cms";
 
 // Bản đồ Google nhúng, không cần API key
-export function MapEmbed() {
+export async function MapEmbed() {
+  const site = await getSite();
   const src = `https://maps.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=16&hl=vi&output=embed`;
   return (
     <div className="map-frame">

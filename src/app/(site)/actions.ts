@@ -9,7 +9,8 @@ import {
   type BookingValues,
 } from "@/lib/booking";
 import { formatViDate, nightsBetween } from "@/lib/dates";
-import { rooms, stayModes } from "@/lib/site";
+import { getRooms } from "@/lib/cms";
+import { stayModes, type Room } from "@/lib/site";
 
 const FIELDS: BookingField[] = [
   "name",
@@ -54,13 +55,13 @@ export async function submitBooking(_prev: BookingState, formData: FormData): Pr
     return { status: "error", message: "Vui lòng kiểm tra lại các ô được đánh dấu.", errors, values };
   }
 
-  const summary = buildSummary(kind, values);
+  const summary = buildSummary(kind, values, await getRooms());
   const delivered = await deliver(kind, values, summary);
 
   return { status: "ok", summary, delivered, values: {} };
 }
 
-function buildSummary(kind: BookingKind, v: BookingValues) {
+function buildSummary(kind: BookingKind, v: BookingValues, rooms: Room[]) {
   const nights = nightsBetween(v.checkIn!, v.checkOut!);
   const roomName = rooms.find((r) => r.slug === v.room)?.name;
   const stay = stayModes.find((m) => m.key === v.stayType)?.label;

@@ -52,6 +52,9 @@ export const reviews: Review[] = [
   // { name: "Nguyễn A.", text: "Phòng sạch, yên tĩnh…", rating: 5, source: "Google Maps", date: "10/2026" },
 ];
 
+// Thông tin liên hệ truyền từ layout (đọc từ CMS) xuống các component chạy ở trình duyệt
+export type Contact = { name: string; phoneDisplay: string; telLink: string; zaloLink: string };
+
 export const zaloLink = `https://zalo.me/${site.zalo}`;
 export const telLink = `tel:${site.phone}`;
 

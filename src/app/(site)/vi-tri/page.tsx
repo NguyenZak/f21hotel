@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
 import { CtaBand, PageHero, SectionHead } from "@/components/ui";
-import { distances, locationPhotos, site } from "@/lib/site";
+import { getSite } from "@/lib/cms";
+import { distances, locationPhotos } from "@/lib/site";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
   title: "Vị trí & chỉ đường",
   description: `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool, gần cổng 1 Vinhomes Thăng Long. Cách SVĐ Mỹ Đình khoảng 15–20 phút.`,
   alternates: { canonical: "/vi-tri" },
-};
+  };
+}
 
 // TODO: điền tên quán cụ thể sau khi khảo sát thực tế quanh khách sạn
 const nearby = [
@@ -26,7 +30,8 @@ const nearby = [
   },
 ];
 
-export default function LocationPage() {
+export default async function LocationPage() {
+  const site = await getSite();
   return (
     <>
       <PageHero crumb="Vị trí" eyebrow="Vị trí & chỉ đường" title="Trong khu biệt thự Hoa Phượng, cạnh Vinschool">

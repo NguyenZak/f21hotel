@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import { BookingForm } from "@/components/BookingForm";
 import { IconBriefcase, IconRings, IconTicket } from "@/components/Icons";
 import { PageHero, SectionHead } from "@/components/ui";
-import { formatVnd, priceNotes, site } from "@/lib/site";
+import { getPriceNotes, getRooms, getSite, toFormContact, toRoomOptions, type PriceNotes } from "@/lib/cms";
+import { formatVnd } from "@/lib/site";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
   title: "Khách đoàn & doanh nghiệp",
   description: `Khối phòng cưới hỏi, đoàn công tác và ở dài ngày tại ${site.name}, khu biệt thự Hoa Phượng, An Khánh. Giảm tới 15% khi ở dài ngày.`,
   alternates: { canonical: "/doan-doanh-nghiep" },
-};
+  };
+}
 
-const tiers = [
+const tiersFor = (priceNotes: PriceNotes) => [
   {
     icon: IconRings,
     title: "Khối phòng cưới hỏi",
@@ -41,7 +45,9 @@ const tiers = [
   },
 ]; // TODO: xác nhận điều kiện từng gói
 
-export default function GroupsPage() {
+export default async function GroupsPage() {
+  const [priceNotes, rooms, site] = await Promise.all([getPriceNotes(), getRooms(), getSite()]);
+  const tiers = tiersFor(priceNotes);
   return (
     <>
       <PageHero crumb="Khách đoàn" eyebrow="Khách đoàn & doanh nghiệp" title="Nhiều phòng, một đầu mối">
@@ -72,7 +78,7 @@ export default function GroupsPage() {
 
       <section className="section cream">
         <div className="wrap form-layout">
-          <BookingForm kind="group" />
+          <BookingForm kind="group" rooms={toRoomOptions(rooms)} contact={toFormContact(site)} />
           <aside className="side-stack">
             <div className="side-card">
               <h3>Vì sao đoàn chọn F21</h3>

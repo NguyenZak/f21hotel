@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { nav, site, telLink, zaloLink } from "@/lib/site";
+import { getSite } from "@/lib/cms";
+import { nav } from "@/lib/site";
 
-export function Footer() {
+export async function Footer() {
+  const site = await getSite();
+  const { telLink, zaloLink } = site;
   const socials = [
     { label: "Facebook", href: site.social.facebook },
     { label: "TikTok", href: site.social.tiktok },

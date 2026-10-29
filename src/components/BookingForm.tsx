@@ -4,13 +4,16 @@ import { useActionState, useEffect, useState } from "react";
 import { submitBooking } from "@/app/(site)/actions";
 import { groupTypes, initialBookingState, type BookingField, type BookingKind } from "@/lib/booking";
 import { addDays, formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
-import { formatVnd, rooms, site, stayModes, telLink, zaloLink } from "@/lib/site";
+import { formatVnd, stayModes, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
 import { IconChat, IconCheck, IconPhone } from "./Icons";
 
-type Props = { kind?: BookingKind };
+// Hạng phòng rút gọn cho ô chọn phòng; contact lấy từ CMS ở trang cha
+export type RoomOption = { slug: string; name: string; guests: number; overnight: number };
+type Props = { kind?: BookingKind; rooms: RoomOption[]; contact: Contact & { replyHours: string } };
 
-export function BookingForm({ kind = "booking" }: Props) {
+export function BookingForm({ kind = "booking", rooms, contact }: Props) {
+  const { telLink, zaloLink, phoneDisplay, replyHours } = contact;
   const [state, formAction, pending] = useActionState(submitBooking, initialBookingState);
   const [today, setToday] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -31,7 +34,8 @@ export function BookingForm({ kind = "booking" }: Props) {
     if (q.get("guests")) setGuests(q.get("guests")!);
     if (q.get("code")) setCode(q.get("code")!.toUpperCase());
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+    // rooms đến từ máy chủ và không đổi sau khi tải trang, nên effect chỉ chạy một lần
+  }, [rooms]);
 
   useEffect(() => {
     if (state.status === "ok") {
@@ -174,7 +178,7 @@ export function BookingForm({ kind = "booking" }: Props) {
                     <option value="">Chưa chọn, nhờ lễ tân tư vấn</option>
                     {rooms.map((r) => (
                       <option key={r.slug} value={r.slug}>
-                        {r.name} – {r.guests} người – qua đêm {formatVnd(r.prices.overnight)}
+                        {r.name} – {r.guests} người – qua đêm {formatVnd(r.overnight)}
                       </option>
                     ))}
                   </select>
@@ -249,7 +253,7 @@ export function BookingForm({ kind = "booking" }: Props) {
               {pending ? "Đang gửi…" : isGroup ? "Gửi yêu cầu báo giá" : "Gửi yêu cầu đặt phòng"}
             </button>
             <p className="fine">
-              Hoặc gọi ngay <a href={telLink}>{site.phoneDisplay}</a> · Thông tin chỉ dùng để liên hệ đặt phòng.
+              Hoặc gọi ngay <a href={telLink}>{phoneDisplay}</a> · Thông tin chỉ dùng để liên hệ đặt phòng.
             </p>
           </div>
         </form>
@@ -261,7 +265,7 @@ export function BookingForm({ kind = "booking" }: Props) {
         </span>
         <h2>Cảm ơn bạn!</h2>
         {state.delivered ? (
-          <p>F21 đã nhận yêu cầu. Lễ tân sẽ liên hệ lại trong khoảng 15 phút ({site.replyHours}).</p>
+          <p>F21 đã nhận yêu cầu. Lễ tân sẽ liên hệ lại trong khoảng 15 phút ({replyHours}).</p>
         ) : (
           <p>Bấm “Gửi qua Zalo” để chuyển yêu cầu này cho lễ tân. Nội dung đã được soạn sẵn bên dưới.</p>
         )}

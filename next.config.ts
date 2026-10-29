@@ -12,6 +12,16 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
   // Gói có mã riêng cho Cloudflare Workers (theo mẫu Payload cho Cloudflare)
   serverExternalPackages: ["jose", "pg-cloudflare"],
+  // Bản cho Cloudflare build bằng webpack (như mẫu Payload): Turbopack đổi tên gói ngoài
+  // (vd. drizzle-kit) kèm mã băm nên OpenNext không đóng gói được
+  webpack: (webpackConfig: { resolve: { extensionAlias?: Record<string, string[]> } }) => {
+    webpackConfig.resolve.extensionAlias = {
+      ".cjs": [".cts", ".cjs"],
+      ".js": [".ts", ".tsx", ".js", ".jsx"],
+      ".mjs": [".mts", ".mjs"],
+    };
+    return webpackConfig;
+  },
 };
 
 // withPayload gắn trang quản trị /admin và API của CMS vào Next.js

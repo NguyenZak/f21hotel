@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { nav, site, telLink, zaloLink } from "@/lib/site";
+import { nav, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
 import { IconChat, IconPhone } from "./Icons";
 
-export function Header() {
+export function Header({ contact }: { contact: Contact }) {
+  const { name, phoneDisplay, telLink, zaloLink } = contact;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -31,7 +32,7 @@ export function Header() {
     // Tên view-transition giữ header đứng yên khi chuyển trang
     <header className={`site-header${open ? " menu-open" : ""}`} style={{ viewTransitionName: "site-header" }}>
       <div className="wrap">
-        <Link href="/" className="brand" aria-label={`${site.name} – Trang chủ`}>
+        <Link href="/" className="brand" aria-label={`${name} – Trang chủ`}>
           <Image src="/img/logo-ngang.png" alt="" width={673} height={221} priority />
         </Link>
 
@@ -50,7 +51,7 @@ export function Header() {
               Đặt phòng
             </Link>
             <a className="btn btn-ghost btn-block" href={telLink} onClick={() => track("click_call", { from: "menu" })}>
-              <IconPhone /> {site.phoneDisplay}
+              <IconPhone /> {phoneDisplay}
             </a>
             <a
               className="btn btn-ghost btn-block"
@@ -67,7 +68,7 @@ export function Header() {
         <div className="header-cta">
           <a className="header-phone" href={telLink} onClick={() => track("click_call", { from: "header" })}>
             <small>Hotline đặt phòng</small>
-            <strong>{site.phoneDisplay}</strong>
+            <strong>{phoneDisplay}</strong>
           </a>
           <Link className="btn btn-gold" href="/dat-phong">
             Đặt phòng

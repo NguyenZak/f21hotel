@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatVnd, site, telLink, zaloLink, type Photo as PhotoData, type Room } from "@/lib/site";
+import { getSite } from "@/lib/cms";
+import { formatVnd, type Photo as PhotoData, type Room } from "@/lib/site";
 import { Gallery } from "./Gallery";
 import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
 
@@ -125,7 +126,8 @@ export function RoomCard({ room }: { room: Room }) {
   );
 }
 
-export function CtaBand({ title, children }: { title: ReactNode; children?: ReactNode }) {
+export async function CtaBand({ title, children }: { title: ReactNode; children?: ReactNode }) {
+  const { phoneDisplay, telLink, zaloLink } = await getSite();
   return (
     <section className="section tight cta-band on-dark">
       <div className="wrap reveal">
@@ -140,7 +142,7 @@ export function CtaBand({ title, children }: { title: ReactNode; children?: Reac
             <IconChat /> Nhắn Zalo
           </a>
           <a className="btn btn-ghost" href={telLink}>
-            <IconPhone /> {site.phoneDisplay}
+            <IconPhone /> {phoneDisplay}
           </a>
         </div>
       </div>
