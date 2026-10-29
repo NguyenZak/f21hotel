@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 import { formatVnd, site, telLink, zaloLink, type Photo as PhotoData, type Room } from "@/lib/site";
 import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
 
-// Ảnh phủ kín khung chứa; khung tự quy định tỉ lệ qua CSS
+// Ảnh hiển thị đúng tỉ lệ gốc của file
 export function Photo({ photo, sizes, priority }: { photo: PhotoData; sizes: string; priority?: boolean }) {
   return (
     <div className="photo">
-      <Image src={photo.src} alt={photo.alt} fill sizes={sizes} priority={priority} />
+      <Image src={photo.src} alt={photo.alt} width={photo.w} height={photo.h} sizes={sizes} priority={priority} />
     </div>
   );
 }

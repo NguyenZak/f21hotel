@@ -230,20 +230,35 @@ p { margin: 0; }
   color: #fff;
   padding: 48px 0 clamp(36px, 7vw, 80px);
 }
-.hero-media { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
-.hero-media picture { display: contents; }
-.hero-media img {
-  width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%;
-  animation: hero-zoom 18s var(--ease) both;
-}
+.hero-media { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: var(--maroon-ink); }
+/* Mỗi slide chồng lên nhau, slide đang chọn hiện dần */
+.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s var(--ease); }
+.hero-slide.active { opacity: 1; }
+.hero-slide img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.hero-slide.active img { animation: hero-zoom 8s linear both; }
 @keyframes hero-zoom { from { transform: scale(1.08); } to { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .hero-media picture { display: contents; }
-.hero-media img { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide { transition: none; }
+  .hero-slide.active img { animation: none; }
+}
+
+/* Chấm chuyển ảnh, thanh vàng chạy theo thời gian tự chuyển */
+.hero-dots { position: absolute; right: var(--gutter); bottom: clamp(24px, 4vw, 40px); display: flex; gap: 8px; z-index: 1; }
+.hero-dots button {
+  width: 42px; height: 22px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; align-items: center;
+}
+.hero-dots span { display: block; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.35); position: relative; overflow: hidden; }
+.hero-dots span::after { content: ""; position: absolute; inset: 0; background: var(--gold-light); transform: scaleX(0); transform-origin: left; }
+.hero-dots .active span::after { transform: scaleX(1); }
+.hero-dots .active span[style]::after { animation: dot-fill linear both; animation-duration: inherit; }
+@keyframes dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (max-width: 900px) { .hero-dots { left: var(--gutter); right: auto; bottom: 18px; } }
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background:
     linear-gradient(0deg, rgba(36, 7, 9, 0.92) 0%, rgba(36, 7, 9, 0.55) 38%, rgba(36, 7, 9, 0.05) 70%),
-    linear-gradient(90deg, rgba(36, 7, 9, 0.55) 0%, rgba(36, 7, 9, 0) 60%);
+    linear-gradient(90deg, rgba(36, 7, 9, 0.7) 0%, rgba(36, 7, 9, 0.25) 55%, rgba(36, 7, 9, 0) 75%);
 }
 @media (max-width: 900px) {
   /* Ảnh ban ngày khá sáng: phủ tối đều hơn để chữ dễ đọc trên điện thoại */
@@ -310,7 +325,7 @@ p { margin: 0; }
 /* ---------- Giới thiệu ---------- */
 .intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(36px, 6vw, 88px); align-items: center; }
 .intro-media { position: relative; }
-.intro-media .arch { aspect-ratio: 4 / 5; }
+.intro-media .arch { aspect-ratio: 896 / 1195; }
 .intro-media .badge {
   position: absolute; right: -18px; bottom: 36px;
   background: var(--paper); padding: 18px 22px; border-radius: var(--radius); box-shadow: var(--shadow);
@@ -341,29 +356,60 @@ p { margin: 0; }
 .arch { border-radius: 999px 999px var(--radius) var(--radius); overflow: hidden; position: relative; background: var(--sand); }
 .arch img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Ảnh thật, phủ kín khung */
-.photo { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--sand); }
-.photo img { object-fit: cover; }
+/* Ảnh thật, giữ đúng tỉ lệ gốc */
+.photo { overflow: hidden; background: var(--sand); }
+.photo img, .photo-btn img { display: block; width: 100%; height: auto; }
 
-/* Thư viện ảnh trang chủ */
-.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(160px, 17vw, 250px); gap: 12px; }
-.gallery .photo { border-radius: var(--radius); }
-.gallery .photo img { transition: transform 0.6s var(--ease); }
-.gallery .photo:hover img { transform: scale(1.04); }
-.gallery > :nth-child(1) { grid-row: span 2; }
-.gallery > :nth-child(2) { grid-column: span 2; }
-.gallery > :nth-child(5) { grid-column: span 2; }
-.gallery > :nth-child(7) { grid-column: span 2; }
-@media (max-width: 700px) {
-  .gallery { grid-template-columns: 1fr 1fr; grid-auto-rows: 150px; gap: 8px; }
-  .gallery > :nth-child(2), .gallery > :nth-child(5), .gallery > :nth-child(7) { grid-column: span 1; }
-  .gallery > :last-child { grid-column: span 2; }
+/* Ảnh bấm được để mở gallery */
+.photo-btn {
+  display: block; width: 100%; padding: 0; border: 0; background: var(--sand);
+  border-radius: var(--radius); overflow: hidden; cursor: zoom-in;
 }
+.photo-btn img { transition: transform 0.6s var(--ease); }
+.photo-btn:hover img { transform: scale(1.03); }
 
-/* Dải 3 ảnh ở trang Vị trí */
-.photo-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
-.photo-strip .photo { aspect-ratio: 3 / 4; border-radius: var(--radius); }
-@media (max-width: 700px) { .photo-strip { grid-template-columns: 1fr; } .photo-strip .photo { aspect-ratio: 4 / 3; } }
+/* Thư viện ảnh trang chủ: xếp gạch theo cột, ảnh giữ tỉ lệ */
+.gallery { columns: 4 220px; column-gap: 12px; }
+.gallery .photo-btn { break-inside: avoid; margin-bottom: 12px; }
+@media (max-width: 700px) { .gallery { columns: 2; column-gap: 8px; } .gallery .photo-btn { margin-bottom: 8px; } }
+
+/* Ảnh phòng: ảnh chính rộng hết khung, hai ảnh nhỏ bên dưới */
+.room-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+.room-gallery > :first-child { grid-column: 1 / -1; }
+
+/* Ba ảnh ở trang Vị trí */
+.photo-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; align-items: start; }
+@media (max-width: 700px) { .photo-strip { grid-template-columns: 1fr; } }
+
+/* Xem ảnh toàn màn hình */
+html[data-lightbox-open] { overflow: hidden; }
+.lightbox {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0;
+  background: rgba(20, 5, 6, 0.94); color: #fff; overflow: hidden;
+}
+.lightbox::backdrop { background: rgba(20, 5, 6, 0.6); }
+.lightbox[open] { display: grid; place-items: center; animation: lb-in 0.25s var(--ease); }
+@keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+.lightbox figure { margin: 0; display: grid; gap: 12px; justify-items: center; padding: 56px 72px 24px; width: 100%; height: 100%; align-content: center; }
+.lightbox figure img { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 140px); object-fit: contain; border-radius: 4px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.7); }
+.lightbox figcaption { display: flex; gap: 16px; justify-content: center; align-items: baseline; flex-wrap: wrap; font-size: 15px; color: rgba(255, 255, 255, 0.82); text-align: center; }
+.lightbox .count { color: var(--gold-light); font-weight: 700; white-space: nowrap; }
+.lb-close, .lb-nav {
+  position: absolute; display: grid; place-items: center;
+  width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08); color: #fff; font: 400 32px/1 var(--font-body); cursor: pointer;
+  transition: background 0.2s;
+}
+.lb-close:hover, .lb-nav:hover { background: rgba(255, 255, 255, 0.2); }
+.lb-close { top: 16px; right: 16px; font-size: 30px; }
+.lb-nav { top: 50%; transform: translateY(-50%); font-size: 40px; padding-bottom: 4px; }
+.lb-nav.prev { left: 16px; }
+.lb-nav.next { right: 16px; }
+@media (max-width: 700px) {
+  .lightbox figure { padding: 64px 12px 20px; }
+  .lb-nav { top: auto; bottom: 18px; transform: none; width: 46px; height: 46px; }
+  .lightbox figure img { max-height: calc(100dvh - 190px); }
+}
 
 /* Ảnh tạm khi chưa có ảnh chụp thật */
 .ph {
@@ -394,7 +440,7 @@ p { margin: 0; }
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 .room-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.room-card .media { aspect-ratio: 4 / 3; overflow: hidden; }
+.room-card .media { overflow: hidden; }
 .room-card .media .photo img { transition: transform 0.6s var(--ease); }
 .room-card:hover .media .photo img { transform: scale(1.05); }
 .room-card .body { display: grid; gap: 14px; padding: 24px 24px 26px; align-content: start; }
@@ -458,10 +504,6 @@ p { margin: 0; }
 }
 .room-detail:first-of-type { border-top: 0; }
 .room-detail:nth-of-type(even) .room-gallery { order: 2; }
-.room-gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; aspect-ratio: 3 / 2; }
-.room-gallery > :first-child { grid-row: span 2; }
-.room-gallery .ph, .room-gallery .photo { border-radius: var(--radius); }
-.room-gallery .ph::after { font-size: 10px; bottom: 10px; }
 .room-info { display: grid; gap: 20px; }
 .room-info h2 { font-size: clamp(30px, 3.6vw, 42px); }
 .room-info > p { color: var(--muted); }
