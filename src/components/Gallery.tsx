@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, ViewTransition } from "react";
 import type { Photo } from "@/lib/site";
 
 type Props = {
@@ -10,21 +10,36 @@ type Props = {
   // sizes cho ảnh đầu tiên (thường hiển thị lớn hơn) và các ảnh còn lại
   leadSizes?: string;
   sizes: string;
+  // Tên view-transition cho ảnh đầu tiên, để ảnh cùng tên ở trang trước bay sang đây
+  leadTransitionName?: string;
+  // Chỉ hiện N ảnh đầu làm ảnh xem trước; lightbox vẫn duyệt toàn bộ album
+  visible?: number;
+  // Thêm vào ảnh xem trước, ví dụ nhãn "+5 ảnh"
+  badge?: string;
 };
 
 // Lưới ảnh giữ đúng tỉ lệ gốc; bấm vào ảnh mở xem toàn màn hình
-export function Gallery({ photos, className, leadSizes, sizes }: Props) {
+export function Gallery({ photos, className, leadSizes, sizes, leadTransitionName, visible, badge }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [index, setIndex] = useState(0);
+  // Hướng chuyển ảnh trong lightbox: 0 khi vừa mở, 1 ảnh sau, -1 ảnh trước
+  const [dir, setDir] = useState(0);
   const touchX = useRef<number | null>(null);
 
   const open = (i: number) => {
     setIndex(i);
+    setDir(0);
     dialogRef.current?.showModal();
     document.documentElement.toggleAttribute("data-lightbox-open", true);
   };
   const close = () => dialogRef.current?.close();
-  const step = useCallback((d: number) => setIndex((i) => (i + d + photos.length) % photos.length), [photos.length]);
+  const step = useCallback(
+    (d: number) => {
+      setDir(d);
+      setIndex((i) => (i + d + photos.length) % photos.length);
+    },
+    [photos.length],
+  );
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -47,23 +62,33 @@ export function Gallery({ photos, className, leadSizes, sizes }: Props) {
   return (
     <>
       <div className={className}>
-        {photos.map((photo, i) => (
-          <button
-            type="button"
-            className="photo-btn"
-            key={photo.src}
-            onClick={() => open(i)}
-            aria-label={`Xem ảnh lớn: ${photo.alt}`}
-          >
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              width={photo.w}
-              height={photo.h}
-              sizes={i === 0 && leadSizes ? leadSizes : sizes}
-            />
-          </button>
-        ))}
+        {photos.slice(0, visible ?? photos.length).map((photo, i) => {
+          const button = (
+            <button
+              type="button"
+              className="photo-btn"
+              key={photo.src}
+              onClick={() => open(i)}
+              aria-label={`Xem ảnh lớn: ${photo.alt}`}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                width={photo.w}
+                height={photo.h}
+                sizes={i === 0 && leadSizes ? leadSizes : sizes}
+              />
+              {badge && i === 0 ? <span className="photo-badge">{badge}</span> : null}
+            </button>
+          );
+          return i === 0 && leadTransitionName ? (
+            <ViewTransition key={photo.src} name={leadTransitionName} share="morph" default="none">
+              {button}
+            </ViewTransition>
+          ) : (
+            button
+          );
+        })}
       </div>
 
       <dialog
@@ -80,7 +105,7 @@ export function Gallery({ photos, className, leadSizes, sizes }: Props) {
           touchX.current = null;
         }}
       >
-        <figure onClick={(e) => e.target === e.currentTarget && close()}>
+        <figure data-dir={dir} onClick={(e) => e.target === e.currentTarget && close()}>
           <Image
             key={current.src}
             src={current.src}
@@ -89,7 +114,7 @@ export function Gallery({ photos, className, leadSizes, sizes }: Props) {
             height={current.h}
             sizes="92vw"
           />
-          <figcaption>
+          <figcaption key={`caption-${current.src}`}>
             <span>{current.alt}</span>
             <span className="count">
               {index + 1} / {photos.length}

@@ -3,6 +3,11 @@ import Link from "next/link";
 import { nav, site, telLink, zaloLink } from "@/lib/site";
 
 export function Footer() {
+  const socials = [
+    { label: "Facebook", href: site.social.facebook },
+    { label: "TikTok", href: site.social.tiktok },
+  ].filter((x) => x.href);
+
   return (
     <footer className="site-footer">
       <div className="wrap">
@@ -13,7 +18,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4>Khám phá</h4>
+            <h2 className="footer-title">Khám phá</h2>
             <ul>
               {nav.map((item) => (
                 <li key={item.href}>
@@ -27,7 +32,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4>Liên hệ</h4>
+            <h2 className="footer-title">Liên hệ</h2>
             <ul>
               <li>
                 <a href={telLink}>Hotline: {site.phoneDisplay}</a>
@@ -40,23 +45,26 @@ export function Footer() {
               <li>
                 <a href={`tel:${site.feedbackPhone}`}>Phản ánh dịch vụ: {site.feedbackPhoneDisplay}</a>
               </li>
-              <li>
-                <a href={`mailto:${site.email}`}>{site.email}</a>
-              </li>
-              <li>
-                <a href={site.social.facebook} target="_blank" rel="noopener">
-                  Facebook
-                </a>{" "}
-                ·{" "}
-                <a href={site.social.tiktok} target="_blank" rel="noopener">
-                  TikTok
-                </a>
-              </li>
+              {/* Mục chưa có dữ liệu trong site.ts thì ẩn, tránh link trống hoặc sai */}
+              {site.email ? (
+                <li>
+                  <a href={`mailto:${site.email}`}>{site.email}</a>
+                </li>
+              ) : null}
+              {socials.length ? (
+                <li className="footer-social">
+                  {socials.map((x) => (
+                    <a key={x.label} href={x.href} target="_blank" rel="noopener">
+                      {x.label}
+                    </a>
+                  ))}
+                </li>
+              ) : null}
             </ul>
           </div>
 
           <div>
-            <h4>Địa chỉ</h4>
+            <h2 className="footer-title">Địa chỉ</h2>
             <ul>
               <li>{site.address.full}</li>
               <li style={{ fontStyle: "italic" }}>{site.directions}</li>

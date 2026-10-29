@@ -1,30 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { STIX_Two_Text } from "next/font/google";
-import localFont from "next/font/local";
+import type { CSSProperties } from "react";
 import { ContactBar } from "@/components/ContactBar";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Motion } from "@/components/Motion";
+import { motionBootScript } from "@/lib/motion";
 import { site } from "@/lib/site";
+import { theme } from "@/lib/theme";
+import { fontVar, fontVariables } from "./fonts";
 import "./globals.css";
 
-// Font tiêu đề h1–h4: Trajan Pro 3, đã cắt chỉ giữ chữ Latin và tiếng Việt, định dạng woff2
-const heading = localFont({
-  src: [
-    { path: "./fonts/trajan-pro-3-regular.woff2", weight: "400" },
-    { path: "./fonts/trajan-pro-3-semibold.woff2", weight: "600" },
-    { path: "./fonts/trajan-pro-3-bold.woff2", weight: "700" },
-  ],
-  variable: "--font-trajan",
-  display: "swap",
-});
-
-// Font nội dung; giá và số dùng nét đậm. Tự host qua next/font thay cho thẻ <link> Google Fonts
-const stix = STIX_Two_Text({
-  subsets: ["latin", "vietnamese"],
-  style: ["normal", "italic"],
-  variable: "--font-stix",
-  display: "swap",
-});
+// Trỏ từng vai trò chữ vào font đang chọn trong theme (sau này do CMS quyết định)
+const fontRoles = {
+  "--font-role-heading": fontVar(theme.fonts.heading),
+  "--font-role-hero": fontVar(theme.fonts.hero),
+  "--font-role-body": fontVar(theme.fonts.body),
+  "--font-role-ui": fontVar(theme.fonts.ui),
+} as CSSProperties;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -54,7 +46,7 @@ const hotelJsonLd = {
   image: `${site.url}/img/anh/mat-tien-ngay.webp`,
   logo: `${site.url}/img/logo-ngang.png`,
   telephone: site.phone,
-  email: site.email,
+  ...(site.email ? { email: site.email } : {}),
   priceRange: "300.000đ – 1.200.000đ",
   checkinTime: site.checkIn,
   checkoutTime: site.checkOut,
@@ -74,8 +66,10 @@ const hotelJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${heading.variable} ${stix.variable}`}>
+    // data-motion được script trong <head> gắn trước khi React chạy
+    <html lang="vi" className={fontVariables} style={fontRoles} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: motionBootScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelJsonLd) }}
@@ -89,6 +83,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main id="noi-dung">{children}</main>
         <Footer />
         <ContactBar />
+        <Motion />
       </body>
     </html>
   );

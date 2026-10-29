@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatVnd, site, telLink, zaloLink, type Photo as PhotoData, type Room } from "@/lib/site";
+import { Gallery } from "./Gallery";
 import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
 
 // Ảnh hiển thị đúng tỉ lệ gốc của file
@@ -83,7 +84,15 @@ export function RoomCard({ room }: { room: Room }) {
   return (
     <article className="room-card">
       <div className="media">
-        <Photo photo={room.photos[0]} sizes="(max-width: 640px) 100vw, (max-width: 1140px) 50vw, 25vw" />
+        {/* Bấm ảnh mở album của phòng. leadTransitionName cùng tên với ảnh lớn ở trang Phòng:
+            khi chuyển trang ảnh bay sang vị trí mới */}
+        <Gallery
+          photos={room.photos}
+          visible={1}
+          badge={`${room.photos.length} ảnh`}
+          leadTransitionName={`room-${room.slug}`}
+          sizes="(max-width: 640px) 100vw, (max-width: 1140px) 50vw, 25vw"
+        />
       </div>
       <div className="body">
         <h3>{room.name}</h3>

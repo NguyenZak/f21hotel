@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { IconPlay } from "@/components/Icons";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
 import { CtaBand, PageHero, SectionHead } from "@/components/ui";
@@ -73,14 +72,25 @@ export default function LocationPage() {
               Thời gian đi ô tô hoặc xe máy lúc đường thông thoáng. Ngày có sự kiện ở Mỹ Đình nên đi sớm hơn 30 phút.
             </p>
           </div>
-          {/* TODO: thay bằng video 30 giây quay đường từ Lê Trọng Tấn vào tới cửa, cả ban ngày và buổi tối */}
-          <div className="video-ph reveal">
-            <div className="ph" data-label="Video đường vào · cập nhật sau">
-              <span className="play">
-                <IconPlay />
-              </span>
+          {/* Có video đường vào (site.entranceVideo) thì hiện video; chưa có thì hiện album ảnh đường vào */}
+          {site.entranceVideo ? (
+            <div className="video-frame reveal">
+              {site.entranceVideo.endsWith(".mp4") ? (
+                <video src={site.entranceVideo} controls playsInline preload="metadata" />
+              ) : (
+                <iframe src={site.entranceVideo} title="Video đường vào F21 Hotel" loading="lazy" allowFullScreen />
+              )}
             </div>
-          </div>
+          ) : (
+            <div className="reveal">
+              <Gallery
+                photos={locationPhotos}
+                visible={1}
+                badge={`${locationPhotos.length} ảnh`}
+                sizes="(max-width: 900px) 100vw, 45vw"
+              />
+            </div>
+          )}
         </div>
       </section>
 
@@ -99,7 +109,6 @@ export default function LocationPage() {
               </div>
             ))}
           </div>
-          <Gallery photos={locationPhotos} className="photo-strip reveal-stagger" sizes="(max-width: 700px) 100vw, 33vw" />
         </div>
       </section>
 

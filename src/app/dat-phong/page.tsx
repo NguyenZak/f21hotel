@@ -41,10 +41,12 @@ export default function BookingPage() {
                     Trả lời trong 15 phút, {site.replyHours}
                   </span>
                 </a>
-                <a href={`mailto:${site.email}`}>
-                  <IconMail />
-                  <span>{site.email}</span>
-                </a>
+                {site.email ? (
+                  <a href={`mailto:${site.email}`}>
+                    <IconMail />
+                    <span>{site.email}</span>
+                  </a>
+                ) : null}
                 <a href={site.social.googleMaps} target="_blank" rel="noopener">
                   <IconPin />
                   <span>

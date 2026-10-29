@@ -245,7 +245,7 @@ export function BookingForm({ kind = "booking" }: Props) {
                 {state.message}
               </p>
             ) : null}
-            <button className="btn btn-block" type="submit" disabled={pending}>
+            <button className={`btn btn-block${pending ? " is-pending" : ""}`} type="submit" disabled={pending} aria-busy={pending}>
               {pending ? "Đang gửi…" : isGroup ? "Gửi yêu cầu báo giá" : "Gửi yêu cầu đặt phòng"}
             </button>
             <p className="fine">

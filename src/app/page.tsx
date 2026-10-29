@@ -1,12 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
-import { IconBriefcase, IconCar, IconChat, IconHeart, IconRings, IconTicket, IconTree, IconClock } from "@/components/Icons";
-import { QuickBook } from "@/components/QuickBook";
+import { IconBriefcase, IconCar, IconHeart, IconRings, IconTicket, IconTree, IconClock } from "@/components/Icons";
+import { HeroSearch } from "@/components/HeroSearch";
 import { Gallery } from "@/components/Gallery";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CtaBand, Faq, RoomCard, SectionHead } from "@/components/ui";
 import { MapEmbed } from "@/components/MapEmbed";
-import { directPerks, distances, faqs, formatVnd, gallery, heroSlides, offers, rooms, site, zaloLink } from "@/lib/site";
+import { directPerks, distances, facadePhotos, faqs, gallery, heroSlides, offers, reviews, rooms, site } from "@/lib/site";
 
 const guestTypes = [
   {
@@ -39,54 +38,43 @@ export default function HomePage() {
   return (
     <>
       <section className="hero">
-        <div className="hero-copy on-dark">
-          <div className="hero-inner">
-            <span className="eyebrow">Khu biệt thự Hoa Phượng · An Khánh · Hà Nội</span>
-            <h1>
-              Ở khu biệt thự,
-              <em className="gold-text">giá khách sạn</em>
-            </h1>
-            <p className="hero-lead">
-              Nghỉ yên tĩnh giữa hàng cây khu biệt thự, dễ đỗ xe, cách Sân vận động Mỹ Đình khoảng 15–20 phút.
-            </p>
-            <div className="hero-price">
-              <small>Qua đêm từ</small>
-              <strong>{formatVnd(site.priceFrom)}</strong>
-              <span>19:00 – 10:00</span>
-            </div>
-            <div className="hero-actions">
-              <Link className="btn btn-gold" href="/dat-phong">
-                Đặt phòng trực tiếp
-              </Link>
-              <a className="btn btn-ghost" href={zaloLink} target="_blank" rel="noopener">
-                <IconChat /> Hỏi phòng qua Zalo
-              </a>
-            </div>
-            <p className="hero-note">Hotline {site.phoneDisplay} · Nghỉ ngày đêm từ 900.000đ, nghỉ giờ từ 300.000đ.</p>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <HeroSlider slides={heroSlides} />
+        {/* h1 cố định của trang: luôn có đúng một h1 dù slider đang ở slide nào */}
+        <h1 className="sr-only">
+          {site.name}: khách sạn trong khu biệt thự Hoa Phượng, An Khánh, Hà Nội, gần Mỹ Đình
+        </h1>
+        {/* Ảnh, nội dung từng slide và nút chuyển slide */}
+        <HeroSlider slides={heroSlides} />
+
+        {/* Biểu tượng chuột: bấm để cuộn xuống phần giới thiệu */}
+        <a className="hero-scroll" href="#tong-quan" aria-label="Cuộn xuống phần giới thiệu">
+          <span />
+        </a>
+
+        <div className="hero-bar">
+          <HeroSearch />
+          <nav className="hero-tabs" aria-label="Đi tới mục">
+            <a href="#tong-quan" className="active">
+              Tổng quan
+            </a>
+            <a href="#phong">Phòng & giá</a>
+            <a href="#uu-dai">Ưu đãi</a>
+            <a href="#vi-tri">Vị trí</a>
+          </nav>
         </div>
       </section>
 
-      <QuickBook />
-
       {/* Giới thiệu */}
-      <section className="section">
+      <section className="section" id="tong-quan">
         <div className="wrap intro">
           <div className="intro-media reveal">
-            <div className="arch">
-              <Image
-                src="/img/anh/mat-tien-dem.webp"
-                alt="Toà nhà F21 Hotel kiến trúc tân cổ điển lên đèn buổi tối"
-                width={896}
-                height={1195}
-                priority
-                sizes="(max-width: 900px) 100vw, 45vw"
-                style={{ height: "100%", objectPosition: "50% 45%" }}
-              />
-            </div>
+            {/* Bấm ảnh mở album mặt tiền */}
+            <Gallery
+              photos={facadePhotos}
+              visible={1}
+              badge={`${facadePhotos.length} ảnh`}
+              className="arch"
+              sizes="(max-width: 900px) 100vw, 45vw"
+            />
             <div className="badge">
               <strong>15–20′</strong>
               <span>tới SVĐ Mỹ Đình</span>
@@ -131,12 +119,15 @@ export default function HomePage() {
                 </div>
               </li>
             </ul>
+            <a className="link-arrow" href={site.social.googleMaps} target="_blank" rel="noopener">
+              Xem đánh giá thật trên Google Maps
+            </a>
           </div>
         </div>
       </section>
 
       {/* Phòng */}
-      <section className="section cream">
+      <section className="section cream" id="phong">
         <div className="wrap">
           <SectionHead eyebrow="Phòng & giá" title="Chọn phòng theo chuyến đi của bạn">
             Từ phòng đơn cho chuyến công tác tới phòng 4 người cho cả nhà lên dự cưới. Nghỉ ngày đêm, qua đêm hoặc nghỉ
@@ -209,7 +200,7 @@ export default function HomePage() {
       </section>
 
       {/* Vị trí */}
-      <section className="section cream">
+      <section className="section cream" id="vi-tri">
         <div className="wrap location">
           <div className="location-copy reveal">
             <span className="eyebrow">Vị trí</span>
@@ -236,7 +227,7 @@ export default function HomePage() {
       </section>
 
       {/* Ưu đãi */}
-      <section className="section">
+      <section className="section" id="uu-dai">
         <div className="wrap">
           <SectionHead eyebrow="Ưu đãi" title="Ưu đãi theo dịp">
             Nói mã ưu đãi khi nhắn Zalo, hoặc nhập vào form đặt phòng.
@@ -257,6 +248,34 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Đánh giá: chỉ hiện khi đã nhập đánh giá thật trong site.ts */}
+      {reviews.length ? (
+        <section className="section" id="danh-gia">
+          <div className="wrap">
+            <SectionHead eyebrow="Khách nói gì" title="Đánh giá từ khách đã ở" center />
+            <div className="reviews reveal-stagger">
+              {reviews.map((r) => (
+                <figure className="review" key={`${r.name}-${r.date}`}>
+                  <span className="review-stars" role="img" aria-label={`${r.rating} trên 5 sao`}>
+                    {"★".repeat(r.rating)}
+                    <span aria-hidden="true">{"★".repeat(5 - r.rating)}</span>
+                  </span>
+                  <blockquote>“{r.text}”</blockquote>
+                  <figcaption>
+                    <b>{r.name}</b> · {r.source}, {r.date}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <div style={{ marginTop: 32, textAlign: "center" }}>
+              <a className="btn btn-ghost" href={site.social.googleMaps} target="_blank" rel="noopener">
+                Xem tất cả đánh giá trên Google Maps
+              </a>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Câu hỏi thường gặp */}
       <section className="section cream">

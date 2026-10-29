@@ -15,7 +15,10 @@ export const site = {
   // Đường dây nhận phản ánh dịch vụ
   feedbackPhone: "0383553034",
   feedbackPhoneDisplay: "0383 553 034",
-  email: "datphong@f21hotel.com", // TODO
+  // Để trống thì website tự ẩn mục tương ứng. TODO: điền khi khách sạn cung cấp
+  email: "" as string,
+  // Video 30 giây quay đường vào (đường dẫn file trong /public hoặc YouTube embed)
+  entranceVideo: "" as string,
 
   address: {
     street: "BT13.1, Lô số 1, Khu biệt thự Hoa Phượng",
@@ -35,11 +38,19 @@ export const site = {
   priceFrom: 600000, // giá qua đêm thấp nhất
 
   social: {
-    facebook: "https://www.facebook.com/", // TODO
-    tiktok: "https://www.tiktok.com/", // TODO
+    facebook: "" as string, // TODO
+    tiktok: "" as string, // TODO
     googleMaps: "https://share.google/rhYW7A42TrmiG8YvI",
   },
 } as const;
+
+// Đánh giá thật của khách (chép từ Google Maps, Agoda… và ghi rõ nguồn).
+// Khối "Khách nói gì" trên trang chủ chỉ hiện khi danh sách này có nội dung.
+export type Review = { name: string; text: string; rating: number; source: string; date: string };
+export const reviews: Review[] = [
+  // Ví dụ định dạng (không phải đánh giá thật):
+  // { name: "Nguyễn A.", text: "Phòng sạch, yên tĩnh…", rating: 5, source: "Google Maps", date: "10/2026" },
+];
 
 export const zaloLink = `https://zalo.me/${site.zalo}`;
 export const telLink = `tel:${site.phone}`;
@@ -150,13 +161,64 @@ export const rooms: Room[] = [
   },
 ];
 
-// Ảnh chạy nền ở hero trang chủ (bản 2200px cho máy tính, 1200px cho điện thoại)
-export const heroSlides = [
-  { src: "/img/anh/mat-tien-ngay.webp", srcMobile: "/img/anh/mat-tien-ngay-1200.webp", alt: "Mặt tiền F21 Hotel ở góc đường khu biệt thự Hoa Phượng" },
-  { src: "/img/anh/hero-cua-vom.webp", srcMobile: "/img/anh/hero-cua-vom-1200.webp", alt: "Góc ghế bên cửa sổ vòm trong phòng" },
-  { src: "/img/anh/hero-sanh.webp", srcMobile: "/img/anh/hero-sanh-1200.webp", alt: "Sảnh chờ với biển F21 Hotel" },
-  { src: "/img/anh/hero-ban-cong.webp", srcMobile: "/img/anh/hero-ban-cong-1200.webp", alt: "Phòng có cửa ra ban công" },
-  { src: "/img/anh/hero-phong-doi.webp", srcMobile: "/img/anh/hero-phong-doi-1200.webp", alt: "Phòng hai giường cạnh cửa sổ vòm" },
+// Các slide của hero trang chủ: mỗi slide có ảnh (2200px cho máy tính, 1200px cho điện thoại) và nội dung riêng
+export type HeroSlide = {
+  src: string;
+  srcMobile: string;
+  alt: string;
+  kicker: string;
+  bold: string;
+  light: string;
+  sub: string;
+  cost: { value: string; label: string; href: string };
+  book: { label: string; href: string };
+};
+
+export const heroSlides: HeroSlide[] = [
+  {
+    src: "/img/anh/mat-tien-ngay.webp",
+    srcMobile: "/img/anh/mat-tien-ngay-1200.webp",
+    alt: "Mặt tiền F21 Hotel ở góc đường khu biệt thự Hoa Phượng",
+    kicker: "Khu biệt thự Hoa Phượng · An Khánh",
+    bold: "F21 Hotel",
+    light: "ở khu biệt thự",
+    sub: "Giá khách sạn, cách Sân vận động Mỹ Đình 15–20 phút",
+    cost: { value: formatVnd(600000), label: "Qua đêm từ · 19:00 – 10:00", href: "/phong" },
+    book: { label: "Đặt phòng", href: "/dat-phong" },
+  },
+  {
+    src: "/img/anh/hero-cua-vom.webp",
+    srcMobile: "/img/anh/hero-cua-vom-1200.webp",
+    alt: "Góc ghế bên cửa sổ vòm trong phòng",
+    kicker: "19 phòng · 4 hạng phòng",
+    bold: "Phòng nghỉ",
+    light: "sáng & yên tĩnh",
+    sub: "Cửa sổ vòm, rèm voan, sàn gỗ. Phòng cho 2, 3 hoặc 4 người",
+    cost: { value: formatVnd(900000), label: "Ngày đêm từ · 14:00 – 12:00", href: "/phong" },
+    book: { label: "Xem phòng", href: "/phong" },
+  },
+  {
+    src: "/img/anh/hero-ban-cong.webp",
+    srcMobile: "/img/anh/hero-ban-cong-1200.webp",
+    alt: "Phòng có cửa ra ban công",
+    kicker: "Ưu đãi ở dài ngày",
+    bold: "Giảm 15%",
+    light: "khi ở dài ngày",
+    sub: "Trên 7 ngày giảm 5%, trên 15 ngày giảm 10%, trên 30 ngày giảm 15%",
+    cost: { value: "−15%", label: "Ở trên 30 ngày", href: "/uu-dai#o-dai-ngay" },
+    book: { label: "Hỏi giá đoàn", href: "/doan-doanh-nghiep" },
+  },
+  {
+    src: "/img/anh/hero-phong-doi.webp",
+    srcMobile: "/img/anh/hero-phong-doi-1200.webp",
+    alt: "Phòng hai giường cạnh cửa sổ vòm",
+    kicker: "Sự kiện Mỹ Đình · 7–8/11/2026",
+    bold: "Đi xem 10Fest",
+    light: "nghỉ ở F21",
+    sub: "Cách sân 15–20 phút, giá vẫn như ngày thường. Phòng 2–4 người",
+    cost: { value: "10FEST", label: "Mã ưu đãi khi đặt phòng", href: "/uu-dai#su-kien-my-dinh" },
+    book: { label: "Dùng ưu đãi", href: "/dat-phong?code=10FEST" },
+  },
 ];
 
 // Ảnh không gian chung cho thư viện ảnh trang chủ
@@ -171,6 +233,14 @@ export const gallery: Photo[] = [
   { src: "/img/anh/phong-ghe-co-dien.webp", alt: "Phòng có bộ ghế cổ điển", w: 1600, h: 1067 },
   { src: "/img/anh/phong-cua-so.webp", alt: "Phòng có cửa sổ lớn nhìn ra hàng cây", w: 1600, h: 1067 },
   { src: "/img/anh/phong-kinh-tam.webp", alt: "Phòng có vách kính phòng tắm", w: 1600, h: 1067 },
+];
+
+// Album mặt tiền, mở khi bấm ảnh khung vòm ở phần giới thiệu trang chủ
+export const facadePhotos: Photo[] = [
+  { src: "/img/anh/mat-tien-dem.webp", alt: "Toà nhà F21 Hotel kiến trúc tân cổ điển lên đèn buổi tối", w: 896, h: 1195 },
+  { src: "/img/anh/mat-tien-ngay.webp", alt: "Mặt tiền F21 Hotel ở góc đường khu biệt thự Hoa Phượng", w: 2200, h: 1650 },
+  { src: "/img/anh/mat-tien-xa.webp", alt: "F21 Hotel nhìn từ đầu đường nội khu", w: 1050, h: 1400 },
+  { src: "/img/anh/duong-vao.webp", alt: "Góc đường trước F21 Hotel trong khu biệt thự Hoa Phượng", w: 967, h: 1400 },
 ];
 
 // Ảnh đường vào và mặt tiền cho trang Vị trí

@@ -8,7 +8,7 @@ import { IconCalendar, IconChat, IconPhone } from "./Icons";
 // Thanh Gọi / Zalo / Đặt phòng luôn hiện ở cuối màn hình điện thoại
 export function ContactBar() {
   return (
-    <nav className="mobile-bar" aria-label="Liên hệ nhanh">
+    <nav className="mobile-bar" aria-label="Liên hệ nhanh" style={{ viewTransitionName: "mobile-bar" }}>
       <a href={telLink} onClick={() => track("click_call", { from: "mobile_bar" })}>
         <IconPhone />
         Gọi

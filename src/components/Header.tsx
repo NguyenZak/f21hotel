@@ -28,7 +28,8 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className={`site-header${open ? " menu-open" : ""}`}>
+    // Tên view-transition giữ header đứng yên khi chuyển trang
+    <header className={`site-header${open ? " menu-open" : ""}`} style={{ viewTransitionName: "site-header" }}>
       <div className="wrap">
         <Link href="/" className="brand" aria-label={`${site.name} – Trang chủ`}>
           <Image src="/img/logo-ngang.png" alt="" width={673} height={221} priority />

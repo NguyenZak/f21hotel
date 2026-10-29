@@ -104,6 +104,7 @@ export default function RoomsPage() {
                 photos={room.photos}
                 className="room-gallery reveal"
                 leadSizes="(max-width: 900px) 100vw, 46vw"
+                leadTransitionName={`room-${room.slug}`}
                 sizes="(max-width: 900px) 50vw, 23vw"
               />
               <div className="room-info reveal">
