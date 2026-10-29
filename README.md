@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# F21 Hotel – Website
 
-## Getting Started
+Website đặt phòng trực tiếp cho F21 Hotel, khu biệt thự Hoa Phượng, An Khánh, Hà Nội.
 
-First, run the development server:
+- Next.js 16 (App Router, Cache Components) + TypeScript
+- Chạy trên Cloudflare Workers qua [OpenNext](https://opennext.js.org/cloudflare)
+- Font: SVN-Audrey (tiêu đề) và Lora (nội dung), màu theo Cẩm nang thương hiệu
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Chạy ở máy
+
+```sh
+npm install
+cp .dev.vars.example .dev.vars   # tuỳ chọn, xem docs/google-apps-script.md
+npm run dev                      # http://localhost:3000
+npm run preview                  # build và chạy trong workerd, giống môi trường Cloudflare
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy lên Cloudflare
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npx wrangler login
+npx wrangler secret put BOOKING_WEBHOOK_URL   # URL Google Apps Script
+npm run deploy
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Sau đó gắn tên miền trong Cloudflare Dashboard → Workers → `f21-hotel-web` → Settings → Domains & Routes, và sửa `url` trong [src/lib/site.ts](src/lib/site.ts) cho đúng tên miền.
 
-## Learn More
+## Sửa nội dung
 
-To learn more about Next.js, take a look at the following resources:
+Toàn bộ thông tin khách sạn nằm trong [src/lib/site.ts](src/lib/site.ts): số điện thoại, Zalo, địa chỉ, giờ nhận/trả phòng, hạng phòng và giá, ưu đãi, khoảng cách, câu hỏi thường gặp. Tìm `TODO` để thấy các mục cần khách sạn xác nhận.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ảnh phòng đang là ảnh tạm (khối màu đỏ có biểu tượng). Khi có ảnh chụp, đặt vào `public/img/` và thay `<Placeholder>` bằng `<Image>` trong [src/components/ui.tsx](src/components/ui.tsx) và [src/app/phong/page.tsx](src/app/phong/page.tsx).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Cấu trúc
 
-## Deploy on Vercel
+| Đường dẫn | Trang |
+| --- | --- |
+| `/` | Trang chủ: hero, đặt nhanh, giới thiệu, phòng, quyền lợi đặt trực tiếp, nhóm khách, vị trí, ưu đãi, hỏi đáp |
+| `/phong` | Chi tiết 4 hạng phòng |
+| `/uu-dai` | Ưu đãi theo dịp, có mã |
+| `/doan-doanh-nghiep` | Gói đoàn và form xin báo giá |
+| `/vi-tri` | Bản đồ, câu chỉ đường, khoảng cách, video đường vào |
+| `/dat-phong` | Form đặt phòng, liên hệ, chính sách |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Đường dẫn đặt phòng nhận tham số để điền sẵn form: `/dat-phong?room=deluxe&in=2026-11-07&out=2026-11-08&guests=2&code=10FEST`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Form đặt phòng
+
+Form gửi qua Server Action ([src/app/actions.ts](src/app/actions.ts)): kiểm tra dữ liệu ở server, gửi về Google Sheet và email lễ tân qua webhook ([hướng dẫn](docs/google-apps-script.md)), sau đó cho khách bấm “Gửi qua Zalo” với nội dung đã soạn sẵn.
+
+## Đo lường
+
+[src/lib/track.ts](src/lib/track.ts) gửi các sự kiện `click_call`, `click_zalo`, `submit_booking` tới GA4 / Google Ads khi đã gắn `gtag` (chưa gắn).
+
+## Lưu ý về font SVN-Audrey
+
+Font không có các ký tự `< > @ _ \` { | } ~ © ® ° ² · × – — • … € ™`. Những ký tự này được loại khỏi `unicode-range` trong [src/app/layout.tsx](src/app/layout.tsx) để trình duyệt tự lấy từ font dự phòng, tránh hiện ô trống.

@@ -1,0 +1,21 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "f21-hotel-web",
+	"compatibility_date": "2026-10-15",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference service binding, tên service phải trùng tên worker
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "f21-hotel-web"
+		}
+	],
+	"observability": { "enabled": true }
+	// Secret (đặt bằng `npx wrangler secret put BOOKING_WEBHOOK_URL`):
+	//   BOOKING_WEBHOOK_URL — URL Google Apps Script nhận yêu cầu đặt phòng
+}

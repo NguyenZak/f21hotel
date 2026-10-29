@@ -1,0 +1,3 @@
+# Sao chép thành .dev.vars để chạy thử ở máy
+NEXTJS_ENV=development
+BOOKING_WEBHOOK_URL=
