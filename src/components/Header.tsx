@@ -10,16 +10,7 @@ import { IconChat, IconPhone } from "./Icons";
 
 export function Header() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Đóng menu khi chuyển trang
   const [menuPath, setMenuPath] = useState(pathname);
@@ -36,16 +27,11 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const classes = ["site-header", isHome && "is-home", isHome && !scrolled && !open && "over-hero", open && "menu-open"]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <header className={classes}>
+    <header className={`site-header${open ? " menu-open" : ""}`}>
       <div className="wrap">
         <Link href="/" className="brand" aria-label={`${site.name} – Trang chủ`}>
-          <Image className="logo-dark" src="/img/logo-ngang.png" alt="" width={673} height={221} priority />
-          <Image className="logo-light" src="/img/logo-ngang-trang.png" alt="" width={674} height={221} priority />
+          <Image src="/img/logo-ngang.png" alt="" width={673} height={221} priority />
         </Link>
 
         <nav className="nav" id="site-nav" aria-label="Điều hướng chính">

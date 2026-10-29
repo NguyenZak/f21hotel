@@ -156,7 +156,6 @@ p { margin: 0; }
 .site-header .wrap { height: 100%; display: flex; align-items: center; gap: 28px; }
 .brand { display: block; flex: none; }
 .brand img { height: 46px; width: auto; }
-.brand .logo-light { display: none; }
 
 .nav { margin-left: auto; }
 .nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 30px; }
@@ -196,21 +195,6 @@ p { margin: 0; }
 .menu-open .menu-toggle span::before { transform: translateY(7px) rotate(45deg); }
 .menu-open .menu-toggle span::after { transform: translateY(-7px) rotate(-45deg); }
 
-/* Header trong suốt trên ảnh hero (trang chủ) */
-.site-header.is-home { position: fixed; left: 0; right: 0; }
-.site-header.over-hero {
-  background: linear-gradient(rgba(30, 6, 8, 0.55), rgba(30, 6, 8, 0));
-  backdrop-filter: none; -webkit-backdrop-filter: none;
-  border-color: transparent;
-}
-.site-header.over-hero .logo-dark { display: none; }
-.site-header.over-hero .logo-light { display: block; }
-.site-header.over-hero .nav li > a,
-.site-header.over-hero .header-phone,
-.site-header.over-hero .header-phone strong { color: #fff; }
-.site-header.over-hero .header-phone small { color: rgba(255, 255, 255, 0.75); }
-.site-header.over-hero .menu-toggle { color: #fff; }
-
 @media (max-width: 1080px) {
   .header-phone { display: none; }
   .nav ul { gap: 22px; }
@@ -231,13 +215,9 @@ p { margin: 0; }
   .menu-open .nav { opacity: 1; visibility: visible; transform: none; }
   .nav ul { flex-direction: column; gap: 0; }
   .nav li { border-bottom: 1px solid var(--line); }
-  .nav li > a, .site-header.over-hero .nav li > a { display: block; padding: 18px 0; font-size: 22px; color: var(--ink); }
+  .nav li > a { display: block; padding: 18px 0; font-size: 22px; color: var(--ink); }
   .nav li > a::after { display: none; }
   .nav .nav-extra { display: grid; gap: 12px; margin-top: 28px; }
-  .site-header.menu-open { background: var(--paper) !important; border-color: var(--line) !important; }
-  .site-header.menu-open .logo-dark { display: block !important; }
-  .site-header.menu-open .logo-light { display: none !important; }
-  .site-header.menu-open .menu-toggle { color: var(--maroon) !important; }
   html[data-menu-open] { overflow: hidden; }
 }
 @media (min-width: 901px) { .nav .nav-extra { display: none; } }
@@ -245,10 +225,10 @@ p { margin: 0; }
 /* ---------- Hero trang chủ ---------- */
 .hero {
   position: relative; isolation: isolate;
-  min-height: min(100svh, 920px);
+  min-height: min(calc(100svh - var(--header-h)), 860px);
   display: grid; align-items: end;
   color: #fff;
-  padding: calc(var(--header-h) + 40px) 0 clamp(36px, 7vw, 80px);
+  padding: 48px 0 clamp(36px, 7vw, 80px);
 }
 .hero-media { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
 .hero-media picture { display: contents; }
