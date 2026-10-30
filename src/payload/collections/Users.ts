@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import { Forbidden, type CollectionConfig } from "payload";
 import { isOwner, ownerOnlyField, ownerOrSelf, ROLES } from "../access";
 
 export const Users: CollectionConfig = {
@@ -15,8 +15,17 @@ export const Users: CollectionConfig = {
     delete: isOwner,
   },
   hooks: {
+    beforeOperation: [
+      // Không cho tự đăng ký: tắt màn hình "tạo tài khoản đầu tiên" của Payload và mọi yêu cầu tạo tài khoản
+      // không kèm người đăng nhập. Tài khoản Chủ đầu tiên tạo bằng script: npm run create-admin(:remote).
+      // Script chạy qua Local API (payloadAPI "local") nên không bị chặn.
+      ({ args, operation, req }) => {
+        if (operation === "create" && !req.user && req.payloadAPI !== "local") throw new Forbidden(req.t);
+        return args;
+      },
+    ],
     beforeChange: [
-      // Tài khoản đầu tiên (tạo ở màn hình khởi tạo) luôn là Chủ
+      // Tài khoản đầu tiên luôn là Chủ
       async ({ data, operation, req }) => {
         if (operation === "create") {
           const { totalDocs } = await req.payload.count({ collection: "users", overrideAccess: true });

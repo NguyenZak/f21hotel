@@ -10,3 +10,8 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 CLOUDINARY_FOLDER=f21-hotel
+
+# Chỉ dùng khi tạo tài khoản Chủ bằng npm run create-admin(:remote); xoá ADMIN_PASSWORD sau khi tạo xong
+# ADMIN_EMAIL=
+# ADMIN_NAME=
+# ADMIN_PASSWORD=

@@ -58,7 +58,7 @@ Trang quản trị: `/admin` (tiếng Việt). Dựng bằng [Payload CMS 3](htt
 
 - **Dữ liệu:** Cloudflare D1. Chạy ở máy thì wrangler tự giả lập, không cần tạo gì trên Cloudflare.
 - **Ảnh:** Cloudinary, qua bộ kết nối tự viết ở [src/payload/cloudinary.ts](src/payload/cloudinary.ts) (gọi REST API bằng `fetch`, chạy được trên Workers). Chưa khai báo `CLOUDINARY_*` thì bản dev lưu ảnh vào `media-uploads/`.
-- **Vai trò:** Chủ, Quản lý, Nhân viên. Bảng quyền ở [src/payload/access.ts](src/payload/access.ts). Tài khoản tạo đầu tiên luôn là Chủ.
+- **Vai trò:** Chủ, Quản lý, Nhân viên. Bảng quyền ở [src/payload/access.ts](src/payload/access.ts). Không có form tự đăng ký: tài khoản Chủ đầu tiên tạo bằng `npm run create-admin` (CMS thật: `create-admin:remote`, đọc ADMIN_EMAIL/ADMIN_NAME/ADMIN_PASSWORD trong `.env.local`); các tài khoản sau do Chủ tạo trong CMS › Hệ thống › Tài khoản.
 - **Nhật ký thao tác:** mọi thêm, sửa, xoá đều ghi lại người thực hiện ([src/payload/audit.ts](src/payload/audit.ts)).
 - **Bảng dữ liệu:** Tài khoản, Thư viện ảnh, Hạng phòng, Danh sách phòng, Ưu đãi, Đánh giá, Hỏi đáp, Trang, Nhật ký; cài đặt chung: Thông tin khách sạn, Giao diện (font).
 
