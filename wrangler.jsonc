@@ -1,7 +1,9 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
-	"name": "f21-hotel-web",
+	"name": "f21hotel",
+	// Tài khoản Cloudflare của khách sạn (Azlabs.it@gmail.com's Account)
+	"account_id": "a53fd282b8369dffc65cf51b9e234e2a",
 	"compatibility_date": "2026-10-15",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"assets": {
@@ -12,26 +14,44 @@
 		{
 			// Self-reference service binding, tên service phải trùng tên worker
 			"binding": "WORKER_SELF_REFERENCE",
-			"service": "f21-hotel-web"
+			"service": "f21hotel"
 		}
 	],
 	// CMS: dữ liệu ở D1 (ảnh ở Cloudinary, khai báo qua secret CLOUDINARY_*).
-	// Trước khi deploy lần đầu: `npx wrangler d1 create f21-hotel-cms` rồi thay database_id.
-	// Chạy ở máy thì wrangler tự giả lập D1.
+	// Chạy ở máy thì wrangler tự giả lập D1. Tạo bảng trên D1 thật: npm run deploy:database
 	"d1_databases": [
 		{
 			"binding": "D1",
 			"database_name": "f21-hotel-cms",
-			"database_id": "00000000-0000-0000-0000-000000000000"
+			"database_id": "a35fdcd2-8455-43f3-9c39-c0641ebee789"
 		}
 	],
 	// Bộ nhớ đệm trang (OpenNext): một KV namespace cho cả hai binding.
-	// Trước khi deploy lần đầu: `npx wrangler kv namespace create f21-hotel-cache` rồi thay id.
 	"kv_namespaces": [
-		{ "binding": "NEXT_INC_CACHE_KV", "id": "00000000000000000000000000000000" },
-		{ "binding": "NEXT_TAG_CACHE_KV", "id": "00000000000000000000000000000000" }
+		{ "binding": "NEXT_INC_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" },
+		{ "binding": "NEXT_TAG_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" }
 	],
-	"observability": { "enabled": true }
+	"observability": { "enabled": true },
+	// Môi trường "remote": chỉ để các lệnh CMS chạy từ máy (npm run deploy:database, seed:remote)
+	// đọc/ghi D1 thật. Không deploy môi trường này; `next dev` vẫn dùng D1 giả lập.
+	"env": {
+		"remote": {
+			"d1_databases": [
+				{
+					"binding": "D1",
+					"database_name": "f21-hotel-cms",
+					"database_id": "a35fdcd2-8455-43f3-9c39-c0641ebee789",
+					"remote": true
+				}
+			],
+			// Khai báo lại cho đủ (wrangler không kế thừa binding sang môi trường); hai binding này không dùng khi chạy lệnh CMS
+			"kv_namespaces": [
+				{ "binding": "NEXT_INC_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" },
+				{ "binding": "NEXT_TAG_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" }
+			],
+			"services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "f21hotel" }]
+		}
+	}
 	// Secret (đặt bằng `npx wrangler secret put BOOKING_WEBHOOK_URL`):
 	//   BOOKING_WEBHOOK_URL — URL Google Apps Script nhận yêu cầu đặt phòng
 }

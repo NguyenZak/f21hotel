@@ -17,7 +17,9 @@
     "generate:types": "payload generate:types",
     "seed": "payload run src/payload/seed.ts",
     "sync-media": "payload run src/payload/sync-media.ts",
-    "migrate": "payload migrate"
+    "migrate": "payload migrate",
+    "deploy:database": "CLOUDFLARE_ENV=remote NODE_ENV=production payload migrate && wrangler d1 execute D1 --command \"PRAGMA optimize\" --remote",
+    "seed:remote": "CLOUDFLARE_ENV=remote NODE_ENV=production payload run src/payload/seed.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.14",
