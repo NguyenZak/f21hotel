@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
@@ -7,17 +8,19 @@ import { directPerks } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
-  return {
-  title: "Ưu đãi",
-  description: `Ưu đãi đặt phòng trực tiếp tại ${site.name}: sự kiện Mỹ Đình, mùa cưới, giá doanh nghiệp, Noel và tất niên.`,
-  alternates: { canonical: "/uu-dai" },
-  };
+  return pageMeta(
+    site,
+    "/uu-dai",
+    "Ưu đãi đặt phòng trực tiếp, sự kiện Mỹ Đình",
+    `Ưu đãi đặt phòng trực tiếp tại ${site.name}: sự kiện Mỹ Đình, mùa cưới, giá doanh nghiệp, Noel và tất niên.`,
+  );
 }
 
 export default async function OffersPage() {
-  const offers = await getOffers();
+  const [offers, site] = await Promise.all([getOffers(), getSite()]);
   return (
     <>
+      <JsonLd data={breadcrumbJsonLd(site, "/uu-dai", "Ưu đãi")} />
       <PageHero crumb="Ưu đãi" eyebrow="Ưu đãi" title="Ưu đãi theo dịp">
         Nhắn mã ưu đãi qua Zalo hoặc nhập vào form đặt phòng. Mỗi đặt phòng áp dụng một mã, tuỳ phòng trống.
       </PageHero>

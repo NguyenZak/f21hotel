@@ -1,6 +1,6 @@
 # Nhận yêu cầu đặt phòng vào Google Sheet và email
 
-Form trên website gửi mỗi yêu cầu tới một URL Google Apps Script. Script ghi một dòng vào Google Sheet và email cho lễ tân. Chi phí: 0đ.
+Form trên website gửi mỗi yêu cầu (và mỗi đặt phòng online, `kind` là `online`, kèm `bookingCode` và `total`) tới một URL Google Apps Script. Script ghi một dòng vào Google Sheet và email cho lễ tân. Chi phí: 0đ.
 
 ## 1. Tạo Sheet và script
 
@@ -13,8 +13,8 @@ const EMAIL_LE_TAN = "datphong@f21hotel.com";
 const SECRET = "doi-chuoi-nay";
 
 const COLUMNS = [
-  "submittedAt", "kind", "name", "phone", "checkIn", "checkOut", "nights",
-  "guests", "room", "roomCount", "code", "company", "groupType", "invoice", "note",
+  "submittedAt", "kind", "bookingCode", "name", "phone", "checkIn", "checkOut", "nights",
+  "guests", "room", "roomCount", "total", "code", "company", "groupType", "invoice", "note",
 ];
 
 function doPost(e) {
@@ -28,7 +28,7 @@ function doPost(e) {
 
   MailApp.sendEmail({
     to: EMAIL_LE_TAN,
-    subject: `[F21] ${data.kind === "group" ? "Báo giá đoàn" : "Đặt phòng"}: ${data.name} – ${data.checkIn}`,
+    subject: `[F21] ${data.kind === "group" ? "Báo giá đoàn" : data.kind === "online" ? `Đặt online ${data.bookingCode}` : "Đặt phòng"}: ${data.name} – ${data.checkIn}`,
     body: data.summary,
   });
   return ContentService.createTextOutput("ok");

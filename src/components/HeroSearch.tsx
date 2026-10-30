@@ -2,16 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent, type MouseEvent } from "react";
-import { addDays, toIsoDate } from "@/lib/dates";
-
-const WEEKDAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-
-// "2026-11-07" -> "T7, 07/11"
-function shortDate(iso: string) {
-  const d = new Date(`${iso}T00:00`);
-  if (Number.isNaN(d.getTime())) return iso;
-  return `${WEEKDAYS[d.getDay()]}, ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
+import { addDays, shortDate, toIsoDate } from "@/lib/dates";
 
 // Ô chọn ngày gọn ở thanh đáy hero; chuyển sang trang đặt phòng kèm ngày đã chọn
 export function HeroSearch() {

@@ -12,6 +12,7 @@ import { cloudinaryAdapter, cloudinaryConfigFromEnv } from "./payload/cloudinary
 import { withRevalidate, withRevalidateGlobal } from "./payload/revalidate";
 import { CMS_TAGS } from "./lib/cms-tags";
 import { AuditLogs } from "./payload/collections/AuditLogs";
+import { Bookings, RateRules } from "./payload/collections/Bookings";
 import { Faqs, Offers, Reviews, RoomTypes, Rooms } from "./payload/collections/Content";
 import { Media } from "./payload/collections/Media";
 import { Pages } from "./payload/collections/Pages";
@@ -47,6 +48,9 @@ export default buildConfig({
     withRevalidate(withAudit(Media), [CMS_TAGS.rooms]),
     withRevalidate(withAudit(RoomTypes), [CMS_TAGS.rooms]),
     withRevalidate(withAudit(Rooms), [CMS_TAGS.rooms]),
+    // Đặt phòng và giá theo ngày được tính trực tiếp mỗi lần khách tìm phòng, không lưu đệm
+    withAudit(Bookings),
+    withAudit(RateRules),
     withRevalidate(withAudit(Offers), [CMS_TAGS.offers]),
     withRevalidate(withAudit(Reviews), [CMS_TAGS.reviews]),
     withRevalidate(withAudit(Faqs), [CMS_TAGS.faqs]),
@@ -61,7 +65,9 @@ export default buildConfig({
   i18n: { supportedLanguages: { vi }, fallbackLanguage: "vi" },
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
-  db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+  // Bản dev cũng chỉ đổi cấu trúc dữ liệu qua migration (npm run migrate), giống D1 thật.
+  // Để Payload tự "push" thì drizzle dựng lại bảng do migration tạo và lỗi "index already exists".
+  db: sqliteD1Adapter({ binding: cloudflare.env.D1, push: false }),
   plugins: [
     cloudStoragePlugin({
       enabled: Boolean(cloudinary),

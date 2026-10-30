@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { breadcrumbJsonLd, JsonLd, pageMeta, roomsJsonLd } from "@/lib/seo";
 import Link from "next/link";
 import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
@@ -7,18 +8,22 @@ import { getPriceNotes, getRooms, getSite } from "@/lib/cms";
 import { formatVnd, stayModes } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSite();
-  return {
-  title: "Phòng & bảng giá",
-  description: `Bảng giá ${site.name}: Phòng Đơn, Đơn VIP, Phòng Đôi 3 và 4 người. Qua đêm từ ${formatVnd(site.priceFrom)}, ngày đêm từ 900.000đ, nghỉ giờ từ 300.000đ.`,
-  alternates: { canonical: "/phong" },
-  };
+  const [site, rooms] = await Promise.all([getSite(), getRooms()]);
+  const from = (key: "overnight" | "fullDay" | "hourly") => formatVnd(Math.min(...rooms.map((r) => r.prices[key])));
+  return pageMeta(
+    site,
+    "/phong",
+    `Phòng & bảng giá, qua đêm từ ${from("overnight")}`,
+    `Bảng giá ${site.name}: ${rooms.map((r) => r.name).join(", ")}. Qua đêm từ ${from("overnight")}, ngày đêm từ ${from("fullDay")}, nghỉ giờ từ ${from("hourly")}.`,
+  );
 }
 
 export default async function RoomsPage() {
-  const [rooms, priceNotes] = await Promise.all([getRooms(), getPriceNotes()]);
+  const [rooms, priceNotes, site] = await Promise.all([getRooms(), getPriceNotes(), getSite()]);
   return (
     <>
+      <JsonLd data={roomsJsonLd(site, rooms)} />
+      <JsonLd data={breadcrumbJsonLd(site, "/phong", "Phòng & giá")} />
       <PageHero crumb="Phòng & giá" eyebrow="Phòng & bảng giá" title="Bốn hạng phòng, ba cách nghỉ">
         Nghỉ ngày đêm, qua đêm hoặc nghỉ giờ. Giá đã gồm 2 chai nước suối miễn phí trong phòng.
       </PageHero>

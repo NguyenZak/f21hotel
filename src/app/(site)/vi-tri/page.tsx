@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
@@ -8,11 +9,12 @@ import { distances, locationPhotos } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
-  return {
-  title: "Vị trí & chỉ đường",
-  description: `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool, gần cổng 1 Vinhomes Thăng Long. Cách SVĐ Mỹ Đình khoảng 15–20 phút.`,
-  alternates: { canonical: "/vi-tri" },
-  };
+  return pageMeta(
+    site,
+    "/vi-tri",
+    "Vị trí & chỉ đường: An Khánh, gần Mỹ Đình",
+    `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool, gần cổng 1 Vinhomes Thăng Long. Cách SVĐ Mỹ Đình khoảng 15–20 phút.`,
+  );
 }
 
 // TODO: điền tên quán cụ thể sau khi khảo sát thực tế quanh khách sạn
@@ -35,6 +37,7 @@ export default async function LocationPage() {
   const site = await getSite();
   return (
     <>
+      <JsonLd data={breadcrumbJsonLd(site, "/vi-tri", "Vị trí")} />
       <PageHero crumb="Vị trí" eyebrow="Vị trí & chỉ đường" title="Trong khu biệt thự Hoa Phượng, cạnh Vinschool">
         {site.address.full}
       </PageHero>

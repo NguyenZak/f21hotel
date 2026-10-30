@@ -10,6 +10,7 @@ import {
 } from "@/lib/booking";
 import { formatViDate, nightsBetween } from "@/lib/dates";
 import { getRooms } from "@/lib/cms";
+import { notifyFrontDesk } from "@/lib/notify";
 import { stayModes, type Room } from "@/lib/site";
 
 const FIELDS: BookingField[] = [
@@ -84,32 +85,14 @@ function buildSummary(kind: BookingKind, v: BookingValues, rooms: Room[]) {
   return lines.filter(Boolean).join("\n");
 }
 
-// Gửi yêu cầu tới Google Apps Script (lưu Google Sheet và email cho lễ tân).
-// Xem docs/google-apps-script.md để tạo URL này.
-async function deliver(kind: BookingKind, v: BookingValues, summary: string) {
-  const url = process.env.BOOKING_WEBHOOK_URL;
-  if (!url) {
-    console.warn("[booking] BOOKING_WEBHOOK_URL chưa được cấu hình, yêu cầu chưa được lưu:\n" + summary);
-    return false;
-  }
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        kind,
-        ...v,
-        phone: v.phone ? normalizePhone(v.phone) : "",
-        nights: nightsBetween(v.checkIn ?? "", v.checkOut ?? ""),
-        summary,
-        submittedAt: new Date().toISOString(),
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) console.error("[booking] Webhook trả về", res.status);
-    return res.ok;
-  } catch (err) {
-    console.error("[booking] Không gửi được webhook", err);
-    return false;
-  }
+function deliver(kind: BookingKind, v: BookingValues, summary: string) {
+  return notifyFrontDesk(
+    {
+      kind,
+      ...v,
+      phone: v.phone ? normalizePhone(v.phone) : "",
+      nights: nightsBetween(v.checkIn ?? "", v.checkOut ?? ""),
+    },
+    summary,
+  );
 }

@@ -80,7 +80,18 @@ npm run dev      # mở http://localhost:3000/admin
 npm run sync-media  # sau khi mới khai báo CLOUDINARY_*: đẩy ảnh đã tải trước đó (media-uploads/) lên Cloudinary
 ```
 
-Sau khi sửa bảng dữ liệu: `npm run generate:types` và `npm run generate:importmap`.
+Sau khi sửa bảng dữ liệu: `npx payload migrate:create <ten>`, `npm run migrate`, `npm run generate:types` và `npm run generate:importmap`. Bản dev không tự đồng bộ cấu trúc dữ liệu (`push: false`), luôn đi qua migration như D1 thật; lấy code mới về thì chạy `npm run migrate`.
+
+### Đặt phòng trực tuyến
+
+Trang `/dat-phong` là luồng đặt phòng kiểu các trang đặt phòng: chọn ngày và số khách → xem phòng trống, giá từng hạng phòng (Ngày đêm; Qua đêm khi ở 1 đêm) → chọn số phòng → điền thông tin → trang xác nhận `/dat-phong/xac-nhan/<mã>` (không cho Google lập chỉ mục). Chưa thu tiền trên website: đặt phòng ở trạng thái **Chờ xác nhận** và giữ phòng ngay, lễ tân gọi xác nhận và thu cọc.
+
+- **Phòng trống** = số phòng đang bán của hạng phòng (Danh sách phòng) trừ đặt phòng Chờ xác nhận / Đã xác nhận / Đã nhận phòng trùng đêm. Nghỉ giờ không tính. Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, đặt phòng làm vượt số phòng bị huỷ và khách được báo chọn lại.
+- **Giá** = bảng giá của hạng phòng, cộng/trừ theo **Phòng & giá › Giá theo ngày** (Tết, cuối tuần, sự kiện…): phần trăm, ngừng bán online, số đêm tối thiểu. Nhiều quy tắc trùng đêm thì cộng dồn phần trăm.
+- **CMS › Đặt phòng**: lễ tân nhập đặt phòng qua điện thoại, Zalo, OTA; gán số phòng (chặn gán trùng phòng, sai hạng phòng); đổi trạng thái, ghi tiền đã thu.
+- **Cài đặt › Thông tin khách sạn › Đặt phòng online**: bật/tắt (tắt thì quay về form gửi yêu cầu), % cọc, số phòng và số đêm tối đa, tài khoản nhận cọc (điền đủ thì trang xác nhận hiện mã QR VietQR có sẵn số tiền và mã đặt phòng).
+- Mỗi đặt phòng mới báo lễ tân qua `BOOKING_WEBHOOK_URL` ([hướng dẫn](docs/google-apps-script.md)).
+- Code: [src/lib/reservations.ts](src/lib/reservations.ts) (phòng trống, giá), [src/app/(site)/dat-phong/actions.ts](src/app/(site)/dat-phong/actions.ts) (tìm phòng, tạo đặt phòng), [src/components/BookingEngine.tsx](src/components/BookingEngine.tsx) (giao diện), [src/payload/collections/Bookings.ts](src/payload/collections/Bookings.ts) (bảng dữ liệu).
 
 ### Lưu ý khi nâng cấp Payload
 Ba file trong `src/app/(payload)/` do Payload tạo ra đã được sửa thêm `await connection()` (và `export const instant = false` ở trang admin) để chạy với Cache Components của Next.js 16. Nếu Payload tạo lại các file này thì phải thêm lại.

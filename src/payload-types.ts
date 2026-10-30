@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     'room-types': RoomType;
     rooms: Room;
+    bookings: Booking;
+    'rate-rules': RateRule;
     offers: Offer;
     reviews: Review;
     faqs: Faq;
@@ -87,6 +89,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'room-types': RoomTypesSelect<false> | RoomTypesSelect<true>;
     rooms: RoomsSelect<false> | RoomsSelect<true>;
+    bookings: BookingsSelect<false> | BookingsSelect<true>;
+    'rate-rules': RateRulesSelect<false> | RateRulesSelect<true>;
     offers: OffersSelect<false> | OffersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
@@ -236,6 +240,90 @@ export interface Room {
    */
   active?: boolean | null;
   note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Đặt phòng từ website và do lễ tân nhập. Đặt phòng Chờ xác nhận và Đã xác nhận đều giữ phòng.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bookings".
+ */
+export interface Booking {
+  id: number;
+  /**
+   * Tự tạo khi lưu.
+   */
+  code?: string | null;
+  status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled' | 'no_show';
+  source: 'website' | 'phone' | 'walk_in' | 'agoda' | 'booking_com' | 'traveloka' | 'trip_com' | 'expedia' | 'other';
+  checkIn: string;
+  checkOut: string;
+  nights?: number | null;
+  items: {
+    roomType: number | RoomType;
+    stayType: 'fullDay' | 'overnight' | 'hourly';
+    quantity: number;
+    amount?: number | null;
+    /**
+     * Lễ tân gán số phòng khi xác nhận hoặc khi khách đến.
+     */
+    rooms?: (number | Room)[] | null;
+    id?: string | null;
+  }[];
+  guestName: string;
+  phone: string;
+  email?: string | null;
+  guests?: number | null;
+  arrivalTime?: string | null;
+  promoCode?: string | null;
+  note?: string | null;
+  /**
+   * Để trống thì cộng thành tiền các phòng.
+   */
+  total?: number | null;
+  deposit?: number | null;
+  paid?: number | null;
+  /**
+   * Khách không thấy ghi chú này.
+   */
+  staffNote?: string | null;
+  externalRef?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Áp dụng cho các đêm từ ngày bắt đầu đến ngày kết thúc. Nhiều quy tắc trùng một đêm thì cộng dồn phần trăm. Chỉ ảnh hưởng giá đặt online, không đổi bảng giá niêm yết.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-rules".
+ */
+export interface RateRule {
+  id: number;
+  /**
+   * Ví dụ: Tết 2027, Cuối tuần, Concert Mỹ Đình 14/12
+   */
+  name: string;
+  from: string;
+  to: string;
+  /**
+   * Để trống là mọi đêm. Ví dụ cuối tuần: chọn T6 và T7.
+   */
+  days?: ('1' | '2' | '3' | '4' | '5' | '6' | '0')[] | null;
+  /**
+   * Để trống là mọi hạng phòng.
+   */
+  roomTypes?: (number | RoomType)[] | null;
+  /**
+   * 20 là tăng 20%, -10 là giảm 10%.
+   */
+  adjust?: number | null;
+  minNights?: number | null;
+  /**
+   * Website báo hết phòng cho các đêm này; lễ tân vẫn nhận đặt qua điện thoại.
+   */
+  closed?: boolean | null;
+  active?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -391,6 +479,14 @@ export interface PayloadLockedDocument {
         value: number | Room;
       } | null)
     | ({
+        relationTo: 'bookings';
+        value: number | Booking;
+      } | null)
+    | ({
+        relationTo: 'rate-rules';
+        value: number | RateRule;
+      } | null)
+    | ({
         relationTo: 'offers';
         value: number | Offer;
       } | null)
@@ -535,6 +631,59 @@ export interface RoomsSelect<T extends boolean = true> {
   roomType?: T;
   active?: T;
   note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bookings_select".
+ */
+export interface BookingsSelect<T extends boolean = true> {
+  code?: T;
+  status?: T;
+  source?: T;
+  checkIn?: T;
+  checkOut?: T;
+  nights?: T;
+  items?:
+    | T
+    | {
+        roomType?: T;
+        stayType?: T;
+        quantity?: T;
+        amount?: T;
+        rooms?: T;
+        id?: T;
+      };
+  guestName?: T;
+  phone?: T;
+  email?: T;
+  guests?: T;
+  arrivalTime?: T;
+  promoCode?: T;
+  note?: T;
+  total?: T;
+  deposit?: T;
+  paid?: T;
+  staffNote?: T;
+  externalRef?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-rules_select".
+ */
+export interface RateRulesSelect<T extends boolean = true> {
+  name?: T;
+  from?: T;
+  to?: T;
+  days?: T;
+  roomTypes?: T;
+  adjust?: T;
+  minNights?: T;
+  closed?: T;
+  active?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -705,6 +854,29 @@ export interface SiteSetting {
         }[]
       | null;
   };
+  booking?: {
+    /**
+     * Tắt thì trang Đặt phòng chỉ hiện form gửi yêu cầu và số hotline.
+     */
+    enabled?: boolean | null;
+    depositPercent?: number | null;
+    maxRooms?: number | null;
+    maxNights?: number | null;
+    /**
+     * Điền đủ thì trang xác nhận hiện mã QR chuyển khoản (VietQR) kèm số tiền cọc và mã đặt phòng. Để trống thì lễ tân hướng dẫn cọc qua điện thoại.
+     */
+    bank?: {
+      /**
+       * Ví dụ: VCB, MB, TCB, BIDV, ACB
+       */
+      bankId?: string | null;
+      accountNo?: string | null;
+      /**
+       * Viết hoa không dấu
+       */
+      accountName?: string | null;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -821,6 +993,21 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               label?: T;
               discount?: T;
               id?: T;
+            };
+      };
+  booking?:
+    | T
+    | {
+        enabled?: T;
+        depositPercent?: T;
+        maxRooms?: T;
+        maxNights?: T;
+        bank?:
+          | T
+          | {
+              bankId?: T;
+              accountNo?: T;
+              accountName?: T;
             };
       };
   updatedAt?: T;

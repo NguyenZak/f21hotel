@@ -112,6 +112,52 @@ export const SiteSettings: GlobalConfig = {
             },
           ],
         },
+        {
+          label: "Đặt phòng online",
+          fields: [
+            {
+              name: "booking",
+              label: false,
+              type: "group",
+              fields: [
+                {
+                  name: "enabled",
+                  label: "Nhận đặt phòng trên website",
+                  type: "checkbox",
+                  defaultValue: true,
+                  admin: { description: "Tắt thì trang Đặt phòng chỉ hiện form gửi yêu cầu và số hotline." },
+                },
+                {
+                  type: "row",
+                  fields: [
+                    { name: "depositPercent", label: "Tiền cọc (% tổng tiền)", type: "number", min: 0, max: 100, defaultValue: 50 },
+                    { name: "maxRooms", label: "Số phòng tối đa mỗi lần đặt", type: "number", min: 1, defaultValue: 5 },
+                    { name: "maxNights", label: "Số đêm tối đa", type: "number", min: 1, defaultValue: 30 },
+                  ],
+                },
+                {
+                  name: "bank",
+                  label: "Tài khoản nhận cọc",
+                  type: "group",
+                  admin: {
+                    description:
+                      "Điền đủ thì trang xác nhận hiện mã QR chuyển khoản (VietQR) kèm số tiền cọc và mã đặt phòng. Để trống thì lễ tân hướng dẫn cọc qua điện thoại.",
+                  },
+                  fields: [
+                    {
+                      type: "row",
+                      fields: [
+                        { name: "bankId", label: "Ngân hàng (mã viết tắt)", type: "text", admin: { description: "Ví dụ: VCB, MB, TCB, BIDV, ACB" } },
+                        { name: "accountNo", label: "Số tài khoản", type: "text" },
+                        { name: "accountName", label: "Chủ tài khoản", type: "text", admin: { description: "Viết hoa không dấu" } },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

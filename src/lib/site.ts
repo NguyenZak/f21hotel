@@ -7,7 +7,7 @@ export const site = {
   tagline: "Ở khu biệt thự, giá khách sạn",
   description:
     "F21 Hotel – khách sạn trong khu biệt thự Hoa Phượng, An Khánh, phía Tây Hà Nội. Yên tĩnh, cách Mỹ Đình khoảng 15–20 phút. Phòng qua đêm từ 600.000đ.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://f21hotel.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://f21hotel.com.vn",
 
   phone: "0968740333",
   phoneDisplay: "0968 740 333",

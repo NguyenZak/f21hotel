@@ -89,6 +89,32 @@ export async function getPriceNotes(): Promise<PriceNotes> {
   };
 }
 
+export type BookingSettings = {
+  enabled: boolean;
+  depositPercent: number;
+  maxRooms: number;
+  maxNights: number;
+  bank: { bankId: string; accountNo: string; accountName: string } | null;
+};
+
+export async function getBookingSettings(): Promise<BookingSettings> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(CMS_TAGS.settings);
+  const b = (await (await payload()).findGlobal({ slug: "site-settings", depth: 0 })).booking;
+  const bank = b?.bank;
+  return {
+    enabled: b?.enabled ?? true,
+    depositPercent: b?.depositPercent ?? 50,
+    maxRooms: b?.maxRooms ?? 5,
+    maxNights: b?.maxNights ?? 30,
+    bank:
+      bank?.bankId && bank.accountNo
+        ? { bankId: bank.bankId.trim(), accountNo: bank.accountNo.trim(), accountName: bank.accountName?.trim() ?? "" }
+        : null,
+  };
+}
+
 export async function getThemeFonts(): Promise<Record<"heading" | "hero" | "body" | "ui", FontKey>> {
   "use cache";
   cacheLife("max");
