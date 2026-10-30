@@ -67,16 +67,16 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
+    bookings: Booking;
     'room-types': RoomType;
     rooms: Room;
-    bookings: Booking;
     'rate-rules': RateRule;
+    pages: Page;
     offers: Offer;
+    media: Media;
     reviews: Review;
     faqs: Faq;
-    pages: Page;
+    users: User;
     'audit-logs': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -85,16 +85,16 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
+    bookings: BookingsSelect<false> | BookingsSelect<true>;
     'room-types': RoomTypesSelect<false> | RoomTypesSelect<true>;
     rooms: RoomsSelect<false> | RoomsSelect<true>;
-    bookings: BookingsSelect<false> | BookingsSelect<true>;
     'rate-rules': RateRulesSelect<false> | RateRulesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     offers: OffersSelect<false> | OffersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -140,108 +140,6 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  name: string;
-  role: 'owner' | 'manager' | 'staff';
-  /**
-   * Bỏ chọn để khoá tài khoản khi nhân viên nghỉ việc, không cần xoá.
-   */
-  active?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Mô tả ngắn nội dung ảnh, dùng cho Google và người khiếm thị.
-   */
-  alt: string;
-  prefix?: string | null;
-  _objectKey?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "room-types".
- */
-export interface RoomType {
-  id: number;
-  name: string;
-  /**
-   * Chữ thường, không dấu, nối bằng gạch ngang. Ví dụ: don-vip
-   */
-  slug: string;
-  short: string;
-  description: string;
-  guests: number;
-  prices: {
-    hourly: number;
-    overnight: number;
-    fullDay: number;
-    extraHour: number;
-  };
-  amenities?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  photos?: (number | Media)[] | null;
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rooms".
- */
-export interface Room {
-  id: number;
-  number: string;
-  floor: number;
-  roomType: number | RoomType;
-  /**
-   * Bỏ chọn khi phòng sửa chữa hoặc tạm ngừng bán.
-   */
-  active?: boolean | null;
-  note?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * Đặt phòng từ website và do lễ tân nhập. Đặt phòng Chờ xác nhận và Đã xác nhận đều giữ phòng.
@@ -293,6 +191,76 @@ export interface Booking {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "room-types".
+ */
+export interface RoomType {
+  id: number;
+  name: string;
+  /**
+   * Chữ thường, không dấu, nối bằng gạch ngang. Ví dụ: don-vip
+   */
+  slug: string;
+  short: string;
+  description: string;
+  guests: number;
+  prices: {
+    hourly: number;
+    overnight: number;
+    fullDay: number;
+    extraHour: number;
+  };
+  amenities?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  photos?: (number | Media)[] | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Mô tả ngắn nội dung ảnh, dùng cho Google và người khiếm thị.
+   */
+  alt: string;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rooms".
+ */
+export interface Room {
+  id: number;
+  number: string;
+  floor: number;
+  roomType: number | RoomType;
+  /**
+   * Bỏ chọn khi phòng sửa chữa hoặc tạm ngừng bán.
+   */
+  active?: boolean | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Áp dụng cho các đêm từ ngày bắt đầu đến ngày kết thúc. Nhiều quy tắc trùng một đêm thì cộng dồn phần trăm. Chỉ ảnh hưởng giá đặt online, không đổi bảng giá niêm yết.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -324,6 +292,41 @@ export interface RateRule {
    */
   closed?: boolean | null;
   active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Bấm vào một trang rồi chọn “Mở trình dựng trang” để kéo thả, sửa nội dung.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  /**
+   * home = trang chủ. Chữ thường, không dấu, nối bằng gạch ngang.
+   */
+  slug: string;
+  publishedAt?: string | null;
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  draft?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -390,39 +393,36 @@ export interface Faq {
   createdAt: string;
 }
 /**
- * Bấm vào một trang rồi chọn “Mở trình dựng trang” để kéo thả, sửa nội dung.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "users".
  */
-export interface Page {
+export interface User {
   id: number;
-  title: string;
+  name: string;
+  role: 'owner' | 'manager' | 'staff';
   /**
-   * home = trang chủ. Chữ thường, không dấu, nối bằng gạch ngang.
+   * Bỏ chọn để khoá tài khoản khi nhân viên nghỉ việc, không cần xoá.
    */
-  slug: string;
-  publishedAt?: string | null;
-  data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  draft?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  active?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -463,12 +463,8 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'bookings';
+        value: number | Booking;
       } | null)
     | ({
         relationTo: 'room-types';
@@ -479,16 +475,20 @@ export interface PayloadLockedDocument {
         value: number | Room;
       } | null)
     | ({
-        relationTo: 'bookings';
-        value: number | Booking;
-      } | null)
-    | ({
         relationTo: 'rate-rules';
         value: number | RateRule;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
         relationTo: 'offers';
         value: number | Offer;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'reviews';
@@ -499,8 +499,8 @@ export interface PayloadLockedDocument {
         value: number | Faq;
       } | null)
     | ({
-        relationTo: 'pages';
-        value: number | Page;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'audit-logs';
@@ -550,47 +550,39 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "bookings_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  active?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface BookingsSelect<T extends boolean = true> {
+  code?: T;
+  status?: T;
+  source?: T;
+  checkIn?: T;
+  checkOut?: T;
+  nights?: T;
+  items?:
     | T
     | {
+        roomType?: T;
+        stayType?: T;
+        quantity?: T;
+        amount?: T;
+        rooms?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  prefix?: T;
-  _objectKey?: T;
+  guestName?: T;
+  phone?: T;
+  email?: T;
+  guests?: T;
+  arrivalTime?: T;
+  promoCode?: T;
+  note?: T;
+  total?: T;
+  deposit?: T;
+  paid?: T;
+  staffNote?: T;
+  externalRef?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -636,42 +628,6 @@ export interface RoomsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "bookings_select".
- */
-export interface BookingsSelect<T extends boolean = true> {
-  code?: T;
-  status?: T;
-  source?: T;
-  checkIn?: T;
-  checkOut?: T;
-  nights?: T;
-  items?:
-    | T
-    | {
-        roomType?: T;
-        stayType?: T;
-        quantity?: T;
-        amount?: T;
-        rooms?: T;
-        id?: T;
-      };
-  guestName?: T;
-  phone?: T;
-  email?: T;
-  guests?: T;
-  arrivalTime?: T;
-  promoCode?: T;
-  note?: T;
-  total?: T;
-  deposit?: T;
-  paid?: T;
-  staffNote?: T;
-  externalRef?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rate-rules_select".
  */
 export interface RateRulesSelect<T extends boolean = true> {
@@ -684,6 +640,19 @@ export interface RateRulesSelect<T extends boolean = true> {
   minNights?: T;
   closed?: T;
   active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedAt?: T;
+  data?: T;
+  draft?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -712,6 +681,24 @@ export interface OffersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  prefix?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reviews_select".
  */
 export interface ReviewsSelect<T extends boolean = true> {
@@ -737,16 +724,29 @@ export interface FaqsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
+ * via the `definition` "users_select".
  */
-export interface PagesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  publishedAt?: T;
-  data?: T;
-  draft?: T;
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  active?: T;
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

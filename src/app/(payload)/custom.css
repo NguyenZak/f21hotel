@@ -1,0 +1,171 @@
+/* Giao diện CMS theo nhận diện F21 Hotel.
+   Payload đặt style gốc trong @layer payload-default, nên các quy tắc dưới đây (ngoài layer) luôn thắng.
+   Ưu tiên đổi biến màu của Payload; chỉ nhắm class khi không có biến (nút chính, menu, đăng nhập). */
+
+:root {
+  --f21-maroon: #8d191d;
+  --f21-maroon-deep: #6e1316;
+  --f21-maroon-soft: #f6e9e7;
+  --f21-gold: #c9a23f;
+  --f21-gold-ink: #8a6a17;
+  --f21-cream: #faf6ef;
+
+  /* Thang xám ngả ấm cho hợp tông kem của website (Payload dùng thang này cho nền, viền, chữ) */
+  --color-base-0: #ffffff;
+  --color-base-50: #f8f5f0;
+  --color-base-100: #efeae2;
+  --color-base-150: #e5ded3;
+  --color-base-200: #d8d0c3;
+  --color-base-250: #cac1b3;
+  --color-base-300: #bbb2a4;
+  --color-base-350: #aca395;
+  --color-base-400: #978e81;
+  --color-base-450: #877e72;
+  --color-base-500: #786f64;
+  --color-base-550: #696157;
+  --color-base-600: #5b544b;
+  --color-base-650: #4e4740;
+  --color-base-700: #413b35;
+  --color-base-750: #35302b;
+  --color-base-800: #2a2622;
+  --color-base-850: #1f1b18;
+  --color-base-900: #15120f;
+  --color-base-950: #0b0908;
+  --color-base-1000: #000000;
+
+  /* "Thành công" của Payload mặc định màu xanh dương; đổi sang xanh lá cho dễ hiểu (đã lưu, đã xác nhận) */
+  --color-success-50: #eef7f0;
+  --color-success-100: #dcefe1;
+  --color-success-150: #c3e4cb;
+  --color-success-200: #a6d6b2;
+  --color-success-250: #88c799;
+  --color-success-300: #6bb781;
+  --color-success-350: #52a76c;
+  --color-success-400: #3e975b;
+  --color-success-450: #32864f;
+  --color-success-500: #2a7745;
+  --color-success-550: #24693d;
+  --color-success-600: #1f5c36;
+  --color-success-650: #1b5030;
+  --color-success-700: #17452a;
+  --color-success-750: #143b24;
+  --color-success-800: #11321f;
+  --color-success-850: #0e2919;
+  --color-success-900: #0b2014;
+  --color-success-950: #08170e;
+
+  --style-radius-s: 6px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+  --accessibility-outline: 2px solid var(--f21-gold);
+}
+
+/* ---------- Nút ---------- */
+.btn--style-primary {
+  --bg-color: var(--f21-maroon);
+  --hover-bg: var(--f21-maroon-deep);
+  --color: #fff;
+}
+.btn--style-primary.btn--disabled {
+  --bg-color: var(--theme-elevation-150);
+  --color: var(--theme-elevation-500);
+}
+
+/* ---------- Menu trái ---------- */
+.nav {
+  background: var(--f21-cream);
+}
+.nav-group__toggle {
+  color: var(--f21-gold-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.nav__link {
+  padding-block: 5px;
+  color: var(--theme-elevation-700);
+}
+.nav__link:hover {
+  color: var(--f21-maroon);
+}
+.nav__link.active,
+.nav__link:has(.nav__link-indicator) {
+  color: var(--f21-maroon);
+}
+.nav__link-indicator {
+  background: var(--f21-maroon);
+  width: 3px;
+  height: 18px;
+}
+
+/* ---------- Liên kết và ô đang chọn ---------- */
+a:not(.btn):hover {
+  color: var(--f21-maroon);
+}
+.field-type input:focus,
+.field-type textarea:focus,
+.react-select .rs__control--is-focused {
+  border-color: var(--f21-gold) !important;
+  box-shadow: 0 0 0 3px rgba(201, 162, 63, 0.18);
+}
+
+/* ---------- Đăng nhập ---------- */
+.template-minimal.login {
+  position: relative;
+  isolation: isolate;
+  background: var(--f21-maroon-deep) url("/img/anh/mat-tien-dem.webp") center / cover no-repeat;
+}
+.template-minimal.login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(160deg, rgba(61, 13, 15, 0.82), rgba(61, 13, 15, 0.55));
+}
+.template-minimal.login .template-minimal__wrap {
+  background: #fff;
+  border-radius: var(--style-radius-l);
+  padding: 36px 32px 28px;
+  box-shadow: 0 24px 60px rgba(20, 5, 6, 0.35);
+}
+.f21-login-intro {
+  margin-bottom: 20px;
+}
+.f21-login-intro h1 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  line-height: 1.3;
+  color: var(--f21-maroon);
+}
+.f21-login-intro p {
+  margin: 0;
+  color: var(--theme-elevation-500);
+  font-size: 14px;
+}
+
+/* ---------- Ô nhập tiền (src/payload/admin/Money.tsx) ---------- */
+.f21-money {
+  flex: 1 1 0;
+  min-width: 140px;
+}
+.f21-money__input {
+  position: relative;
+}
+.f21-money__input input {
+  width: 100%;
+  padding-right: 32px;
+  font-variant-numeric: tabular-nums;
+}
+.f21-money__input span {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--theme-elevation-500);
+  pointer-events: none;
+}
+.f21-money-cell {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

@@ -2,6 +2,7 @@ import { ValidationError, type CollectionBeforeChangeHook, type CollectionConfig
 import { BOOKING_SOURCES, BOOKING_STATUSES, BLOCKING_STATUSES, newBookingCode } from "@/lib/booking";
 import { fromDbDate, nightsBetween, toDbDate } from "@/lib/dates";
 import { isManager, isStaff } from "../access";
+import { moneyAdmin } from "../admin/fields";
 
 // Đặt phòng: khách đặt trên website (qua server action, src/app/(site)/dat-phong/actions.ts)
 // hoặc lễ tân nhập tay khi khách gọi điện, nhắn Zalo, đến trực tiếp, đặt qua OTA.
@@ -142,7 +143,7 @@ export const Bookings: CollectionConfig = {
             { name: "roomType", label: "Hạng phòng", type: "relationship", relationTo: "room-types", required: true },
             { name: "stayType", label: "Hình thức", type: "select", required: true, defaultValue: "fullDay", options: STAY_OPTIONS },
             { name: "quantity", label: "Số phòng", type: "number", required: true, min: 1, defaultValue: 1 },
-            { name: "amount", label: "Thành tiền (đồng)", type: "number", min: 0 },
+            { name: "amount", label: "Thành tiền", type: "number", min: 0, admin: moneyAdmin },
           ],
         },
         {
@@ -190,9 +191,9 @@ export const Bookings: CollectionConfig = {
         {
           type: "row",
           fields: [
-            { name: "total", label: "Tổng tiền (đồng)", type: "number", min: 0, admin: { description: "Để trống thì cộng thành tiền các phòng." } },
-            { name: "deposit", label: "Tiền cọc cần thu", type: "number", min: 0 },
-            { name: "paid", label: "Đã thu", type: "number", min: 0, defaultValue: 0 },
+            { name: "total", label: "Tổng tiền", type: "number", min: 0, admin: { ...moneyAdmin, description: "Để trống thì cộng thành tiền các phòng." } },
+            { name: "deposit", label: "Tiền cọc cần thu", type: "number", min: 0, admin: moneyAdmin },
+            { name: "paid", label: "Đã thu", type: "number", min: 0, defaultValue: 0, admin: moneyAdmin },
           ],
         },
       ],

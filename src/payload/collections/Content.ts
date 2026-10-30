@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { anyone, isManager, isStaff } from "../access";
+import { hiddenUnless, moneyAdmin } from "../admin/fields";
 
 // Nội dung hiển thị trên website. Chủ và Quản lý sửa được, Nhân viên chỉ xem.
 const managedContent = { read: anyone, create: isManager, update: isManager, delete: isManager };
@@ -42,10 +43,10 @@ export const RoomTypes: CollectionConfig = {
         {
           type: "row",
           fields: [
-            { name: "hourly", label: "Nghỉ giờ (2 giờ đầu)", type: "number", required: true, min: 0 },
-            { name: "overnight", label: "Qua đêm (19:00 – 10:00)", type: "number", required: true, min: 0 },
-            { name: "fullDay", label: "Ngày đêm (14:00 – 12:00)", type: "number", required: true, min: 0 },
-            { name: "extraHour", label: "Giờ phụ trội", type: "number", required: true, min: 0 },
+            { name: "hourly", label: "Nghỉ giờ (2 giờ đầu)", type: "number", required: true, min: 0, admin: moneyAdmin },
+            { name: "overnight", label: "Qua đêm (19:00 – 10:00)", type: "number", required: true, min: 0, admin: moneyAdmin },
+            { name: "fullDay", label: "Ngày đêm (14:00 – 12:00)", type: "number", required: true, min: 0, admin: moneyAdmin },
+            { name: "extraHour", label: "Giờ phụ trội", type: "number", required: true, min: 0, admin: moneyAdmin },
           ],
         },
       ],
@@ -93,7 +94,7 @@ export const Rooms: CollectionConfig = {
 export const Offers: CollectionConfig = {
   slug: "offers",
   labels: { singular: "Ưu đãi", plural: "Ưu đãi" },
-  admin: { group: "Nội dung", useAsTitle: "title", defaultColumns: ["title", "tag", "when", "code", "active"] },
+  admin: { group: "Website", hidden: hiddenUnless("owner", "manager"), useAsTitle: "title", defaultColumns: ["title", "tag", "when", "code", "active"] },
   defaultSort: "order",
   access: managedContent,
   fields: [
@@ -119,7 +120,8 @@ export const Reviews: CollectionConfig = {
   slug: "reviews",
   labels: { singular: "Đánh giá", plural: "Đánh giá của khách" },
   admin: {
-    group: "Nội dung",
+    group: "Website",
+    hidden: hiddenUnless("owner", "manager"),
     useAsTitle: "name",
     defaultColumns: ["name", "rating", "source", "date", "published"],
     description: "Chỉ nhập đánh giá thật, chép từ Google Maps, Agoda, Booking… và ghi rõ nguồn.",
@@ -144,7 +146,7 @@ export const Reviews: CollectionConfig = {
 export const Faqs: CollectionConfig = {
   slug: "faqs",
   labels: { singular: "Câu hỏi", plural: "Hỏi đáp" },
-  admin: { group: "Nội dung", useAsTitle: "question", defaultColumns: ["question", "order"] },
+  admin: { group: "Website", hidden: hiddenUnless("owner", "manager"), useAsTitle: "question", defaultColumns: ["question", "order"] },
   defaultSort: "order",
   access: managedContent,
   fields: [

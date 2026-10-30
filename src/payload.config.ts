@@ -36,31 +36,47 @@ const cloudflare =
 // Bản chạy trên Cloudflare bắt buộc có Cloudinary (Workers không có ổ đĩa để lưu file).
 const cloudinary = cloudinaryConfigFromEnv();
 
+// Ẩn tab "API" (dữ liệu thô) ở trang sửa: người dùng CMS không cần tới
+function hideApiTab<T extends { admin?: object }>(entity: T): T {
+  return { ...entity, admin: { ...entity.admin, hideAPIURL: true } };
+}
+
 export default buildConfig({
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
-    meta: { titleSuffix: " · F21 Hotel CMS" },
+    meta: {
+      titleSuffix: " · F21 Hotel CMS",
+      icons: [{ rel: "icon", type: "image/png", url: "/icon.png" }],
+    },
+    // Giao diện theo màu F21 (src/app/(payload)/custom.css), chỉ dùng nền sáng
+    theme: "light",
+    dateFormat: "dd/MM/yyyy HH:mm",
+    components: {
+      graphics: { Logo: "/payload/admin/Graphics#Logo", Icon: "/payload/admin/Graphics#Icon" },
+      beforeLogin: ["/payload/admin/LoginIntro#LoginIntro"],
+    },
   },
+  // Thứ tự khai báo = thứ tự nhóm trên menu: Đặt phòng, Phòng & giá, Website, Cài đặt.
   // Mọi bảng (trừ nhật ký) đều ghi nhật ký thao tác; bảng hiển thị trên website thì làm mới trang khi lưu
   collections: [
-    withAudit(Users),
-    withRevalidate(withAudit(Media), [CMS_TAGS.rooms]),
-    withRevalidate(withAudit(RoomTypes), [CMS_TAGS.rooms]),
-    withRevalidate(withAudit(Rooms), [CMS_TAGS.rooms]),
     // Đặt phòng và giá theo ngày được tính trực tiếp mỗi lần khách tìm phòng, không lưu đệm
     withAudit(Bookings),
+    withRevalidate(withAudit(RoomTypes), [CMS_TAGS.rooms]),
+    withRevalidate(withAudit(Rooms), [CMS_TAGS.rooms]),
     withAudit(RateRules),
+    withRevalidate(withAudit(Pages), [CMS_TAGS.pages]),
     withRevalidate(withAudit(Offers), [CMS_TAGS.offers]),
+    withRevalidate(withAudit(Media), [CMS_TAGS.rooms]),
     withRevalidate(withAudit(Reviews), [CMS_TAGS.reviews]),
     withRevalidate(withAudit(Faqs), [CMS_TAGS.faqs]),
-    withRevalidate(withAudit(Pages), [CMS_TAGS.pages]),
+    withAudit(Users),
     AuditLogs,
-  ],
+  ].map(hideApiTab),
   globals: [
     withRevalidateGlobal(withAuditGlobal(SiteSettings), [CMS_TAGS.settings]),
     withRevalidateGlobal(withAuditGlobal(ThemeSettings), [CMS_TAGS.theme]),
-  ],
+  ].map(hideApiTab),
   // Trang quản trị bằng tiếng Việt
   i18n: { supportedLanguages: { vi }, fallbackLanguage: "vi" },
   secret: process.env.PAYLOAD_SECRET || "",

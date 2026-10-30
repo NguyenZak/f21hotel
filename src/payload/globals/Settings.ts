@@ -1,13 +1,14 @@
 import type { GlobalConfig } from "payload";
 import { fontChoices } from "@/lib/theme";
 import { anyone, isManager } from "../access";
+import { hiddenUnless, moneyAdmin } from "../admin/fields";
 
 const access = { read: anyone, update: isManager };
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
   label: "Thông tin khách sạn",
-  admin: { group: "Cài đặt" },
+  admin: { group: "Cài đặt", hidden: hiddenUnless("owner", "manager") },
   access,
   fields: [
     {
@@ -20,7 +21,7 @@ export const SiteSettings: GlobalConfig = {
             { name: "tagline", label: "Câu định vị", type: "text", required: true },
             { name: "description", label: "Mô tả ngắn (Google, chia sẻ mạng xã hội)", type: "textarea", required: true },
             { name: "url", label: "Địa chỉ website", type: "text", required: true },
-            { name: "priceFrom", label: "Giá thấp nhất (qua đêm, đồng)", type: "number", required: true },
+            { name: "priceFrom", label: "Giá thấp nhất (qua đêm)", type: "number", required: true, admin: moneyAdmin },
           ],
         },
         {
@@ -90,7 +91,7 @@ export const SiteSettings: GlobalConfig = {
               label: "Ghi chú bảng giá",
               type: "group",
               fields: [
-                { name: "extraPerson", label: "Phụ thu thêm người (đồng)", type: "number" },
+                { name: "extraPerson", label: "Phụ thu thêm người", type: "number", admin: moneyAdmin },
                 { name: "deposit", label: "Đặt cọc", type: "text" },
                 { name: "refund", label: "Hoàn tiền", type: "text" },
                 { name: "water", label: "Đã gồm trong giá", type: "text" },
@@ -171,7 +172,7 @@ const fontOptions = Object.entries(fontChoices).map(([value, f]) => ({
 export const ThemeSettings: GlobalConfig = {
   slug: "theme-settings",
   label: "Giao diện",
-  admin: { group: "Cài đặt" },
+  admin: { group: "Cài đặt", hidden: hiddenUnless("owner", "manager") },
   access,
   fields: [
     {

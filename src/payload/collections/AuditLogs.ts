@@ -1,12 +1,14 @@
 import type { CollectionConfig } from "payload";
 import { isManager } from "../access";
+import { hiddenUnless } from "../admin/fields";
 
 // Nhật ký thao tác: chỉ ghi qua hook trong ../audit.ts, không ai sửa hay xoá được
 export const AuditLogs: CollectionConfig = {
   slug: "audit-logs",
   labels: { singular: "Nhật ký", plural: "Nhật ký thao tác" },
   admin: {
-    group: "Hệ thống",
+    group: "Cài đặt",
+    hidden: hiddenUnless("owner", "manager"),
     useAsTitle: "title",
     defaultColumns: ["createdAt", "user", "action", "target", "title"],
   },

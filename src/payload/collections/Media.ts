@@ -1,10 +1,11 @@
 import type { CollectionConfig } from "payload";
 import { anyone, isManager } from "../access";
+import { hiddenUnless } from "../admin/fields";
 
 export const Media: CollectionConfig = {
   slug: "media",
   labels: { singular: "Ảnh", plural: "Thư viện ảnh" },
-  admin: { group: "Nội dung" },
+  admin: { group: "Website", hidden: hiddenUnless("owner", "manager") },
   access: { read: anyone, create: isManager, update: isManager, delete: isManager },
   fields: [
     {

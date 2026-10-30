@@ -1,10 +1,11 @@
 import { Forbidden, type CollectionConfig } from "payload";
 import { isOwner, ownerOnlyField, ownerOrSelf, ROLES } from "../access";
+import { hiddenUnless } from "../admin/fields";
 
 export const Users: CollectionConfig = {
   slug: "users",
   labels: { singular: "Tài khoản", plural: "Tài khoản" },
-  admin: { useAsTitle: "name", defaultColumns: ["name", "email", "role", "active"], group: "Hệ thống" },
+  admin: { useAsTitle: "name", defaultColumns: ["name", "email", "role", "active"], group: "Cài đặt", hidden: hiddenUnless("owner") },
   auth: true,
   access: {
     // Vào được trang quản trị: mọi tài khoản có vai trò và đang hoạt động
