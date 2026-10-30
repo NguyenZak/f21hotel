@@ -1190,3 +1190,11 @@ html[data-lightbox-open] { overflow: hidden; }
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 @media (min-width: 901px) { .toast { bottom: 32px; } }
+
+/* Khối cơ bản của trình dựng trang (src/blocks): xếp dọc và chia cột */
+.blocks-stack { display: flex; flex-direction: column; gap: 20px; min-height: 40px; }
+.blocks-stack > * { min-width: 0; }
+.blocks-columns { display: grid; gap: clamp(24px, 4vw, 56px); grid-template-columns: 1fr 1fr; align-items: start; }
+.blocks-columns[data-ratio="2-1"] { grid-template-columns: 2fr 1fr; }
+.blocks-columns[data-ratio="1-2"] { grid-template-columns: 1fr 2fr; }
+@media (max-width: 760px) { .blocks-columns, .blocks-columns[data-ratio] { grid-template-columns: 1fr; } }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CtaBand, PageHero, SectionHead } from "@/components/ui";
+import { PageHero, SectionHead } from "@/components/ui";
+import { CtaBand } from "@/components/CtaBand";
 import { getOffers, getSite } from "@/lib/cms";
 import { directPerks } from "@/lib/site";
 

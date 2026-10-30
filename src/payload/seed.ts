@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { faqs, offers, priceNotes, rooms, site } from "@/lib/site";
 import { theme } from "@/lib/theme";
+import { defaultHome } from "@/blocks/home";
 
 const publicDir = path.resolve(process.cwd(), "public");
 
@@ -123,6 +124,15 @@ export async function seed(payload: Payload) {
   });
 
   await payload.updateGlobal({ slug: "theme-settings", data: { fonts: { ...theme.fonts } } });
+
+  // Trang chủ cho trình dựng trang: chỉ tạo khi chưa có, không ghi đè bố cục đã chỉnh trong CMS
+  const home = await payload.find({ collection: "pages", where: { slug: { equals: "home" } }, limit: 1 });
+  if (!home.docs[0]) {
+    await payload.create({
+      collection: "pages",
+      data: { title: "Trang chủ", slug: "home", data: defaultHome, publishedAt: new Date().toISOString() },
+    });
+  }
 
   payload.logger.info(
     `Đã nạp: ${rooms.length} hạng phòng, ${rooms.reduce((n, r) => n + r.roomNumbers.length, 0)} phòng, ${offers.length} ưu đãi, ${faqs.length} câu hỏi`,

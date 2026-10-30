@@ -14,6 +14,7 @@ import { CMS_TAGS } from "./lib/cms-tags";
 import { AuditLogs } from "./payload/collections/AuditLogs";
 import { Faqs, Offers, Reviews, RoomTypes, Rooms } from "./payload/collections/Content";
 import { Media } from "./payload/collections/Media";
+import { Pages } from "./payload/collections/Pages";
 import { Users } from "./payload/collections/Users";
 import { SiteSettings, ThemeSettings } from "./payload/globals/Settings";
 
@@ -49,6 +50,7 @@ export default buildConfig({
     withRevalidate(withAudit(Offers), [CMS_TAGS.offers]),
     withRevalidate(withAudit(Reviews), [CMS_TAGS.reviews]),
     withRevalidate(withAudit(Faqs), [CMS_TAGS.faqs]),
+    withRevalidate(withAudit(Pages), [CMS_TAGS.pages]),
     AuditLogs,
   ],
   globals: [

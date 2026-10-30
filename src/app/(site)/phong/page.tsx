@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Gallery } from "@/components/Gallery";
-import { CtaBand, PageHero, SectionHead } from "@/components/ui";
+import { PageHero, SectionHead } from "@/components/ui";
+import { CtaBand } from "@/components/CtaBand";
 import { getPriceNotes, getRooms, getSite } from "@/lib/cms";
 import { formatVnd, stayModes } from "@/lib/site";
 

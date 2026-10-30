@@ -2,8 +2,10 @@
 // khi lưu trong CMS, hook ở src/payload/revalidate.ts gọi revalidateTag theo nhãn để làm mới trang.
 // Mục nào CMS còn trống thì dùng giá trị mặc định trong site.ts / theme.ts.
 import config from "@payload-config";
+import type { Data } from "@puckeditor/core";
 import { cacheLife, cacheTag } from "next/cache";
 import { getPayload } from "payload";
+import type { BlockMeta } from "@/blocks/types";
 import type { Media } from "@/payload-types";
 import { CMS_TAGS } from "./cms-tags";
 import {
@@ -180,4 +182,27 @@ export async function getReviews(): Promise<Review[]> {
     limit: 12,
   });
   return res.docs.map((r) => ({ name: r.name, text: r.text, rating: r.rating, source: r.source, date: r.date }));
+}
+
+// Bố cục đã xuất bản của một trang dựng bằng trình kéo thả (null nếu chưa có hoặc chưa xuất bản)
+export async function getPageData(slug: string): Promise<{ title: string; data: Data } | null> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(CMS_TAGS.pages);
+  const res = await (await payload()).find({
+    collection: "pages",
+    where: { slug: { equals: slug } },
+    depth: 0,
+    limit: 1,
+    select: { title: true, data: true },
+  });
+  const page = res.docs[0];
+  const data = page?.data as Data | null | undefined;
+  return page && data?.content ? { title: page.title, data } : null;
+}
+
+// Dữ liệu CMS mà các khối của trình dựng trang cần (src/blocks/types.ts)
+export async function getBlockMeta(): Promise<BlockMeta> {
+  const [site, rooms, offers, faqs, reviews] = await Promise.all([getSite(), getRooms(), getOffers(), getFaqs(), getReviews()]);
+  return { site, rooms, offers, faqs, reviews };
 }

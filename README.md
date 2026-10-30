@@ -60,7 +60,15 @@ Trang quản trị: `/admin` (tiếng Việt). Dựng bằng [Payload CMS 3](htt
 - **Ảnh:** Cloudinary, qua bộ kết nối tự viết ở [src/payload/cloudinary.ts](src/payload/cloudinary.ts) (gọi REST API bằng `fetch`, chạy được trên Workers). Chưa khai báo `CLOUDINARY_*` thì bản dev lưu ảnh vào `media-uploads/`.
 - **Vai trò:** Chủ, Quản lý, Nhân viên. Bảng quyền ở [src/payload/access.ts](src/payload/access.ts). Tài khoản tạo đầu tiên luôn là Chủ.
 - **Nhật ký thao tác:** mọi thêm, sửa, xoá đều ghi lại người thực hiện ([src/payload/audit.ts](src/payload/audit.ts)).
-- **Bảng dữ liệu:** Tài khoản, Thư viện ảnh, Hạng phòng, Danh sách phòng, Ưu đãi, Đánh giá, Hỏi đáp, Nhật ký; cài đặt chung: Thông tin khách sạn, Giao diện (font).
+- **Bảng dữ liệu:** Tài khoản, Thư viện ảnh, Hạng phòng, Danh sách phòng, Ưu đãi, Đánh giá, Hỏi đáp, Trang, Nhật ký; cài đặt chung: Thông tin khách sạn, Giao diện (font).
+
+### Trình dựng trang (kéo thả)
+
+CMS › Nội dung › Trang › chọn trang › **Mở trình dựng trang** (đường dẫn `/editor/<id>`, chỉ Chủ và Quản lý). Dựng bằng [Puck](https://puckeditor.com).
+
+- **Lưu nháp** chỉ lưu bản đang sửa, website chưa đổi. **Xuất bản** mới đưa lên website và làm mới trang ngay.
+- Trang chủ là trang có mã `home`. Chưa xuất bản lần nào thì trang chủ dùng bố cục mặc định ở [src/blocks/home.ts](src/blocks/home.ts).
+- Các khối ở [src/blocks/](src/blocks/): `render.tsx` (giao diện, dùng chung cho website và khung xem trước), `editor-config.tsx` (trường chỉnh sửa, giá trị mặc định), `config.ts` (bản chỉ hiển thị). Khối Phòng, Ưu đãi, Đánh giá, Hỏi đáp tự lấy dữ liệu từ các bảng tương ứng; thêm khối mới thì khai báo ở cả ba file.
 
 ### Chạy ở máy
 
@@ -69,6 +77,7 @@ npm install
 # .env.local: PAYLOAD_SECRET (bắt buộc), SEED_PASSWORD (tuỳ chọn), CLOUDINARY_* (tuỳ chọn)
 npm run seed     # nạp dữ liệu từ src/lib/site.ts vào CMS; có SEED_PASSWORD thì tạo thêm 3 tài khoản thử nghiệm *@f21.test
 npm run dev      # mở http://localhost:3000/admin
+npm run sync-media  # sau khi mới khai báo CLOUDINARY_*: đẩy ảnh đã tải trước đó (media-uploads/) lên Cloudinary
 ```
 
 Sau khi sửa bảng dữ liệu: `npm run generate:types` và `npm run generate:importmap`.

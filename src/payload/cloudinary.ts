@@ -42,6 +42,10 @@ async function callApi(cfg: CloudinaryConfig, action: "upload" | "destroy", para
   return res.json() as Promise<Record<string, unknown>>;
 }
 
+// Tải một file lên đúng public_id mà adapter dùng (dùng cho script đồng bộ ảnh cũ)
+export const uploadFile = (cfg: CloudinaryConfig, storageFilePath: string, file: Blob) =>
+  callApi(cfg, "upload", { public_id: `${cfg.folder}/${stripExt(storageFilePath)}`, overwrite: "true" }, file);
+
 export function cloudinaryAdapter(cfg: CloudinaryConfig): Adapter {
   // public_id trên Cloudinary = thư mục + đường dẫn file trong CMS (bỏ đuôi), nên tính lại được từ tên file
   const publicId = (filePath: string) => `${cfg.folder}/${stripExt(filePath)}`;

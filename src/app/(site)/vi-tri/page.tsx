@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
-import { CtaBand, PageHero, SectionHead } from "@/components/ui";
+import { PageHero, SectionHead } from "@/components/ui";
+import { CtaBand } from "@/components/CtaBand";
 import { getSite } from "@/lib/cms";
 import { distances, locationPhotos } from "@/lib/site";
 

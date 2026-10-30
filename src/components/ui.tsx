@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { getSite } from "@/lib/cms";
 import { formatVnd, type Photo as PhotoData, type Room } from "@/lib/site";
 import { Gallery } from "./Gallery";
 import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
@@ -126,23 +125,34 @@ export function RoomCard({ room }: { room: Room }) {
   );
 }
 
-export async function CtaBand({ title, children }: { title: ReactNode; children?: ReactNode }) {
-  const { phoneDisplay, telLink, zaloLink } = await getSite();
+// Dải kêu gọi đặt phòng (giao diện thuần, dùng được cả trong trình dựng trang).
+// Bản tự đọc liên hệ từ CMS: CtaBand trong ./CtaBand.tsx
+export function CtaBandView({
+  title,
+  children,
+  eyebrow = "Đặt trực tiếp, thêm quyền lợi",
+  contact,
+}: {
+  title: ReactNode;
+  children?: ReactNode;
+  eyebrow?: string;
+  contact: { phoneDisplay: string; telLink: string; zaloLink: string };
+}) {
   return (
     <section className="section tight cta-band on-dark">
       <div className="wrap reveal">
-        <span className="eyebrow">Đặt trực tiếp, thêm quyền lợi</span>
+        <span className="eyebrow">{eyebrow}</span>
         <h2>{title}</h2>
         {children ? <p>{children}</p> : null}
         <div className="actions">
           <Link className="btn btn-gold" href="/dat-phong">
             Gửi yêu cầu đặt phòng
           </Link>
-          <a className="btn btn-ghost" href={zaloLink} target="_blank" rel="noopener">
+          <a className="btn btn-ghost" href={contact.zaloLink} target="_blank" rel="noopener">
             <IconChat /> Nhắn Zalo
           </a>
-          <a className="btn btn-ghost" href={telLink}>
-            <IconPhone /> {phoneDisplay}
+          <a className="btn btn-ghost" href={contact.telLink}>
+            <IconPhone /> {contact.phoneDisplay}
           </a>
         </div>
       </div>
