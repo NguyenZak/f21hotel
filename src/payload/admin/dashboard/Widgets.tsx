@@ -2,6 +2,7 @@
 // Bố cục mặc định theo vai trò: defaultLayout trong src/payload/admin/dashboard/layout.ts
 import Link from "next/link";
 import type { PayloadRequest } from "payload";
+import { db } from "@/lib/db";
 import { checkAvailability } from "@/lib/reservations";
 import { formatViDate, shortDate } from "@/lib/dates";
 import { normalizePhone } from "@/lib/booking";
@@ -125,7 +126,7 @@ export async function PendingWidget({ req }: Props) {
 
 export async function AvailabilityWidget() {
   const day = today();
-  const types = Object.values(await checkAvailability(day, plusDays(day, 1)));
+  const types = Object.values(await checkAvailability(await db(), day, plusDays(day, 1)));
   return (
     <Card title="Phòng trống tối nay">
       {types.length ? (

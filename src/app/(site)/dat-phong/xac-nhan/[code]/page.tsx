@@ -9,6 +9,7 @@ import { PageHero } from "@/components/ui";
 import { STAY_LABELS, statusLabel, summarizeBooking } from "@/lib/booking";
 import { getBookingSettings, getSite } from "@/lib/cms";
 import { shortDate } from "@/lib/dates";
+import { db } from "@/lib/db";
 import { findBooking } from "@/lib/reservations";
 import { formatVnd } from "@/lib/site";
 
@@ -43,7 +44,7 @@ async function Confirmation({ params }: { params: Promise<{ code: string }> }) {
   await connection();
   const code = decodeURIComponent((await params).code).toUpperCase();
   if (!/^F21-[A-Z0-9]{7}$/.test(code)) notFound();
-  const [booking, site, settings] = await Promise.all([findBooking(code), getSite(), getBookingSettings()]);
+  const [booking, site, settings] = await Promise.all([db().then((d) => findBooking(d, code)), getSite(), getBookingSettings()]);
   if (!booking) notFound();
 
   const cancelled = booking.status === "cancelled" || booking.status === "no_show";

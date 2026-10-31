@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"main": ".open-next/worker.js",
+	// worker.ts bọc worker của OpenNext (API đặt phòng nhẹ chạy trước khi nạp Next.js)
+	"main": "worker.ts",
 	"name": "f21hotel",
 	// Tài khoản Cloudflare của khách sạn (Azlabs.it@gmail.com's Account)
 	"account_id": "a53fd282b8369dffc65cf51b9e234e2a",

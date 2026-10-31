@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { createBooking, searchRooms } from "@/app/(site)/dat-phong/actions";
+import { createBooking, searchRooms } from "@/lib/booking-client";
 import type { CartLine, GuestField, OnlineStay, SearchResult } from "@/lib/booking";
 import { addDays, nightsBetween, shortDate, toIsoDate } from "@/lib/dates";
 import { formatVnd, type Photo } from "@/lib/site";
@@ -12,7 +12,7 @@ import { track } from "@/lib/track";
 import { IconCheck, IconPhone, IconUsers } from "./Icons";
 
 // Đặt phòng trực tuyến kiểu các trang đặt phòng: chọn ngày → chọn phòng → thông tin người đặt.
-// Phòng trống và giá lấy từ server action (searchRooms) mỗi khi đổi ngày; đặt xong chuyển sang trang xác nhận.
+// Phòng trống và giá lấy từ API /api/booking/search (src/lib/booking-api.ts) mỗi khi đổi ngày; đặt xong chuyển sang trang xác nhận.
 
 export type EngineRoom = { slug: string; name: string; short: string; guests: number; amenities: string[]; photo: Photo | null };
 

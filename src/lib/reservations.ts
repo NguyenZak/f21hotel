@@ -1,26 +1,31 @@
 // Đặt phòng phía server: phòng trống, giá theo ngày, đọc một đặt phòng theo mã, tạo đặt phòng.
+// Các hàm nhận D1 làm tham số, không phụ thuộc Next.js: dùng được cả trong custom worker (worker.ts,
+// chạy trước khi nạp Next.js nên rất nhẹ CPU) lẫn trong trang Next (truyền await db()).
 // Đọc/ghi D1 trực tiếp mỗi lần gọi (không lưu đệm vì số phòng trống đổi theo từng đặt phòng), không qua Payload
 // để vừa giới hạn CPU của Workers Free. Bảng theo cấu trúc Payload: bookings, bookings_items (_parent_id, _order),
 // bookings_rels (path "items.N.rooms"), rate_rules, rate_rules_days, rate_rules_rels (path "roomTypes").
 import { BLOCKING_STATUSES, newBookingCode, type BookingView, type RoomAvailability } from "./booking";
 import { fromDbDate, nightsBetween, nightsOf, toDbDate } from "./dates";
-import { db, num, readAll, rowId, str } from "./db";
+import { num, rowId, str } from "./sql";
 
 // available có thể âm khi đã bán quá số phòng (dùng để phát hiện hai khách đặt cùng lúc phòng cuối cùng)
 export type TypeAvailability = RoomAvailability & { id: number; name: string; guests: number };
 
 type Row = Record<string, unknown>;
+
+async function batch<T extends unknown[]>(d: D1Database, ...stmts: D1PreparedStatement[]): Promise<{ [K in keyof T]: T[K][] }> {
+  return (await d.batch(stmts)).map((r) => r.results) as { [K in keyof T]: T[K][] };
+}
 const roundPrice = (n: number) => Math.round(n / 1000) * 1000;
 const blocking = BLOCKING_STATUSES.map(() => "?").join(", ");
 
-export async function checkAvailability(checkIn: string, checkOut: string): Promise<Record<string, TypeAvailability>> {
+export async function checkAvailability(d: D1Database, checkIn: string, checkOut: string): Promise<Record<string, TypeAvailability>> {
   const nights = nightsOf(checkIn, checkOut);
   if (!nights.length) return {};
   const first = nights[0];
   const last = nights[nights.length - 1];
-  const d = await db();
 
-  const [types, roomCounts, sold, rules, ruleDays, ruleTypes] = await readAll<[Row, Row, Row, Row, Row, Row]>(
+  const [types, roomCounts, sold, rules, ruleDays, ruleTypes] = await batch<[Row, Row, Row, Row, Row, Row]>(d,
     d.prepare('select id, slug, name, guests, prices_full_day, prices_overnight from room_types order by "order", id'),
     d.prepare("select room_type_id, count(*) n from rooms where active = 1 group by room_type_id"),
     // Mục nghỉ giờ không giữ phòng qua đêm
@@ -94,8 +99,7 @@ export async function checkAvailability(checkIn: string, checkOut: string): Prom
 }
 
 // Đặt phòng theo mã, cho trang xác nhận của khách
-export async function findBooking(code: string): Promise<BookingView | null> {
-  const d = await db();
+export async function findBooking(d: D1Database, code: string): Promise<BookingView | null> {
   const b = await d.prepare("select * from bookings where code = ? limit 1").bind(code.toUpperCase()).first<Row>();
   if (!b) return null;
   const { results: items } = await d
@@ -145,8 +149,7 @@ export type NewBooking = {
 
 // Tạo đặt phòng (bản ghi + các dòng phòng) trong một lần ghi D1. Tự làm phần việc mà hook "prepare"
 // của CMS làm khi lưu qua Payload: tạo mã đặt phòng, tính số đêm. Trả về id và mã.
-export async function insertBooking(b: NewBooking): Promise<{ id: number; code: string }> {
-  const d = await db();
+export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id: number; code: string }> {
   const nights = nightsBetween(b.checkIn, b.checkOut) ?? 0;
   for (let attempt = 0; attempt < 3; attempt++) {
     const code = newBookingCode();
@@ -196,8 +199,7 @@ export async function insertBooking(b: NewBooking): Promise<{ id: number; code: 
   throw new Error("Không tạo được mã đặt phòng");
 }
 
-export async function deleteBooking(id: number) {
-  const d = await db();
+export async function deleteBooking(d: D1Database, id: number) {
   await d.batch([
     d.prepare("delete from bookings_rels where parent_id = ?").bind(id),
     d.prepare("delete from bookings_items where _parent_id = ?").bind(id),

@@ -4,7 +4,7 @@ import { fromDbDate, nightsBetween, toDbDate } from "@/lib/dates";
 import { isManager, isStaff } from "../access";
 import { moneyAdmin } from "../admin/fields";
 
-// Đặt phòng: khách đặt trên website (qua server action, src/app/(site)/dat-phong/actions.ts)
+// Đặt phòng: khách đặt trên website (API /api/booking/create, src/lib/booking-api.ts)
 // hoặc lễ tân nhập tay khi khách gọi điện, nhắn Zalo, đến trực tiếp, đặt qua OTA.
 
 const dayOnly = { date: { pickerAppearance: "dayOnly" as const, displayFormat: "dd/MM/yyyy" } };
