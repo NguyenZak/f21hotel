@@ -103,6 +103,8 @@ export function HeroBlock({ heading, slides, search, tabs, puck }: P<HeroProps>)
 }
 
 export type IntroProps = Section & {
+  // Khung bên trái: bản đồ 3D (mặc định) hoặc ảnh vòm
+  media?: "map" | "photo";
   photos: PhotoItem[];
   badgeValue: string;
   badgeLabel: string;
@@ -122,15 +124,20 @@ export function IntroBlock(p: P<IntroProps>) {
     <section {...sectionProps(p)}>
       <div className="wrap intro">
         <div className="intro-media reveal">
-          {photos.length ? (
-            <Gallery
-              photos={photos}
-              visible={1}
-              badge={`${photos.length} ảnh`}
-              className="arch"
-              sizes="(max-width: 900px) 100vw, 45vw"
-            />
-          ) : null}
+          {p.media === "photo" ? (
+            photos.length ? (
+              <Gallery
+                photos={photos}
+                visible={1}
+                className="arch"
+                sizes="(max-width: 900px) 100vw, 45vw"
+              />
+            ) : null
+          ) : (
+            <LocationMap3D>
+              <MapFrame site={meta(p.puck).site} />
+            </LocationMap3D>
+          )}
           {p.badgeValue ? (
             <div className="badge">
               <strong>{p.badgeValue}</strong>
@@ -489,7 +496,7 @@ export function ImageBlock({ photo, caption, album, puck }: P<ImageProps>) {
   const photos: Photo[] = [photo, ...photosOf(album)];
   return (
     <figure style={{ margin: 0 }}>
-      <Gallery photos={photos} visible={1} badge={photos.length > 1 ? `${photos.length} ảnh` : undefined} sizes="(max-width: 900px) 100vw, 60vw" />
+      <Gallery photos={photos} visible={1} sizes="(max-width: 900px) 100vw, 60vw" />
       {caption ? <figcaption style={{ marginTop: 8, fontSize: 15, color: "var(--muted)" }}>{caption}</figcaption> : null}
     </figure>
   );

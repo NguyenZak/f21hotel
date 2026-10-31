@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSite } from "@/lib/cms";
 import { nav } from "@/lib/site";
+import { IconZalo } from "./Icons";
 
 export async function Footer() {
   const site = await getSite();
@@ -41,8 +42,8 @@ export async function Footer() {
                 <a href={telLink}>Hotline: {site.phoneDisplay}</a>
               </li>
               <li>
-                <a href={zaloLink} target="_blank" rel="noopener">
-                  Zalo: {site.phoneDisplay}
+                <a className="footer-zalo" href={zaloLink} target="_blank" rel="noopener">
+                  <IconZalo /> Zalo: {site.phoneDisplay}
                 </a>
               </li>
               <li>

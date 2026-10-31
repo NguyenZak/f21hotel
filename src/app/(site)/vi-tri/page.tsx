@@ -79,7 +79,6 @@ export default async function LocationPage() {
               <Gallery
                 photos={locationPhotos}
                 visible={1}
-                badge={`${locationPhotos.length} ảnh`}
                 sizes="(max-width: 900px) 100vw, 45vw"
               />
             </div>

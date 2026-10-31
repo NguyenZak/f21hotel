@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { track } from "@/lib/track";
-import { IconChat } from "./Icons";
+import { IconZalo } from "./Icons";
 
 // Chép mã đặt phòng; gửi nội dung đặt phòng cho lễ tân qua Zalo (chép sẵn để khách dán vào khung chat)
 export function CopyCode({ code }: { code: string }) {
@@ -44,7 +44,7 @@ export function SendViaZalo({ summary, zaloLink }: { summary: string; zaloLink: 
         window.open(zaloLink, "_blank", "noopener");
       }}
     >
-      <IconChat /> {copied ? "Đã chép, dán vào Zalo" : "Gửi qua Zalo"}
+      <IconZalo /> {copied ? "Đã chép, dán vào Zalo" : "Gửi qua Zalo"}
     </button>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { ContactBar } from "@/components/ContactBar";
+import { FloatContact } from "@/components/FloatContact";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Motion } from "@/components/Motion";
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <main id="noi-dung">{children}</main>
         <Footer />
         <ContactBar contact={contact} />
+        <FloatContact zaloLink={site.zaloLink} facebook={site.social.facebook} />
         <Motion />
       </body>
     </html>

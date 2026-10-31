@@ -6,7 +6,7 @@ import { groupTypes, initialBookingState, type BookingField, type BookingKind } 
 import { addDays, formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
 import { formatVnd, stayModes, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
-import { IconChat, IconCheck, IconPhone } from "./Icons";
+import { IconCheck, IconPhone, IconZalo } from "./Icons";
 
 // Hạng phòng rút gọn cho ô chọn phòng; contact lấy từ CMS ở trang cha
 export type RoomOption = { slug: string; name: string; guests: number; overnight: number };
@@ -272,7 +272,7 @@ export function BookingForm({ kind = "booking", rooms, contact }: Props) {
         {state.summary ? <pre>{state.summary}</pre> : null}
         <div className="actions">
           <button type="button" className="btn btn-gold" onClick={sendViaZalo}>
-            <IconChat /> {copied ? "Đã chép, dán vào Zalo" : "Gửi qua Zalo"}
+            <IconZalo /> {copied ? "Đã chép, dán vào Zalo" : "Gửi qua Zalo"}
           </button>
           <a className="btn btn-ghost" href={telLink}>
             <IconPhone /> Gọi lễ tân

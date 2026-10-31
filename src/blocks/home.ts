@@ -32,6 +32,7 @@ export const heroDefaults: B.HeroProps = {
 
 export const introDefaults: B.IntroProps = {
   anchor: "tong-quan",
+  media: "map",
   background: "",
   photos: facadePhotos.map(photo),
   badgeValue: "15–20′",

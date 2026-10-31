@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
 import { BookingEngine, type EngineRoom } from "@/components/BookingEngine";
 import { BookingForm } from "@/components/BookingForm";
-import { IconChat, IconClock, IconMail, IconPhone, IconPin } from "@/components/Icons";
+import { IconClock, IconMail, IconPhone, IconPin, IconZalo } from "@/components/Icons";
 import { PageHero, SectionHead } from "@/components/ui";
 import { getBookingSettings, getPriceNotes, getRooms, getSite, toFormContact, toRoomOptions } from "@/lib/cms";
 import { directPerks, formatVnd, stayModes } from "@/lib/site";
@@ -42,7 +42,7 @@ export default async function BookingPage() {
             </span>
           </a>
           <a href={zaloLink} target="_blank" rel="noopener">
-            <IconChat />
+            <IconZalo />
             <span>
               <strong>Zalo {site.phoneDisplay}</strong>
               <br />

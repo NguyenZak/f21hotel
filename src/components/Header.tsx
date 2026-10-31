@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { nav, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
-import { IconChat, IconPhone } from "./Icons";
+import { IconPhone, IconZalo } from "./Icons";
 
 export function Header({ contact }: { contact: Contact }) {
   const { name, phoneDisplay, telLink, zaloLink } = contact;
@@ -60,7 +60,7 @@ export function Header({ contact }: { contact: Contact }) {
               rel="noopener"
               onClick={() => track("click_zalo", { from: "menu" })}
             >
-              <IconChat /> Nhắn Zalo
+              <IconZalo /> Nhắn Zalo
             </a>
           </div>
         </nav>

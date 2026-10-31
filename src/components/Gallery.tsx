@@ -14,12 +14,10 @@ type Props = {
   leadTransitionName?: string;
   // Chỉ hiện N ảnh đầu làm ảnh xem trước; lightbox vẫn duyệt toàn bộ album
   visible?: number;
-  // Thêm vào ảnh xem trước, ví dụ nhãn "+5 ảnh"
-  badge?: string;
 };
 
 // Lưới ảnh giữ đúng tỉ lệ gốc; bấm vào ảnh mở xem toàn màn hình
-export function Gallery({ photos, className, leadSizes, sizes, leadTransitionName, visible, badge }: Props) {
+export function Gallery({ photos, className, leadSizes, sizes, leadTransitionName, visible }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [index, setIndex] = useState(0);
   // Hướng chuyển ảnh trong lightbox: 0 khi vừa mở, 1 ảnh sau, -1 ảnh trước
@@ -78,7 +76,6 @@ export function Gallery({ photos, className, leadSizes, sizes, leadTransitionNam
                 height={photo.h}
                 sizes={i === 0 && leadSizes ? leadSizes : sizes}
               />
-              {badge && i === 0 ? <span className="photo-badge">{badge}</span> : null}
             </button>
           );
           return i === 0 && leadTransitionName ? (

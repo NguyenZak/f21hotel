@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatVnd, type Photo as PhotoData, type Room } from "@/lib/site";
 import { Gallery } from "./Gallery";
-import { IconBed, IconChat, IconClock, IconPhone, IconUsers } from "./Icons";
+import { IconBed, IconClock, IconPhone, IconUsers, IconZalo } from "./Icons";
 
 // Ảnh hiển thị đúng tỉ lệ gốc của file
 export function Photo({ photo, sizes, priority }: { photo: PhotoData; sizes: string; priority?: boolean }) {
@@ -89,7 +89,6 @@ export function RoomCard({ room }: { room: Room }) {
         <Gallery
           photos={room.photos}
           visible={1}
-          badge={`${room.photos.length} ảnh`}
           leadTransitionName={`room-${room.slug}`}
           sizes="(max-width: 640px) 100vw, (max-width: 1140px) 50vw, 25vw"
         />
@@ -149,7 +148,7 @@ export function CtaBandView({
             Gửi yêu cầu đặt phòng
           </Link>
           <a className="btn btn-ghost" href={contact.zaloLink} target="_blank" rel="noopener">
-            <IconChat /> Nhắn Zalo
+            <IconZalo /> Nhắn Zalo
           </a>
           <a className="btn btn-ghost" href={contact.telLink}>
             <IconPhone /> {contact.phoneDisplay}

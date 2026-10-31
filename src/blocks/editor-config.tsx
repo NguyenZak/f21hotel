@@ -88,9 +88,17 @@ const components = {
     defaultProps: D.heroDefaults,
   },
   Intro: {
-    label: "Giới thiệu (ảnh vòm + điểm nổi bật)",
+    label: "Giới thiệu (bản đồ 3D hoặc ảnh vòm + điểm nổi bật)",
     fields: {
-      photos: photoList("Album ảnh (ảnh đầu hiện trong khung vòm)"),
+      media: {
+        type: "radio",
+        label: "Khung bên trái",
+        options: [
+          { label: "Bản đồ 3D", value: "map" },
+          { label: "Ảnh vòm", value: "photo" },
+        ],
+      },
+      photos: photoList("Album ảnh (khi chọn Ảnh vòm: ảnh đầu hiện trong khung vòm)"),
       badgeValue: text("Huy hiệu: số"),
       badgeLabel: text("Huy hiệu: chú thích"),
       eyebrow: text("Nhãn nhỏ"),

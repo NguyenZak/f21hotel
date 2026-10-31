@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Contact } from "@/lib/site";
 import { track } from "@/lib/track";
-import { IconCalendar, IconChat, IconPhone } from "./Icons";
+import { IconCalendar, IconPhone, IconZalo } from "./Icons";
 
 // Thanh Gọi / Zalo / Đặt phòng luôn hiện ở cuối màn hình điện thoại
 export function ContactBar({ contact }: { contact: Contact }) {
@@ -15,7 +15,7 @@ export function ContactBar({ contact }: { contact: Contact }) {
         Gọi
       </a>
       <a href={zaloLink} target="_blank" rel="noopener" onClick={() => track("click_zalo", { from: "mobile_bar" })}>
-        <IconChat />
+        <IconZalo />
         Zalo
       </a>
       <Link className="book" href="/dat-phong">
