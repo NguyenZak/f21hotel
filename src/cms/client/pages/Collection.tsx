@@ -1,14 +1,20 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { collectionByPath, type CollectionDef, type Field } from "../../schema";
 import { api, ApiError } from "../api";
 import { money } from "../booking";
 import { FieldInput } from "../fields";
 import { hasRole, useSession } from "../session";
 import { useToast } from "../ui";
+import type { ColumnDef, DataTableProps } from "../DataTable";
+
+const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: () => <p className="c-empty">Đang tải…</p> }) as <T>(
+  p: DataTableProps<T>,
+) => ReactNode;
 
 // Trang danh sách và trang sửa dùng chung cho các mục nội dung khai báo trong src/cms/schema.ts
 
@@ -34,8 +40,8 @@ function Denied() {
 export function CollectionListPage({ path }: { path: string }) {
   const def = collectionByPath(path)!;
   const { user } = useSession();
-  const router = useRouter();
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [filter, setFilter] = useState("");
   const [refs, setRefs] = useState<Record<number, string>>({});
   const [error, setError] = useState("");
   useEffect(() => {
@@ -48,8 +54,30 @@ export function CollectionListPage({ path }: { path: string }) {
         .then((r) => setRefs(Object.fromEntries(r.options.map((o) => [o.id, o.title]))))
         .catch(() => {});
   }, [def]);
+  // Sắp xếp theo giá trị gốc của cột (số, ngày, chữ); ô hiển thị theo kiểu trường
+  const columns = useMemo<ColumnDef<Row, unknown>[]>(
+    () =>
+      (def.listColumns ?? [def.titleField]).map((c, i) => {
+        const f = scalarByColumn(def, c);
+        return {
+          id: c,
+          header: f?.label ?? c,
+          accessorFn: (r: Row) => (f?.type === "ref" ? (refs[Number(r[c])] ?? "") : f?.type === "money" || f?.type === "number" ? Number(r[c] ?? 0) : String(r[c] ?? "")),
+          cell: ({ row: { original: r } }) =>
+            i === 0 ? (
+              <Link href={`/quan-tri/${def.path}/sua?id=${r.id}`}>
+                <b>
+                  <Cell def={def} col={c} row={r} refs={refs} />
+                </b>
+              </Link>
+            ) : (
+              <Cell def={def} col={c} row={r} refs={refs} />
+            ),
+        };
+      }),
+    [def, refs],
+  );
   if (user && !hasRole(user, ...def.read)) return <Denied />;
-  const cols = def.listColumns ?? [def.titleField];
   const canWrite = hasRole(user, ...def.write);
   return (
     <>
@@ -65,40 +93,32 @@ export function CollectionListPage({ path }: { path: string }) {
         ) : null}
       </div>
       {error ? <p className="c-alert c-alert--error">{error}</p> : null}
+      {rows && rows.length > 6 ? (
+        <div className="c-toolbar">
+          <input
+            className="c-input c-filter"
+            type="search"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={`Lọc ${def.label.toLowerCase()}…`}
+            aria-label={`Lọc ${def.label}`}
+          />
+          <span className="c-muted">{rows.length} mục · bấm tiêu đề cột để sắp xếp</span>
+        </div>
+      ) : null}
       <div className="c-card c-table-wrap">
         {!rows ? (
           <p className="c-empty">Đang tải…</p>
         ) : !rows.length ? (
           <p className="c-empty">Chưa có mục nào.</p>
         ) : (
-          <table className="c-table">
-            <thead>
-              <tr>
-                {cols.map((c) => (
-                  <th key={c}>{scalarByColumn(def, c)?.label ?? c}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={String(r.id)} className="c-row-link" onClick={() => router.push(`/quan-tri/${def.path}/sua?id=${r.id}`)}>
-                  {cols.map((c, i) => (
-                    <td key={c}>
-                      {i === 0 ? (
-                        <Link href={`/quan-tri/${def.path}/sua?id=${r.id}`} onClick={(e) => e.stopPropagation()}>
-                          <b>
-                            <Cell def={def} col={c} row={r} refs={refs} />
-                          </b>
-                        </Link>
-                      ) : (
-                        <Cell def={def} col={c} row={r} refs={refs} />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            data={rows}
+            columns={columns}
+            filter={filter}
+            rowHref={(r) => `/quan-tri/${def.path}/sua?id=${r.id}`}
+            getRowId={(r) => String(r.id)}
+          />
         )}
       </div>
     </>

@@ -1,11 +1,60 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { BookingDTO } from "../../types";
 import { api, ApiError } from "../api";
 import { dayLabel, money, roomsText, sourceLabel, statusLabel, telHref } from "../booking";
+import type { ColumnDef, DataTableProps } from "../DataTable";
+
+const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: () => <p className="c-empty">Đang tải…</p> }) as <T>(
+  p: DataTableProps<T>,
+) => ReactNode;
+
+const editHref = (b: BookingDTO) => `/quan-tri/dat-phong/sua?id=${b.id}`;
+
+// Cột bảng: giá trị (accessor) dùng để sắp xếp, ô (cell) để hiển thị
+const COLUMNS: ColumnDef<BookingDTO, unknown>[] = [
+  {
+    id: "guest",
+    header: "Khách",
+    accessorFn: (b) => `${b.guestName} ${b.code} ${b.phone}`,
+    cell: ({ row: { original: b } }) => (
+      <>
+        <Link href={editHref(b)}>
+          <b>{b.guestName}</b>
+        </Link>
+        <div className="c-muted" style={{ fontSize: 13 }}>
+          {b.code} · <a href={telHref(b.phone)}>{b.phone}</a>
+        </div>
+      </>
+    ),
+  },
+  {
+    id: "stay",
+    header: "Ngày ở",
+    accessorFn: (b) => b.checkIn,
+    cell: ({ row: { original: b } }) => (
+      <>
+        {dayLabel(b.checkIn)} → {dayLabel(b.checkOut)}
+        <div className="c-muted" style={{ fontSize: 13 }}>
+          {b.nights ? `${b.nights} đêm` : "Trong ngày"}
+        </div>
+      </>
+    ),
+  },
+  { id: "rooms", header: "Phòng", accessorFn: roomsText, enableSorting: false },
+  {
+    id: "status",
+    header: "Trạng thái",
+    accessorFn: (b) => statusLabel(b.status),
+    cell: ({ row: { original: b } }) => <span className={`c-status c-status--${b.status}`}>{statusLabel(b.status)}</span>,
+  },
+  { id: "total", header: "Tổng tiền", accessorFn: (b) => b.total ?? 0, cell: ({ row: { original: b } }) => money(b.total), sortDescFirst: true },
+  { id: "source", header: "Kênh", accessorFn: (b) => sourceLabel(b.source), cell: ({ getValue }) => <span className="c-muted">{String(getValue())}</span> },
+];
 
 // Danh sách đặt phòng: lọc nhanh, tìm theo mã / tên / số điện thoại
 const FILTERS = [
@@ -88,47 +137,7 @@ export function BookingsPage() {
         ) : !rows.length ? (
           <p className="c-empty">Không có đặt phòng nào{q ? ` khớp “${q}”` : ""}.</p>
         ) : (
-          <table className="c-table">
-            <thead>
-              <tr>
-                <th>Khách</th>
-                <th>Ngày ở</th>
-                <th>Phòng</th>
-                <th>Trạng thái</th>
-                <th>Tổng tiền</th>
-                <th>Kênh</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((b) => (
-                <tr key={b.id} className="c-row-link" onClick={() => router.push(`/quan-tri/dat-phong/sua?id=${b.id}`)}>
-                  <td>
-                    <Link href={`/quan-tri/dat-phong/sua?id=${b.id}`} onClick={(e) => e.stopPropagation()}>
-                      <b>{b.guestName}</b>
-                    </Link>
-                    <div className="c-muted" style={{ fontSize: 13 }}>
-                      {b.code} ·{" "}
-                      <a href={telHref(b.phone)} onClick={(e) => e.stopPropagation()}>
-                        {b.phone}
-                      </a>
-                    </div>
-                  </td>
-                  <td>
-                    {dayLabel(b.checkIn)} → {dayLabel(b.checkOut)}
-                    <div className="c-muted" style={{ fontSize: 13 }}>
-                      {b.nights ? `${b.nights} đêm` : "Trong ngày"}
-                    </div>
-                  </td>
-                  <td>{roomsText(b)}</td>
-                  <td>
-                    <span className={`c-status c-status--${b.status}`}>{statusLabel(b.status)}</span>
-                  </td>
-                  <td>{money(b.total)}</td>
-                  <td className="c-muted">{sourceLabel(b.source)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable data={rows} columns={COLUMNS} rowHref={editHref} getRowId={(b) => String(b.id)} />
         )}
       </div>
       {more ? (

@@ -508,3 +508,12 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 @keyframes c-fade { from { opacity: 0; } }
 @keyframes c-pop { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
 @media (prefers-reduced-motion: reduce) { .c-cmdk-overlay, .c-cmdk-content { animation: none; } }
+
+/* ---------- Bảng danh sách (TanStack Table) ---------- */
+.c-sort { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.c-sort:hover { color: var(--c-text); }
+.c-sort__mark { font-size: 9px; opacity: 0.45; }
+[aria-sort] .c-sort__mark { opacity: 1; color: var(--c-maroon); }
+.c-datatable tr.is-active td { background: var(--c-maroon-soft); }
+.c-datatable tr.is-active td:first-child { box-shadow: inset 3px 0 0 var(--c-maroon); }
+.c-filter { max-width: 320px; }
