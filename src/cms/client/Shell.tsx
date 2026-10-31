@@ -1,58 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { api, ROLE_LABELS, type Role } from "./api";
-import { Icon, type IconName } from "./icons";
+import { Icon } from "./icons";
+import { navFor } from "./nav";
 import { SessionProvider, useSession } from "./session";
-import { ThemeToggle } from "./theme";
-
-// Menu CMS theo công việc và vai trò. Mục có "legacy" chưa làm lại, tạm mở trang của CMS cũ (/admin).
-type Item = { href: string; label: string; icon: IconName; roles?: Role[]; legacy?: boolean };
-type Group = { title?: string; roles?: Role[]; items: Item[] };
-
-const ALL: Role[] = ["owner", "manager", "staff"];
-const MANAGE: Role[] = ["owner", "manager"];
-
-const NAV: Group[] = [
-  {
-    items: [
-      { href: "/quan-tri", label: "Hôm nay", icon: "today" },
-      { href: "/quan-tri/dat-phong", label: "Đặt phòng", icon: "bookings" },
-      { href: "/quan-tri/lich-phong", label: "Lịch phòng", icon: "calendar" },
-    ],
-  },
-  {
-    title: "Phòng & giá",
-    items: [
-      { href: "/quan-tri/hang-phong", label: "Hạng phòng", icon: "roomTypes" },
-      { href: "/quan-tri/phong", label: "Danh sách phòng", icon: "rooms" },
-      { href: "/quan-tri/gia-theo-ngay", label: "Giá theo ngày", icon: "rates" },
-    ],
-  },
-  {
-    title: "Website",
-    roles: MANAGE,
-    items: [
-      { href: "/quan-tri/trang", label: "Trang", icon: "pages" },
-      { href: "/quan-tri/uu-dai", label: "Ưu đãi", icon: "offers" },
-      { href: "/quan-tri/thu-vien-anh", label: "Thư viện ảnh", icon: "media" },
-      { href: "/quan-tri/danh-gia", label: "Đánh giá của khách", icon: "reviews" },
-      { href: "/quan-tri/hoi-dap", label: "Hỏi đáp", icon: "faqs" },
-    ],
-  },
-  {
-    title: "Cài đặt",
-    roles: MANAGE,
-    items: [
-      { href: "/quan-tri/thong-tin", label: "Thông tin khách sạn", icon: "hotel" },
-      { href: "/quan-tri/giao-dien", label: "Giao diện", icon: "theme" },
-      { href: "/quan-tri/tai-khoan", label: "Tài khoản", icon: "users", roles: ["owner"] },
-      { href: "/quan-tri/nhat-ky", label: "Nhật ký thao tác", icon: "audit" },
-    ],
-  },
-];
+import { ThemeToggle, useMounted } from "./theme";
 
 function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
   const path = usePathname();
@@ -71,9 +27,8 @@ function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
           <small>Quản lý khách sạn</small>
         </span>
       </Link>
-      {NAV.filter((g) => (g.roles ?? ALL).includes(role)).map((g, i) => {
-        const items = g.items.filter((it) => (it.roles ?? ALL).includes(role));
-        if (!items.length) return null;
+      {navFor(role).map((g, i) => {
+        const items = g.items;
         return (
           <div className="c-nav__group" key={g.title ?? i}>
             {g.title ? <h3>{g.title}</h3> : null}
@@ -107,9 +62,32 @@ function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
   );
 }
 
+// Bảng lệnh Ctrl+K: chỉ tải khi mở lần đầu
+const CommandPalette = dynamic(() => import("./CommandPalette").then((m) => m.CommandPalette), { ssr: false });
+
 function Frame({ children }: { children: ReactNode }) {
   const { user } = useSession();
   const [open, setOpen] = useState(false);
+  const [palette, setPalette] = useState(false);
+  const [paletteUsed, setPaletteUsed] = useState(false);
+  const mac = useMounted() && /Mac|iPhone|iPad/.test(navigator.userAgent);
+  const openPalette = () => {
+    setPaletteUsed(true);
+    setPalette(true);
+  };
+
+  // Ctrl+K (Windows) / ⌘K (Mac) mở bảng lệnh ở mọi trang
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey) && !e.altKey) {
+        e.preventDefault();
+        setPaletteUsed(true);
+        setPalette((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const logout = async () => {
     await api("logout", { body: {} }).catch(() => {});
@@ -141,6 +119,11 @@ function Frame({ children }: { children: ReactNode }) {
           >
             ☰ Menu
           </button>
+          <button className="c-cmdk-trigger" type="button" onClick={openPalette} aria-keyshortcuts="Control+K Meta+K">
+            <Icon name="search" />
+            <span>Tìm nhanh…</span>
+            <kbd>{mac ? "⌘K" : "Ctrl K"}</kbd>
+          </button>
           <ThemeToggle />
           {user ? (
             <div className="c-user">
@@ -164,6 +147,7 @@ function Frame({ children }: { children: ReactNode }) {
         </header>
         <main className="c-page">{children}</main>
       </div>
+      {user && paletteUsed ? <CommandPalette open={palette} onOpenChange={setPalette} role={user.role} onLogout={logout} /> : null}
     </div>
   );
 }

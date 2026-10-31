@@ -465,5 +465,46 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 }
 
 /* ---------- Thanh trên: tìm nhanh (Ctrl+K), sáng/tối ---------- */
-.c-theme-toggle { margin-left: auto; }
+.c-cmdk-trigger {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 8px; min-width: 240px; min-height: 36px; padding: 0 8px 0 10px;
+  border: 1px solid var(--c-line-strong); border-radius: var(--r-s); background: var(--c-card); color: var(--c-muted);
+  font: inherit; font-size: 14px; cursor: pointer; text-align: left;
+}
+.c-cmdk-trigger span { flex: 1; }
+.c-cmdk-trigger:hover { border-color: var(--c-gold); color: var(--c-text); }
+.cms kbd {
+  display: inline-block; padding: 1px 6px; border: 1px solid var(--c-line-strong); border-bottom-width: 2px; border-radius: 4px;
+  background: var(--c-raised); color: var(--c-muted); font: 600 11px/1.5 var(--font);
+}
 .c-theme-toggle + .c-user { margin-left: 0; }
+@media (max-width: 900px) {
+  .c-cmdk-trigger { min-width: 0; padding: 0 9px; }
+  .c-cmdk-trigger span, .c-cmdk-trigger kbd { display: none; }
+}
+
+/* ---------- Bảng lệnh Ctrl+K (cmdk) ---------- */
+.c-cmdk-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(20, 12, 10, 0.45); backdrop-filter: blur(2px); animation: c-fade 0.18s ease-out; }
+.c-cmdk-content {
+  position: fixed; z-index: 91; top: 12vh; left: 50%; translate: -50% 0; width: min(640px, calc(100vw - 24px));
+  background: var(--c-card); color: var(--c-text); border: 1px solid var(--c-line); border-radius: var(--r-l);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.45); overflow: hidden; animation: c-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.c-cmdk__input { display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--c-line); color: var(--c-muted); }
+.c-cmdk__input input { flex: 1; min-width: 0; height: 52px; border: 0; outline: none; background: none; color: var(--c-text); font: inherit; font-size: 16px; }
+.c-cmdk__input input:focus-visible { outline: none; }
+.c-cmdk__list { max-height: min(56vh, 460px); overflow-y: auto; overscroll-behavior: contain; padding: 6px; scroll-padding-block: 8px; }
+.c-cmdk [cmdk-group-heading] { padding: 10px 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-gold-ink); }
+.c-cmdk [cmdk-item] {
+  display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 6px 10px; border-radius: var(--r-s);
+  cursor: pointer; color: var(--c-text); font-size: 14.5px;
+}
+.c-cmdk [cmdk-item] .c-icon { flex-shrink: 0; color: var(--c-muted); }
+.c-cmdk [cmdk-item][data-selected="true"] { background: var(--c-maroon-soft); }
+.c-cmdk [cmdk-item][data-selected="true"] .c-icon { color: var(--c-maroon); }
+.c-cmdk__main { flex: 1; min-width: 0; display: grid; }
+.c-cmdk__main small { color: var(--c-muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.c-cmdk [cmdk-empty], .c-cmdk [cmdk-loading] { padding: 18px 12px; text-align: center; color: var(--c-muted); font-size: 14px; }
+.c-cmdk__foot { display: flex; gap: 16px; justify-content: flex-end; padding: 8px 14px; border-top: 1px solid var(--c-line); color: var(--c-muted); font-size: 12px; }
+@keyframes c-fade { from { opacity: 0; } }
+@keyframes c-pop { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
+@media (prefers-reduced-motion: reduce) { .c-cmdk-overlay, .c-cmdk-content { animation: none; } }
