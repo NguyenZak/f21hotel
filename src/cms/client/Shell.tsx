@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import { api, ROLE_LABELS, type Role } from "./api";
 import { Icon, type IconName } from "./icons";
 import { SessionProvider, useSession } from "./session";
+import { ThemeToggle } from "./theme";
 
 // Menu CMS theo công việc và vai trò. Mục có "legacy" chưa làm lại, tạm mở trang của CMS cũ (/admin).
 type Item = { href: string; label: string; icon: IconName; roles?: Role[]; legacy?: boolean };
@@ -140,6 +141,7 @@ function Frame({ children }: { children: ReactNode }) {
           >
             ☰ Menu
           </button>
+          <ThemeToggle />
           {user ? (
             <div className="c-user">
               <Link
