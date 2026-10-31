@@ -37,6 +37,14 @@ export default {
       });
       if (res) return res;
     }
+    // Mọi API đều xử lý ở trên; đường dẫn /api khác (vd. bot dò API của CMS cũ) trả 404 ngay,
+    // không nạp Next.js chỉ để dựng trang lỗi (tốn hơn 200 ms CPU)
+    if (pathname.startsWith("/api/")) {
+      return new Response(JSON.stringify({ ok: false, error: "Không có API này." }), {
+        status: 404,
+        headers: { "content-type": "application/json; charset=utf-8" },
+      });
+    }
     return nextWorker.fetch(request, env, ctx);
   },
 } satisfies ExportedHandler<CloudflareEnv>;
