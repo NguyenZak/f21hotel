@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createContext, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { editorConfig } from "@/blocks/editor-config";
 import type { BlockMeta } from "@/blocks/types";
-import { savePage } from "../actions";
+import type { SaveResult } from "../actions";
 
 type Status = { tone: "" | "ok" | "error"; text: string };
 
@@ -14,6 +14,7 @@ type Ctx = {
   pending: boolean;
   status: Status;
   path: string;
+  backHref: string;
 };
 const EditorCtx = createContext<Ctx | null>(null);
 
@@ -91,7 +92,7 @@ function HeaderActions({ children }: { children: ReactNode }) {
           {ctx.status.text}
         </span>
       ) : null}
-      <Link className="editor-btn" href="/admin/collections/pages">
+      <Link className="editor-btn" href={ctx.backHref}>
         Về CMS
       </Link>
       <a className="editor-btn" href={ctx.path} target="_blank" rel="noopener">
@@ -111,6 +112,10 @@ function HeaderActions({ children }: { children: ReactNode }) {
 }
 
 type Props = {
+  // Lưu bố cục: publish = true thì đưa lên website (CMS mới gọi API, CMS cũ gọi server action)
+  save: (id: number, data: Data, publish: boolean) => Promise<SaveResult>;
+  // Nút "Về CMS"
+  backHref?: string;
   id: number;
   title: string;
   path: string;
@@ -121,7 +126,7 @@ type Props = {
   publishedAt: string | null;
 };
 
-export function Editor({ id, title, path, data, metadata, fontRoles, hasDraft, publishedAt }: Props) {
+export function Editor({ save: savePage, backHref = "/admin/collections/pages", id, title, path, data, metadata, fontRoles, hasDraft, publishedAt }: Props) {
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<Status>(() => ({
     tone: "",
@@ -166,7 +171,7 @@ export function Editor({ id, title, path, data, metadata, fontRoles, hasDraft, p
   }));
 
   return (
-    <EditorCtx.Provider value={{ saveDraft: (d) => save(d, false), pending, status, path }}>
+    <EditorCtx.Provider value={{ saveDraft: (d) => save(d, false), pending, status, path, backHref }}>
       <Puck
         config={editorConfig}
         data={data}

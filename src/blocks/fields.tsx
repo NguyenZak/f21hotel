@@ -17,9 +17,10 @@ function ImagePicker({ value, onChange }: { value?: Photo; onChange: (v: Photo) 
 
   useEffect(() => {
     if (!open || items) return;
-    fetch("/api/media?limit=200&depth=0&sort=-createdAt", { credentials: "include" })
-      .then((r) => r.json() as Promise<{ docs: MediaDoc[] }>)
-      .then((j) => setItems(j.docs))
+    // Thư viện ảnh của CMS mới (/api/cms/media); ảnh tải lên ở CMS › Thư viện ảnh
+    fetch("/api/cms/media", { credentials: "same-origin" })
+      .then((r) => r.json() as Promise<{ media: MediaDoc[] }>)
+      .then((j) => setItems(j.media ?? []))
       .catch(() => setItems([]));
   }, [open, items]);
 
@@ -38,7 +39,7 @@ function ImagePicker({ value, onChange }: { value?: Photo; onChange: (v: Photo) 
         <div style={{ display: "grid", gap: 8 }}>
           <input placeholder="Tìm theo mô tả ảnh" value={q} onChange={(e) => setQ(e.target.value)} style={input} />
           {!items ? <small>Đang tải…</small> : null}
-          {items && !items.length ? <small>Thư viện chưa có ảnh. Tải ảnh lên ở CMS › Thư viện ảnh.</small> : null}
+          {items && !items.length ? <small>Thư viện chưa có ảnh. Tải ảnh lên ở Quản lý › Thư viện ảnh.</small> : null}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, maxHeight: 280, overflowY: "auto" }}>
             {shown.map((m) => (
               <button

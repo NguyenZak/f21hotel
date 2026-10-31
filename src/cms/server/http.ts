@@ -13,6 +13,8 @@ export type CmsContext = {
   // (kvTagRevalidator bên dưới); khi chạy next dev: revalidateTag của Next.js.
   revalidate: (tags: string[]) => Promise<void>;
   waitUntil: (p: Promise<unknown>) => void;
+  // Thư viện ảnh (Cloudinary); không có thì không tải ảnh lên được
+  cloudinary?: { cloudName: string; apiKey: string; apiSecret: string; folder: string };
 };
 
 // ---------- Tiện ích ----------

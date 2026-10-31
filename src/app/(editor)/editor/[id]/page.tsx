@@ -9,6 +9,7 @@ import { getPayload } from "payload";
 import { defaultHome } from "@/blocks/home";
 import { getBlockMeta, getThemeFonts } from "@/lib/cms";
 import { fontVar } from "../../../(site)/fonts";
+import { savePage } from "../actions";
 import { Editor } from "./Editor";
 
 // Trang theo người đăng nhập, không prefetch (giống trang quản trị)
@@ -49,6 +50,7 @@ export default async function EditorPage({ params }: { params: Promise<{ id: str
 
   return (
     <Editor
+      save={savePage}
       id={page.id}
       title={page.title}
       path={page.slug === "home" ? "/" : `/${page.slug}`}

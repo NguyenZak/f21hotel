@@ -4,6 +4,9 @@
 // Không import gì từ Next.js / OpenNext / Payload ở đây.
 import { str } from "@/lib/sql";
 import { bookingRoutes } from "./bookings";
+import { contentRoutes } from "./content";
+import { mediaRoutes } from "./media";
+import { pageRoutes } from "./pages";
 import { hashPassword, needsRehash, readSession, signSession, verifyPassword } from "./crypto";
 import { audit, body, can, fail, json, ROLES, toUser, type CmsContext, type CmsUser, type Role } from "./http";
 
@@ -196,6 +199,10 @@ export const routes: Route[] = [
   { method: "GET", match: (p) => p[0] === "audit-logs" && p.length === 1, roles: ["owner", "manager"], handler: listAudit },
   // Vận hành: hôm nay, đặt phòng, lịch phòng (mọi vai trò; xoá đặt phòng: Chủ, Quản lý)
   ...bookingRoutes,
+  // Nội dung (src/cms/schema.ts) và thư viện ảnh: quyền kiểm tra theo từng mục
+  ...contentRoutes,
+  ...mediaRoutes,
+  ...pageRoutes,
 ];
 
 // Xử lý /api/cms/*. Trả null nếu không phải đường dẫn của API này.

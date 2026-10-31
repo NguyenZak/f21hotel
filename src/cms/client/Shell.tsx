@@ -24,52 +24,28 @@ const NAV: Group[] = [
   {
     title: "Phòng & giá",
     items: [
-      {
-        href: "/admin/collections/room-types",
-        label: "Hạng phòng",
-        legacy: true,
-      },
-      {
-        href: "/admin/collections/rooms",
-        label: "Danh sách phòng",
-        legacy: true,
-      },
-      {
-        href: "/admin/collections/rate-rules",
-        label: "Giá theo ngày",
-        legacy: true,
-      },
+      { href: "/quan-tri/hang-phong", label: "Hạng phòng" },
+      { href: "/quan-tri/phong", label: "Danh sách phòng" },
+      { href: "/quan-tri/gia-theo-ngay", label: "Giá theo ngày" },
     ],
   },
   {
     title: "Website",
     roles: MANAGE,
     items: [
-      { href: "/admin/collections/pages", label: "Trang", legacy: true },
-      { href: "/admin/collections/offers", label: "Ưu đãi", legacy: true },
-      { href: "/admin/collections/media", label: "Thư viện ảnh", legacy: true },
-      {
-        href: "/admin/collections/reviews",
-        label: "Đánh giá của khách",
-        legacy: true,
-      },
-      { href: "/admin/collections/faqs", label: "Hỏi đáp", legacy: true },
+      { href: "/quan-tri/trang", label: "Trang" },
+      { href: "/quan-tri/uu-dai", label: "Ưu đãi" },
+      { href: "/quan-tri/thu-vien-anh", label: "Thư viện ảnh" },
+      { href: "/quan-tri/danh-gia", label: "Đánh giá của khách" },
+      { href: "/quan-tri/hoi-dap", label: "Hỏi đáp" },
     ],
   },
   {
     title: "Cài đặt",
     roles: MANAGE,
     items: [
-      {
-        href: "/admin/globals/site-settings",
-        label: "Thông tin khách sạn",
-        legacy: true,
-      },
-      {
-        href: "/admin/globals/theme-settings",
-        label: "Giao diện",
-        legacy: true,
-      },
+      { href: "/quan-tri/thong-tin", label: "Thông tin khách sạn" },
+      { href: "/quan-tri/giao-dien", label: "Giao diện" },
       { href: "/quan-tri/tai-khoan", label: "Tài khoản", roles: ["owner"] },
       { href: "/quan-tri/nhat-ky", label: "Nhật ký thao tác" },
     ],
