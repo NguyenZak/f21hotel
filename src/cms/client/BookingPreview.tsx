@@ -1,26 +1,31 @@
 "use client";
 
-import { AnimatePresence, m } from "motion/react";
+import { AnimatePresence, domAnimation, LazyMotion, m, MotionConfig } from "motion/react";
 import Link from "next/link";
 import type { BookingDTO } from "../types";
 import { dayLabel, money, sourceLabel, STAY_LABELS, statusLabel, telHref, zaloHref } from "./booking";
 import { Icon } from "./icons";
 import { formatTime } from "./ui";
 
-// Xem nhanh một đặt phòng ở khung bên phải trang Đặt phòng (màn hình rộng); đổi đơn thì nội dung chuyển mượt
-export function BookingPreview({ booking }: { booking: BookingDTO | null }) {
+// Xem nhanh một đặt phòng ở khung bên phải trang Đặt phòng (màn hình rộng); đổi đơn thì nội dung chuyển mượt.
+// Tải riêng (next/dynamic, ssr: false) từ trang Đặt phòng để motion không nằm trong gói chạy trên server.
+export default function BookingPreview({ booking }: { booking: BookingDTO | null }) {
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <m.div
-        key={booking?.id ?? "empty"}
-        initial={{ opacity: 0, x: 12 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -6 }}
-        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <PreviewBody b={booking} />
-      </m.div>
-    </AnimatePresence>
+    <MotionConfig reducedMotion="user">
+      <LazyMotion features={domAnimation} strict>
+        <AnimatePresence mode="wait" initial={false}>
+          <m.div
+            key={booking?.id ?? "empty"}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -6 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <PreviewBody b={booking} />
+          </m.div>
+        </AnimatePresence>
+      </LazyMotion>
+    </MotionConfig>
   );
 }
 

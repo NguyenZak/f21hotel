@@ -574,3 +574,9 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-rc .recharts-surface:focus, .c-rc .recharts-wrapper:focus { outline: none; }
 .c-rc-tip { display: grid; gap: 2px; padding: 8px 10px; border-radius: var(--r-s); background: var(--c-inverse); color: var(--c-inverse-ink); font-size: 12.5px; box-shadow: var(--shadow); }
 @media (max-width: 1100px) { .c-reports { grid-template-columns: 1fr; } }
+
+/* Chuyển trang: nội dung mới hiện mờ dần và trượt lên nhẹ */
+@media (prefers-reduced-motion: no-preference) {
+  .c-page { animation: c-page-in 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+}
+@keyframes c-page-in { from { opacity: 0; transform: translateY(8px); } }

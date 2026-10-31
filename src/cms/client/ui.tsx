@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, m } from "motion/react";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 // Hộp thoại dùng thẻ <dialog> của trình duyệt (tự giữ focus, Esc để đóng)
@@ -65,6 +65,9 @@ export function Dialog({
   );
 }
 
+// Hiệu ứng của thông báo dùng motion: tải riêng trong trình duyệt
+const Toast = dynamic(() => import("./Toast"), { ssr: false });
+
 // Thông báo ngắn ở cuối màn hình, tự ẩn sau 3 giây
 export function useToast() {
   const [msg, setMsg] = useState("");
@@ -73,23 +76,7 @@ export function useToast() {
     const t = setTimeout(() => setMsg(""), 3000);
     return () => clearTimeout(t);
   }, [msg]);
-  const node = (
-    <AnimatePresence>
-      {msg ? (
-        <m.div
-          key={msg}
-          className="c-toast"
-          role="status"
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ type: "spring", stiffness: 420, damping: 32 }}
-        >
-          {msg}
-        </m.div>
-      ) : null}
-    </AnimatePresence>
-  );
+  const node = <Toast msg={msg} />;
   return [node, setMsg] as const;
 }
 

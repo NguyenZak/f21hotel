@@ -1,6 +1,5 @@
 "use client";
 
-import { LazyMotion, m, MotionConfig } from "motion/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -62,8 +61,6 @@ function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
     </nav>
   );
 }
-
-const motionFeatures = () => import("./motion-features").then((r) => r.default);
 
 // Bảng lệnh Ctrl+K: chỉ tải khi mở lần đầu
 const CommandPalette = dynamic(() => import("./CommandPalette").then((m) => m.CommandPalette), { ssr: false });
@@ -149,16 +146,10 @@ function Frame({ children }: { children: ReactNode }) {
             </div>
           ) : null}
         </header>
-        {/* Chuyển trang: nội dung mới hiện mờ dần và trượt lên nhẹ (trang cũ thay ngay, không chồng lên nhau) */}
-        <m.main
-          key={path}
-          className="c-page"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        >
+        {/* Chuyển trang: key đổi theo đường dẫn để hiệu ứng CSS c-page-in chạy lại (cms.css) */}
+        <main key={path} className="c-page">
           {children}
-        </m.main>
+        </main>
       </div>
       {user && paletteUsed ? <CommandPalette open={palette} onOpenChange={setPalette} role={user.role} onLogout={logout} /> : null}
     </div>
@@ -167,13 +158,8 @@ function Frame({ children }: { children: ReactNode }) {
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    // reducedMotion="user": khách bật giảm chuyển động trong máy thì bỏ hiệu ứng di chuyển
-    <MotionConfig reducedMotion="user">
-      <LazyMotion features={motionFeatures} strict>
-        <SessionProvider>
-          <Frame>{children}</Frame>
-        </SessionProvider>
-      </LazyMotion>
-    </MotionConfig>
+    <SessionProvider>
+      <Frame>{children}</Frame>
+    </SessionProvider>
   );
 }

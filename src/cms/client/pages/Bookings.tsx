@@ -7,7 +7,6 @@ import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNo
 import type { BookingDTO } from "../../types";
 import { api, ApiError } from "../api";
 import { dayLabel, money, roomsText, sourceLabel, statusLabel, telHref } from "../booking";
-import { BookingPreview } from "../BookingPreview";
 import type { ColumnDef, DataTableProps } from "../DataTable";
 
 const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: () => <p className="c-empty">Đang tải…</p> }) as <T>(
@@ -15,6 +14,7 @@ const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: (
 ) => ReactNode;
 
 const SplitView = dynamic(() => import("../SplitView"), { ssr: false });
+const BookingPreview = dynamic(() => import("../BookingPreview"), { ssr: false });
 
 // Màn hình rộng: danh sách và khung xem nhanh nằm cạnh nhau
 const WIDE = "(min-width: 1180px)";
