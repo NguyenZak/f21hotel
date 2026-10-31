@@ -1,8 +1,6 @@
 "use server";
 
-import config from "@payload-config";
 import { after } from "next/server";
-import { getPayload } from "payload";
 import {
   isValidEmail,
   isValidPhone,
@@ -15,9 +13,9 @@ import {
   type SearchResult,
 } from "@/lib/booking";
 import { getBookingSettings, getOffers, type BookingSettings } from "@/lib/cms";
-import { addDays, nightsBetween, toDbDate, todayInVietnam, toIsoDate } from "@/lib/dates";
+import { addDays, nightsBetween, todayInVietnam, toIsoDate } from "@/lib/dates";
 import { notifyFrontDesk } from "@/lib/notify";
-import { checkAvailability, findBooking } from "@/lib/reservations";
+import { checkAvailability, deleteBooking, findBooking, insertBooking } from "@/lib/reservations";
 
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -126,37 +124,31 @@ export async function createBooking(input: {
       error: `Các phòng đã chọn ở tối đa ${capacity} người. Vui lòng chọn thêm phòng hoặc gọi lễ tân nếu muốn thêm người.`,
     };
 
-  const payload = await getPayload({ config });
-  const booking = await payload.create({
-    collection: "bookings",
-    data: {
-      status: "pending",
-      source: "website",
-      checkIn: toDbDate(checkIn),
-      checkOut: toDbDate(checkOut),
-      items,
-      guestName: g.name!,
-      phone: normalizePhone(g.phone!),
-      email: g.email || undefined,
-      guests,
-      arrivalTime: g.arrivalTime || undefined,
-      promoCode: promoCode || undefined,
-      note: g.note || undefined,
-      total,
-      deposit: Math.round((total * settings.depositPercent) / 100 / 1000) * 1000,
-      paid: 0,
-    },
-    overrideAccess: true,
+  const booking = await insertBooking({
+    status: "pending",
+    source: "website",
+    checkIn,
+    checkOut,
+    items,
+    guestName: g.name!,
+    phone: normalizePhone(g.phone!),
+    email: g.email || undefined,
+    guests,
+    arrivalTime: g.arrivalTime || undefined,
+    promoCode: promoCode || undefined,
+    note: g.note || undefined,
+    total,
+    deposit: Math.round((total * settings.depositPercent) / 100 / 1000) * 1000,
   });
 
   // Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, ai làm vượt số phòng thì huỷ đặt phòng đó
   const recheck = await checkAvailability(checkIn, checkOut);
   if ([...perType.keys()].some((slug) => recheck[slug].available < 0)) {
-    await payload.delete({ collection: "bookings", id: booking.id, overrideAccess: true });
+    await deleteBooking(booking.id);
     return { ok: false, error: "Phòng bạn chọn vừa có khách khác đặt. Vui lòng chọn lại.", refresh: true };
   }
 
-  const code = booking.code!;
+  const code = booking.code;
   // Báo lễ tân sau khi đã trả kết quả cho khách
   after(async () => {
     const view = await findBooking(code);
