@@ -7,10 +7,9 @@ import { api } from "./api";
 import { MediaPicker, type MediaItem } from "./media";
 import type { SortableProps } from "./Sortable";
 
-// Kéo thả sắp xếp (dnd-kit): tải riêng, và tải sẵn ngay khi mở trang sửa để không bị chậm lúc hiện form
-const loadSortable = () => import("./Sortable");
-const Sortable = dynamic(loadSortable, { ssr: false }) as <T>(p: SortableProps<T>) => ReactNode;
-if (typeof window !== "undefined") void loadSortable();
+// Kéo thả sắp xếp (dnd-kit): tải riêng trong trình duyệt. Viết import() ngay trong dynamic() để Next.js nhận ra
+// ssr: false và không đưa dnd-kit vào gói chạy trên server (gói worker giới hạn 3 MB)
+const Sortable = dynamic(() => import("./Sortable"), { ssr: false }) as <T>(p: SortableProps<T>) => ReactNode;
 
 let keySeq = 0;
 const newKey = () => `k${++keySeq}`;
@@ -200,6 +199,7 @@ export function FieldInput({ f, value, onChange }: { f: Exclude<Field, { type: "
           id={id}
           className="c-input"
           type="number"
+          step="any"
           min={f.min}
           max={f.max}
           value={value === null || value === undefined ? "" : String(value)}
