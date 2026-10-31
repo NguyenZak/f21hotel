@@ -15,6 +15,7 @@ export const NAV: NavGroup[] = [
       { href: "/quan-tri", label: "Hôm nay", icon: "today", keywords: ["tổng quan", "dashboard"] },
       { href: "/quan-tri/dat-phong", label: "Đặt phòng", icon: "bookings", keywords: ["booking", "đơn"] },
       { href: "/quan-tri/lich-phong", label: "Lịch phòng", icon: "calendar", keywords: ["calendar", "phòng trống"] },
+      { href: "/quan-tri/bao-cao", label: "Báo cáo", icon: "trend", roles: MANAGE, keywords: ["doanh thu", "công suất", "thống kê"] },
     ],
   },
   {

@@ -4,6 +4,7 @@
 // Không import gì từ Next.js / OpenNext ở đây.
 import { str } from "@/lib/sql";
 import { bookingRoutes } from "./bookings";
+import { reportRoutes } from "./reports";
 import { contentRoutes } from "./content";
 import { mediaRoutes } from "./media";
 import { pageRoutes } from "./pages";
@@ -199,6 +200,8 @@ export const routes: Route[] = [
   { method: "GET", match: (p) => p[0] === "audit-logs" && p.length === 1, roles: ["owner", "manager"], handler: listAudit },
   // Vận hành: hôm nay, đặt phòng, lịch phòng (mọi vai trò; xoá đặt phòng: Chủ, Quản lý)
   ...bookingRoutes,
+  // Báo cáo doanh thu, công suất (Chủ, Quản lý)
+  ...reportRoutes,
   // Nội dung (src/cms/schema.ts) và thư viện ảnh: quyền kiểm tra theo từng mục
   ...contentRoutes,
   ...mediaRoutes,

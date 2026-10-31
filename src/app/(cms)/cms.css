@@ -549,3 +549,28 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-preview__facts small { color: var(--c-muted); font-size: 13px; }
 .c-preview__room small { margin-left: 4px; }
 .c-preview__note { white-space: pre-wrap; }
+
+/* ---------- Báo cáo (recharts): màu lấy từ token nên tự đổi theo sáng/tối ---------- */
+:root { --c-chart: #a83237; }
+:root[data-theme="dark"] { --c-chart: #c4454a; }
+.c-kpi--static:hover { transform: none; border-color: var(--c-line); }
+.c-reports { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.c-report { display: grid; gap: 8px; align-content: start; }
+.c-report__chart { height: 280px; }
+.c-report__table summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--c-muted); padding: 6px 0; }
+.c-report__table summary:hover { color: var(--c-maroon); }
+.c-report__table .c-table-wrap { max-height: 320px; overflow: auto; }
+.c-rc { width: 100%; min-width: 0; }
+.c-rc .recharts-cartesian-grid line { stroke: var(--c-line); }
+.c-rc .recharts-cartesian-axis-tick-value { fill: var(--c-muted); }
+.c-rc .recharts-bar-rectangle path, .c-rc .recharts-active-bar path { fill: var(--c-chart); }
+.c-rc .recharts-area-area { fill: var(--c-chart); fill-opacity: 0.16; }
+.c-rc .recharts-area-curve { stroke: var(--c-chart); }
+.c-rc .recharts-active-dot circle { fill: var(--c-chart); stroke: var(--c-card); stroke-width: 2px; }
+.c-rc .c-rc-cursor { fill: var(--c-neutral); fill-opacity: 0.6; }
+.c-rc .c-rc-crosshair { stroke: var(--c-line-strong); stroke-width: 1px; }
+.c-rc .c-rc-today line { stroke: var(--c-gold); stroke-dasharray: 4 3; }
+.c-rc .c-rc-label, .c-rc .c-rc-today text { fill: var(--c-text); font-size: 12px; font-weight: 600; }
+.c-rc .recharts-surface:focus, .c-rc .recharts-wrapper:focus { outline: none; }
+.c-rc-tip { display: grid; gap: 2px; padding: 8px 10px; border-radius: var(--r-s); background: var(--c-inverse); color: var(--c-inverse-ink); font-size: 12.5px; box-shadow: var(--shadow); }
+@media (max-width: 1100px) { .c-reports { grid-template-columns: 1fr; } }

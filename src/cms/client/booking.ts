@@ -17,6 +17,10 @@ export const dayLabel = (iso: string) => {
   return `${WEEKDAYS[d.getUTCDay()]} ${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 };
 
+// "2026-11" -> "T11/26"; 0.734 -> "73%"
+export const monthLabel = (ym: string) => `T${Number(ym.slice(5, 7))}/${ym.slice(2, 4)}`;
+export const pct = (x: number) => `${Math.round(x * 100)}%`;
+
 export const roomsText = (b: BookingDTO) => b.items.map((i) => `${i.quantity} × ${i.roomTypeName || "phòng"}`).join(", ");
 export const telHref = (phone: string) => `tel:${normalizePhone(phone)}`;
 export const zaloHref = (phone: string) => `https://zalo.me/${normalizePhone(phone)}`;
