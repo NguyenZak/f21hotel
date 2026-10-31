@@ -192,7 +192,7 @@ body.cms {
 .c-dialog__body { padding: 18px 20px; display: grid; gap: 14px; }
 .c-dialog__foot { padding: 14px 20px; border-top: 1px solid var(--c-line); display: flex; justify-content: flex-end; gap: 8px; }
 
-.c-toast { position: fixed; z-index: 50; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: var(--r-m); background: var(--c-inverse); color: var(--c-inverse-ink); box-shadow: var(--shadow); font-size: 14px; }
+.c-toast { position: fixed; z-index: 50; bottom: 20px; left: 50%; translate: -50% 0; padding: 10px 16px; border-radius: var(--r-m); background: var(--c-inverse); color: var(--c-inverse-ink); box-shadow: var(--shadow); font-size: 14px; }
 
 /* ---------- Đăng nhập ---------- */
 .c-login {
