@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { Gallery } from "@/components/Gallery";
 import { HeroSearch } from "@/components/HeroSearch";
 import { HeroSlider } from "@/components/HeroSlider";
+import { LocationMap3D } from "@/components/LocationMap3D";
 import { CtaBandView, Faq, RoomCard, SectionHead } from "@/components/ui";
 import type { Photo } from "@/lib/site";
 import { ICONS, type IconName } from "./icons";
@@ -295,6 +296,8 @@ export type LocationProps = Section & {
   distances: { place: string; time: string }[];
   linkLabel: string;
   linkHref: string;
+  /** "3d": bản đồ 3D động (mặc định, cả với trang đã lưu trước khi có lựa chọn này); "google": chỉ bản đồ Google */
+  map?: "3d" | "google";
 };
 
 export function LocationBlock(p: P<LocationProps>) {
@@ -325,7 +328,13 @@ export function LocationBlock(p: P<LocationProps>) {
           ) : null}
         </div>
         <div className="reveal">
-          <MapFrame site={site} />
+          {p.map === "google" ? (
+            <MapFrame site={site} />
+          ) : (
+            <LocationMap3D distances={p.distances}>
+              <MapFrame site={site} />
+            </LocationMap3D>
+          )}
         </div>
       </div>
     </section>

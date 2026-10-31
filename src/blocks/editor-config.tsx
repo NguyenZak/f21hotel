@@ -168,6 +168,14 @@ const components = {
       },
       linkLabel: text("Liên kết: chữ"),
       linkHref: text("Liên kết: đường dẫn"),
+      map: {
+        type: "radio",
+        label: "Bản đồ",
+        options: [
+          { label: "3D động", value: "3d" },
+          { label: "Google Maps", value: "google" },
+        ],
+      },
       ...sectionFields,
     },
     defaultProps: D.locationDefaults,

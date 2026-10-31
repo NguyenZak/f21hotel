@@ -123,6 +123,7 @@ export const locationDefaults: B.LocationProps = {
   distances: distances.map((d) => ({ ...d })),
   linkLabel: "Xem chỉ đường chi tiết",
   linkHref: "/vi-tri",
+  map: "3d",
 };
 
 export const offersDefaults: B.OffersProps = {
