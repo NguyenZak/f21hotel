@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { api, ROLE_LABELS, type Role } from "./api";
+import { Icon, type IconName } from "./icons";
 import { SessionProvider, useSession } from "./session";
 
 // Menu CMS theo công việc và vai trò. Mục có "legacy" chưa làm lại, tạm mở trang của CMS cũ (/admin).
-type Item = { href: string; label: string; roles?: Role[]; legacy?: boolean };
+type Item = { href: string; label: string; icon: IconName; roles?: Role[]; legacy?: boolean };
 type Group = { title?: string; roles?: Role[]; items: Item[] };
 
 const ALL: Role[] = ["owner", "manager", "staff"];
@@ -16,38 +17,38 @@ const MANAGE: Role[] = ["owner", "manager"];
 const NAV: Group[] = [
   {
     items: [
-      { href: "/quan-tri", label: "Hôm nay" },
-      { href: "/quan-tri/dat-phong", label: "Đặt phòng" },
-      { href: "/quan-tri/lich-phong", label: "Lịch phòng" },
+      { href: "/quan-tri", label: "Hôm nay", icon: "today" },
+      { href: "/quan-tri/dat-phong", label: "Đặt phòng", icon: "bookings" },
+      { href: "/quan-tri/lich-phong", label: "Lịch phòng", icon: "calendar" },
     ],
   },
   {
     title: "Phòng & giá",
     items: [
-      { href: "/quan-tri/hang-phong", label: "Hạng phòng" },
-      { href: "/quan-tri/phong", label: "Danh sách phòng" },
-      { href: "/quan-tri/gia-theo-ngay", label: "Giá theo ngày" },
+      { href: "/quan-tri/hang-phong", label: "Hạng phòng", icon: "roomTypes" },
+      { href: "/quan-tri/phong", label: "Danh sách phòng", icon: "rooms" },
+      { href: "/quan-tri/gia-theo-ngay", label: "Giá theo ngày", icon: "rates" },
     ],
   },
   {
     title: "Website",
     roles: MANAGE,
     items: [
-      { href: "/quan-tri/trang", label: "Trang" },
-      { href: "/quan-tri/uu-dai", label: "Ưu đãi" },
-      { href: "/quan-tri/thu-vien-anh", label: "Thư viện ảnh" },
-      { href: "/quan-tri/danh-gia", label: "Đánh giá của khách" },
-      { href: "/quan-tri/hoi-dap", label: "Hỏi đáp" },
+      { href: "/quan-tri/trang", label: "Trang", icon: "pages" },
+      { href: "/quan-tri/uu-dai", label: "Ưu đãi", icon: "offers" },
+      { href: "/quan-tri/thu-vien-anh", label: "Thư viện ảnh", icon: "media" },
+      { href: "/quan-tri/danh-gia", label: "Đánh giá của khách", icon: "reviews" },
+      { href: "/quan-tri/hoi-dap", label: "Hỏi đáp", icon: "faqs" },
     ],
   },
   {
     title: "Cài đặt",
     roles: MANAGE,
     items: [
-      { href: "/quan-tri/thong-tin", label: "Thông tin khách sạn" },
-      { href: "/quan-tri/giao-dien", label: "Giao diện" },
-      { href: "/quan-tri/tai-khoan", label: "Tài khoản", roles: ["owner"] },
-      { href: "/quan-tri/nhat-ky", label: "Nhật ký thao tác" },
+      { href: "/quan-tri/thong-tin", label: "Thông tin khách sạn", icon: "hotel" },
+      { href: "/quan-tri/giao-dien", label: "Giao diện", icon: "theme" },
+      { href: "/quan-tri/tai-khoan", label: "Tài khoản", icon: "users", roles: ["owner"] },
+      { href: "/quan-tri/nhat-ky", label: "Nhật ký thao tác", icon: "audit" },
     ],
   },
 ];
@@ -84,7 +85,8 @@ function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
                     aria-current={path === it.href || (it.href !== "/quan-tri" && path.startsWith(`${it.href}/`)) ? "page" : undefined}
                     prefetch={!it.legacy}
                   >
-                    <span>{it.label}</span>
+                    <Icon name={it.icon} />
+                    <span className="c-nav__label">{it.label}</span>
                     {it.legacy ? (
                       <span
                         className="c-nav__legacy"
