@@ -3,7 +3,7 @@
 // Dùng chung bảng của CMS Payload (users, audit_logs…) để hai CMS chạy song song trong lúc chuyển đổi.
 // Không import gì từ Next.js / OpenNext / Payload ở đây.
 import { str } from "@/lib/sql";
-import { hashPassword, readSession, signSession, verifyPassword } from "./crypto";
+import { hashPassword, needsRehash, readSession, signSession, verifyPassword } from "./crypto";
 
 export const ROLES = ["owner", "manager", "staff"] as const;
 export type Role = (typeof ROLES)[number];
@@ -117,6 +117,11 @@ async function login({ request, url, ctx }: Req) {
   }
   if (Number(row.login_attempts ?? 0) || row.lock_until)
     ctx.waitUntil(ctx.d.prepare("update users set login_attempts = 0, lock_until = null where id = ?").bind(user.id).run());
+  // Băm lại theo định dạng nhẹ hiện tại (các lần đăng nhập sau tốn ít CPU hơn)
+  if (needsRehash(str(row.hash) || null))
+    ctx.waitUntil(
+      hashPassword(password).then((h) => ctx.d.prepare("update users set salt = ?, hash = ? where id = ?").bind(h.salt, h.hash, user.id).run()),
+    );
 
   const token = await signSession(ctx.secret, { uid: user.id, exp: Date.now() + SESSION_DAYS * 86_400_000 });
   return json({ ok: true, user }, 200, { "set-cookie": setCookie(url, token, SESSION_DAYS * 86_400) });
