@@ -110,6 +110,8 @@ const today: (r: Ctx) => Promise<Response> = async ({ ctx, user }) => {
 async function outlook(d: D1Database, day: string) {
   const end = plusDays(day, 7);
   const monthStart = `${day.slice(0, 7)}-01`;
+  const [y, m] = day.split("-").map(Number);
+  const nextMonth = toIsoDate(new Date(y, m, 1));
   const [rooms, sold, month] = await d.batch([
     d.prepare("select count(*) n from rooms where active = 1"),
     d
@@ -119,8 +121,8 @@ async function outlook(d: D1Database, day: string) {
       )
       .bind(...BLOCKING_STATUSES, toDbDate(end), toDbDate(day)),
     d
-      .prepare("select source, count(*) n, sum(coalesce(total, 0)) revenue from bookings where check_in >= ? and status not in ('cancelled', 'no_show') group by source")
-      .bind(toDbDate(monthStart)),
+      .prepare("select source, count(*) n, sum(coalesce(total, 0)) revenue from bookings where check_in >= ? and check_in < ? and status not in ('cancelled', 'no_show') group by source")
+      .bind(toDbDate(monthStart), toDbDate(nextMonth)),
   ]);
   const total = num((rooms.results[0] as Row)?.n);
   const nights = nightsOf(day, end).map((night) => {

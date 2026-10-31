@@ -1,4 +1,4 @@
-// Icon cho menu CMS: nét vẽ theo bộ Lucide (giấy phép ISC), viết thẳng SVG để không thêm thư viện.
+// Icon cho CMS: nét vẽ theo bộ Lucide (giấy phép ISC), viết thẳng SVG để không thêm thư viện.
 // Icon chỉ để trang trí bên cạnh chữ nên ẩn với trình đọc màn hình.
 import type { ReactNode } from "react";
 
@@ -78,6 +78,24 @@ const ICONS = {
       <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2m4 7h4m-4 5h4m-8-5h.01M8 16h.01" />
     </>
   ),
+  // Trang Hôm nay
+  arrive: <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />,
+  depart: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9" />,
+  inHouse: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H4a1 1 0 0 1-1-1z" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </>
+  ),
+  phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92" />,
+  chat: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />,
+  refresh: <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8m0-5v5h-5m5 4a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16m5 0H3v5" />,
+  plus: <path d="M12 5v14M5 12h14" />,
+  check: <path d="M20 6 9 17l-5-5" />,
+  chevron: <path d="m9 18 6-6-6-6" />,
+  trend: <path d="M22 7 13.5 15.5l-5-5L2 17M16 7h6v6" />,
+  inbox: <path d="M22 12h-6l-2 3h-4l-2-3H2m3.45-6.89L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11" />,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof ICONS;
