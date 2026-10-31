@@ -148,7 +148,7 @@ export type NewBooking = {
 };
 
 // Tạo đặt phòng (bản ghi + các dòng phòng) trong một lần ghi D1. Tự làm phần việc mà hook "prepare"
-// của CMS làm khi lưu qua Payload: tạo mã đặt phòng, tính số đêm. Trả về id và mã.
+// của CMS: tạo mã đặt phòng, tính số đêm. Trả về id và mã.
 export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id: number; code: string }> {
   const nights = nightsBetween(b.checkIn, b.checkOut) ?? 0;
   for (let attempt = 0; attempt < 3; attempt++) {

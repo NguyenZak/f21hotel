@@ -1,6 +1,6 @@
 // API vận hành của CMS mới: hôm nay, danh sách/chi tiết/tạo/sửa/xoá đặt phòng, lịch phòng.
 // Đọc/ghi thẳng D1 theo cấu trúc bảng của Payload (bookings, bookings_items, bookings_rels path "items.N.rooms")
-// để CMS cũ vẫn đọc được. Giữ đúng quy tắc của hook "prepare" trong src/payload/collections/Bookings.ts:
+// (cấu trúc do CMS Payload tạo trước đây). Giữ đúng quy tắc đặt phòng của CMS cũ:
 // mã đặt phòng, số đêm, tổng tiền mặc định, phòng gán đúng hạng / không quá số lượng / không trùng thời gian.
 import { BLOCKING_STATUSES, BOOKING_SOURCES, BOOKING_STATUSES, newBookingCode } from "@/lib/booking";
 import { addDays, fromDbDate, nightsBetween, nightsOf, todayInVietnam, toDbDate, toIsoDate } from "@/lib/dates";

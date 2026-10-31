@@ -52,46 +52,49 @@ Form gửi qua Server Action ([src/app/actions.ts](src/app/actions.ts)): kiểm 
 
 [src/lib/track.ts](src/lib/track.ts) gửi các sự kiện `click_call`, `click_zalo`, `submit_booking` tới GA4 / Google Ads khi đã gắn `gtag` (chưa gắn).
 
-## CMS (nhánh `cms`, đang làm)
+## CMS (quản trị khách sạn)
 
-Trang quản trị: `/admin` (tiếng Việt). Dựng bằng [Payload CMS 3](https://payloadcms.com) chạy chung trong dự án Next.js này.
+Trang quản trị: **`/quan-tri`** (tiếng Việt, dùng được trên điện thoại). `/admin` (CMS Payload cũ, đã bỏ) chuyển hướng về đây.
 
-- **Dữ liệu:** Cloudflare D1. Chạy ở máy thì wrangler tự giả lập, không cần tạo gì trên Cloudflare.
-- **Ảnh:** Cloudinary, qua bộ kết nối tự viết ở [src/payload/cloudinary.ts](src/payload/cloudinary.ts) (gọi REST API bằng `fetch`, chạy được trên Workers). Chưa khai báo `CLOUDINARY_*` thì bản dev lưu ảnh vào `media-uploads/`.
-- **Vai trò:** Chủ, Quản lý, Nhân viên. Bảng quyền ở [src/payload/access.ts](src/payload/access.ts). Không có form tự đăng ký: tài khoản Chủ đầu tiên tạo bằng `npm run create-admin` (CMS thật: `create-admin:remote`, đọc ADMIN_EMAIL/ADMIN_NAME/ADMIN_PASSWORD trong `.env.local`); các tài khoản sau do Chủ tạo trong CMS › Hệ thống › Tài khoản.
-- **Nhật ký thao tác:** mọi thêm, sửa, xoá đều ghi lại người thực hiện ([src/payload/audit.ts](src/payload/audit.ts)).
-- **Bảng dữ liệu:** Tài khoản, Thư viện ảnh, Hạng phòng, Danh sách phòng, Ưu đãi, Đánh giá, Hỏi đáp, Trang, Nhật ký; cài đặt chung: Thông tin khách sạn, Giao diện (font).
+Website chạy trên **Cloudflare Workers gói Free**, giới hạn **10 ms CPU mỗi yêu cầu**. Vì vậy:
 
-### Trình dựng trang (kéo thả)
+- **Giao diện CMS** là các trang tĩnh chạy trong trình duyệt ([src/cms/client](src/cms/client), route ở [src/app/(cms)](src/app/(cms))).
+- **API** `/api/cms/*` (CMS) và `/api/booking/*` (đặt phòng trên website) chạy trong [worker.ts](worker.ts), **trước khi nạp Next.js**: mỗi yêu cầu chỉ là vài câu SQL trên D1 (0–5 ms CPU). Code: [src/cms/server](src/cms/server), [src/lib/booking-api.ts](src/lib/booking-api.ts). Khi chạy `next dev`, các route [src/app/api](src/app/api) gọi cùng hàm đó.
+- **Trang website** đọc D1 bằng SQL ([src/lib/site-data.ts](src/lib/site-data.ts)), được lưu đệm theo nhãn ([src/lib/cms.ts](src/lib/cms.ts)). Lưu trong CMS thì API ghi nhãn đã đổi vào KV tag cache của OpenNext, trang được dựng lại ở lần xem sau.
+- Không dùng server action cho thao tác của khách hay của CMS: mỗi lần gọi phải nạp cả Next.js (200–500 ms CPU khi worker vừa khởi động).
 
-CMS › Nội dung › Trang › chọn trang › **Mở trình dựng trang** (đường dẫn `/editor/<id>`, chỉ Chủ và Quản lý). Dựng bằng [Puck](https://puckeditor.com).
+Chi tiết:
 
-- **Lưu nháp** chỉ lưu bản đang sửa, website chưa đổi. **Xuất bản** mới đưa lên website và làm mới trang ngay.
-- Trang chủ là trang có mã `home`. Chưa xuất bản lần nào thì trang chủ dùng bố cục mặc định ở [src/blocks/home.ts](src/blocks/home.ts).
-- Các khối ở [src/blocks/](src/blocks/): `render.tsx` (giao diện, dùng chung cho website và khung xem trước), `editor-config.tsx` (trường chỉnh sửa, giá trị mặc định), `config.ts` (bản chỉ hiển thị). Khối Phòng, Ưu đãi, Đánh giá, Hỏi đáp tự lấy dữ liệu từ các bảng tương ứng; thêm khối mới thì khai báo ở cả ba file.
+- **Dữ liệu:** Cloudflare D1, cấu trúc ở [db/schema.sql](db/schema.sql) (giữ nguyên các bảng do CMS Payload tạo trước đây).
+- **Đăng nhập:** cookie ký HMAC bằng `PAYLOAD_SECRET`, 7 ngày; sai 5 lần khoá 10 phút. Mật khẩu PBKDF2-SHA256 30000 vòng (≈6 ms CPU trên Workers). Không có form tự đăng ký: tài khoản Chủ tạo/đặt lại bằng `npm run create-admin` (D1 thật: `create-admin:remote`, đọc `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` trong `.env.local`; xoá `ADMIN_PASSWORD` sau khi xong). Các tài khoản khác do Chủ tạo trong CMS › Cài đặt › Tài khoản.
+- **Vai trò:** Chủ (toàn quyền), Quản lý (nội dung, giá, cài đặt, nhật ký), Nhân viên (đặt phòng, lịch phòng, xem phòng). Nhật ký thao tác ghi mọi lần thêm, sửa, xoá.
+- **Vận hành:** Hôm nay, Đặt phòng (tạo/sửa, gán phòng, Xác nhận → Nhận phòng → Trả phòng), Lịch phòng ([src/cms/server/bookings.ts](src/cms/server/bookings.ts)).
+- **Nội dung:** hạng phòng, phòng, giá theo ngày, ưu đãi, đánh giá, hỏi đáp, thông tin khách sạn, giao diện, khai báo ở [src/cms/schema.ts](src/cms/schema.ts); form và API sinh từ khai báo này. Thêm trường: thêm cột vào D1 (file `db/migrations/NNNN_*.sql`, chạy `npx wrangler d1 execute D1 --remote --file …`) rồi khai báo trong schema.ts.
+- **Ảnh:** Cloudinary. Trình duyệt tải thẳng lên Cloudinary bằng chữ ký do API cấp ([src/cms/server/media.ts](src/cms/server/media.ts)).
+- **Trình dựng trang:** CMS › Website › Trang › Mở trình dựng (`/quan-tri/dung-trang?id=`), dựng bằng [Puck](https://puckeditor.com). Lưu nháp không đổi website; Xuất bản mới đưa lên. Các khối ở [src/blocks](src/blocks): `render.tsx` (giao diện), `editor-config.tsx` (trường chỉnh sửa), `config.ts` (bản chỉ hiển thị).
 
 ### Chạy ở máy
 
 ```sh
 npm install
-# .env.local: PAYLOAD_SECRET (bắt buộc), SEED_PASSWORD (tuỳ chọn), CLOUDINARY_* (tuỳ chọn)
-npm run seed     # nạp dữ liệu từ src/lib/site.ts vào CMS; có SEED_PASSWORD thì tạo thêm 3 tài khoản thử nghiệm *@f21.test
-npm run dev      # mở http://localhost:3000/admin
-npm run sync-media  # sau khi mới khai báo CLOUDINARY_*: đẩy ảnh đã tải trước đó (media-uploads/) lên Cloudinary
+# .env.local: PAYLOAD_SECRET (khoá ký phiên đăng nhập), CLOUDINARY_* (thư viện ảnh)
+npm run db:schema          # dựng bảng cho D1 ở máy (lần đầu)
+# Lấy dữ liệu thật về máy (tuỳ chọn): npx wrangler d1 export D1 --remote --output data.sql
+#                                      npx wrangler d1 execute D1 --local --file data.sql
+npm run create-admin       # tạo tài khoản Chủ cho D1 ở máy (ADMIN_* trong .env.local)
+npm run dev                # mở http://localhost:3000/quan-tri
 ```
-
-Sau khi sửa bảng dữ liệu: `npx payload migrate:create <ten>`, `npm run migrate`, `npm run generate:types` và `npm run generate:importmap`. Bản dev không tự đồng bộ cấu trúc dữ liệu (`push: false`), luôn đi qua migration như D1 thật; lấy code mới về thì chạy `npm run migrate`.
 
 ### Đặt phòng trực tuyến
 
-Trang `/dat-phong` là luồng đặt phòng kiểu các trang đặt phòng: chọn ngày và số khách → xem phòng trống, giá từng hạng phòng (Ngày đêm; Qua đêm khi ở 1 đêm) → chọn số phòng → điền thông tin → trang xác nhận `/dat-phong/xac-nhan/<mã>` (không cho Google lập chỉ mục). Chưa thu tiền trên website: đặt phòng ở trạng thái **Chờ xác nhận** và giữ phòng ngay, lễ tân gọi xác nhận và thu cọc.
+Trang `/dat-phong`: chọn ngày và số khách → xem phòng trống và giá từng hạng phòng → chọn số phòng → điền thông tin → trang xác nhận `/dat-phong/xac-nhan/<mã>` (không cho Google lập chỉ mục). Chưa thu tiền trên website: đặt phòng ở trạng thái **Chờ xác nhận** và giữ phòng ngay, lễ tân gọi xác nhận và thu cọc.
 
-- **Phòng trống** = số phòng đang bán của hạng phòng (Danh sách phòng) trừ đặt phòng Chờ xác nhận / Đã xác nhận / Đã nhận phòng trùng đêm. Nghỉ giờ không tính. Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, đặt phòng làm vượt số phòng bị huỷ và khách được báo chọn lại.
-- **Giá** = bảng giá của hạng phòng, cộng/trừ theo **Phòng & giá › Giá theo ngày** (Tết, cuối tuần, sự kiện…): phần trăm, ngừng bán online, số đêm tối thiểu. Nhiều quy tắc trùng đêm thì cộng dồn phần trăm.
-- **CMS › Đặt phòng**: lễ tân nhập đặt phòng qua điện thoại, Zalo, OTA; gán số phòng (chặn gán trùng phòng, sai hạng phòng); đổi trạng thái, ghi tiền đã thu.
-- **Cài đặt › Thông tin khách sạn › Đặt phòng online**: bật/tắt (tắt thì quay về form gửi yêu cầu), % cọc, số phòng và số đêm tối đa, tài khoản nhận cọc (điền đủ thì trang xác nhận hiện mã QR VietQR có sẵn số tiền và mã đặt phòng).
+- **Phòng trống** = số phòng đang bán của hạng phòng trừ đặt phòng Chờ xác nhận / Đã xác nhận / Đã nhận phòng trùng đêm. Nghỉ giờ không tính. Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, đặt phòng làm vượt số phòng bị huỷ và khách được báo chọn lại.
+- **Giá** = bảng giá của hạng phòng, cộng/trừ theo **Giá theo ngày** (Tết, cuối tuần, sự kiện…): phần trăm, ngừng bán online, số đêm tối thiểu. Nhiều quy tắc trùng đêm thì cộng dồn phần trăm.
+- **Cài đặt › Thông tin khách sạn › Đặt phòng online**: bật/tắt, % cọc, số phòng và số đêm tối đa, tài khoản nhận cọc (điền đủ thì trang xác nhận hiện mã QR VietQR có sẵn số tiền và mã đặt phòng).
 - Mỗi đặt phòng mới báo lễ tân qua `BOOKING_WEBHOOK_URL` ([hướng dẫn](docs/google-apps-script.md)).
-- Code: [src/lib/reservations.ts](src/lib/reservations.ts) (phòng trống, giá), [src/app/(site)/dat-phong/actions.ts](src/app/(site)/dat-phong/actions.ts) (tìm phòng, tạo đặt phòng), [src/components/BookingEngine.tsx](src/components/BookingEngine.tsx) (giao diện), [src/payload/collections/Bookings.ts](src/payload/collections/Bookings.ts) (bảng dữ liệu).
+- Code: [src/lib/reservations.ts](src/lib/reservations.ts) (phòng trống, giá, tạo đơn), [src/lib/booking-api.ts](src/lib/booking-api.ts) (API), [src/components/BookingEngine.tsx](src/components/BookingEngine.tsx) (giao diện).
 
-### Lưu ý khi nâng cấp Payload
-Ba file trong `src/app/(payload)/` do Payload tạo ra đã được sửa thêm `await connection()` (và `export const instant = false` ở trang admin) để chạy với Cache Components của Next.js 16. Nếu Payload tạo lại các file này thì phải thêm lại.
+### Deploy
+
+Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), rồi `npx opennextjs-cloudflare build` và `npx opennextjs-cloudflare deploy`. Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).

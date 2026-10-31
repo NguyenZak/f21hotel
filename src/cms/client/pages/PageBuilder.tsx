@@ -3,11 +3,10 @@
 import type { Data } from "@puckeditor/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { SaveResult } from "@/app/(editor)/editor/actions";
-import { Editor } from "@/app/(editor)/editor/[id]/Editor";
 import { defaultHome } from "@/blocks/home";
 import type { BlockMeta } from "@/blocks/types";
 import { api, ApiError } from "../api";
+import { Editor, type SaveResult } from "../PuckEditor";
 
 // Trình dựng trang (Puck) của CMS mới: tải bố cục, dữ liệu xem trước và font qua /api/cms/*, lưu qua API
 type PageDoc = { id: number; title: string; slug: string; publishedAt: string; data: Data | null; draft: Data | null };

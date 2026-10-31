@@ -1,6 +1,6 @@
 // Thư viện ảnh của CMS mới: /api/cms/media. Ảnh nằm trên Cloudinary; trình duyệt tải thẳng lên Cloudinary bằng
 // chữ ký do worker tạo (worker không nhận file, không tốn CPU), sau đó báo lại để lưu vào bảng media.
-// public_id = <thư mục>/<tên file bỏ đuôi>, giống bộ kết nối của CMS cũ (src/payload/cloudinary.ts).
+// public_id = <thư mục>/<tên file bỏ đuôi> (giữ cách đặt tên của CMS Payload trước đây, ảnh cũ vẫn dùng được).
 import { num, str } from "@/lib/sql";
 import { audit, body, can, fail, json, type CmsContext, type CmsUser } from "./http";
 

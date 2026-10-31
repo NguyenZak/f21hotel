@@ -1,5 +1,5 @@
 // Đường dẫn ảnh trong Thư viện ảnh của CMS. Ảnh nằm trên Cloudinary (thư mục CLOUDINARY_FOLDER),
-// public_id = thư mục + tên file bỏ đuôi, giống bộ kết nối ở src/payload/cloudinary.ts.
+// public_id = thư mục + tên file bỏ đuôi, giống API thư viện ảnh (src/cms/server/media.ts).
 // Chưa khai báo Cloudinary (máy dev cũ) thì dùng đường dẫn đã lưu trong bảng media.
 export function mediaUrl(m: { filename?: unknown; prefix?: unknown; url?: unknown }) {
   const cloud = process.env.CLOUDINARY_CLOUD_NAME;

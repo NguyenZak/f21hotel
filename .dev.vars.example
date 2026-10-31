@@ -1,10 +1,8 @@
 # Sao chép thành .dev.vars để chạy thử ở máy
 NEXTJS_ENV=development
 BOOKING_WEBHOOK_URL=
-# CMS (Payload): khoá bí mật, đặt trên Cloudflare bằng `npx wrangler secret put PAYLOAD_SECRET`
+# CMS: khoá ký phiên đăng nhập (tên giữ từ CMS cũ), đặt trên Cloudflare bằng `npx wrangler secret put PAYLOAD_SECRET`
 PAYLOAD_SECRET=
-# Chỉ dùng ở máy dev: mật khẩu cho 3 tài khoản thử nghiệm khi chạy npm run seed
-SEED_PASSWORD=
 # Cloudinary (lưu ảnh của CMS). Trên Cloudflare đặt bằng `npx wrangler secret put CLOUDINARY_API_SECRET`…
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=

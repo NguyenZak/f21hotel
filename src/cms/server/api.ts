@@ -1,7 +1,7 @@
 // API của CMS mới: /api/cms/* (JSON). Chạy trong custom worker (worker.ts) trước khi nạp Next.js,
 // nên mỗi yêu cầu chỉ là vài câu SQL trên D1 (vừa 10 ms CPU của Workers Free).
-// Dùng chung bảng của CMS Payload (users, audit_logs…) để hai CMS chạy song song trong lúc chuyển đổi.
-// Không import gì từ Next.js / OpenNext / Payload ở đây.
+// Dùng các bảng có sẵn (users, audit_logs…), cấu trúc trong db/schema.sql.
+// Không import gì từ Next.js / OpenNext ở đây.
 import { str } from "@/lib/sql";
 import { bookingRoutes } from "./bookings";
 import { contentRoutes } from "./content";

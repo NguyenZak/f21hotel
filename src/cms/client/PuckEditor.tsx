@@ -5,7 +5,8 @@ import Link from "next/link";
 import { createContext, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { editorConfig } from "@/blocks/editor-config";
 import type { BlockMeta } from "@/blocks/types";
-import type { SaveResult } from "../actions";
+
+export type SaveResult = { ok: true; publishedAt?: string } | { ok: false; error: string };
 
 type Status = { tone: "" | "ok" | "error"; text: string };
 
@@ -112,7 +113,7 @@ function HeaderActions({ children }: { children: ReactNode }) {
 }
 
 type Props = {
-  // Lưu bố cục: publish = true thì đưa lên website (CMS mới gọi API, CMS cũ gọi server action)
+  // Lưu bố cục: publish = true thì đưa lên website
   save: (id: number, data: Data, publish: boolean) => Promise<SaveResult>;
   // Nút "Về CMS"
   backHref?: string;
@@ -126,7 +127,7 @@ type Props = {
   publishedAt: string | null;
 };
 
-export function Editor({ save: savePage, backHref = "/admin/collections/pages", id, title, path, data, metadata, fontRoles, hasDraft, publishedAt }: Props) {
+export function Editor({ save: savePage, backHref = "/quan-tri/trang", id, title, path, data, metadata, fontRoles, hasDraft, publishedAt }: Props) {
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<Status>(() => ({
     tone: "",

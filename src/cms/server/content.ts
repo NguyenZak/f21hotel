@@ -1,5 +1,5 @@
 // API chung cho các mục nội dung khai báo trong src/cms/schema.ts: /api/cms/c/<slug>[/<id>], /api/cms/options/<slug>.
-// Đọc/ghi D1 đúng cấu trúc bảng của Payload (bảng chính, bảng mảng con, bảng _rels) để CMS cũ vẫn đọc được.
+// Đọc/ghi D1 theo cấu trúc bảng do CMS Payload tạo trước đây (bảng chính, bảng mảng con, bảng _rels).
 import { fromDbDate, toDbDate } from "@/lib/dates";
 import { num, rowId, str } from "@/lib/sql";
 import { collectionBySlug, type CollectionDef, type Field } from "../schema";

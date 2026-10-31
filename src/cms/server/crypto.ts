@@ -2,11 +2,11 @@
 // Đọc được các định dạng băm mật khẩu mà Payload đã lưu trong bảng users, nên tài khoản cũ đăng nhập được ngay:
 //   - cũ:                 hex(PBKDF2-SHA256, 25000 vòng, 512 byte)
 //   - pbkdf2-sha256-v1:   600000 vòng, 32 byte (Payload 3.92; vượt giới hạn 100000 vòng của Workers)
-//   - pbkdf2-sha256-cf100k: 100000 vòng, 32 byte (bản vá patches/payload+3.92.1.patch)
+//   - pbkdf2-sha256-cf100k: 100000 vòng, 32 byte (bản vá Payload trong thời gian chuyển đổi)
 //   - pbkdf2-sha256-cf30k:  30000 vòng, 32 byte (định dạng hiện tại)
 // Đo trên Workers: 100000 vòng tốn 20–26 ms CPU, 30000 vòng khoảng 6 ms, vừa giới hạn 10 ms của gói Free.
-// Mật khẩu dạng cũ được băm lại theo cf30k ở lần đăng nhập đúng đầu tiên. Bản vá Payload cũng đọc được cf30k
-// để CMS cũ vẫn đăng nhập được trong thời gian chuyển đổi. Có khoá tài khoản sau 5 lần sai.
+// Mật khẩu dạng cũ được băm lại theo cf30k ở lần đăng nhập đúng đầu tiên. Có khoá tài khoản sau 5 lần sai.
+// scripts/create-admin.mjs băm cùng định dạng.
 
 const enc = new TextEncoder();
 const hex = (buf: ArrayBuffer) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");

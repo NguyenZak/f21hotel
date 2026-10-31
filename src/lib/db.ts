@@ -1,6 +1,6 @@
 // Truy cập D1 trực tiếp (không qua Payload) cho phần website chạy trên Cloudflare Workers.
 // Gói Workers Free chỉ cho 10 ms CPU mỗi yêu cầu; khởi tạo Payload tốn hàng trăm ms nên website
-// đọc/ghi bằng câu lệnh SQL nhẹ. Bảng và cột theo cấu trúc Payload đã tạo (src/migrations).
+// đọc/ghi bằng câu lệnh SQL nhẹ. Bảng và cột: db/schema.sql (cấu trúc do CMS Payload tạo trước đây).
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export async function db(): Promise<D1Database> {
