@@ -11,6 +11,7 @@ import { withAudit, withAuditGlobal } from "./payload/audit";
 import { cloudinaryAdapter, cloudinaryConfigFromEnv } from "./payload/cloudinary";
 import { withRevalidate, withRevalidateGlobal } from "./payload/revalidate";
 import { CMS_TAGS } from "./lib/cms-tags";
+import { dashboard } from "./payload/admin/dashboard/layout";
 import { AuditLogs } from "./payload/collections/AuditLogs";
 import { Bookings, RateRules } from "./payload/collections/Bookings";
 import { Faqs, Offers, Reviews, RoomTypes, Rooms } from "./payload/collections/Content";
@@ -56,6 +57,8 @@ export default buildConfig({
       graphics: { Logo: "/payload/admin/Graphics#Logo", Icon: "/payload/admin/Graphics#Icon" },
       beforeLogin: ["/payload/admin/LoginIntro#LoginIntro"],
     },
+    // Bảng điều khiển: widget theo vai trò (lễ tân thấy việc hôm nay, quản lý thấy thêm công suất, doanh thu)
+    dashboard,
   },
   // Thứ tự khai báo = thứ tự nhóm trên menu: Đặt phòng, Phòng & giá, Website, Cài đặt.
   // Mọi bảng (trừ nhật ký) đều ghi nhật ký thao tác; bảng hiển thị trên website thì làm mới trang khi lưu

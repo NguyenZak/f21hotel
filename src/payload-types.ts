@@ -115,6 +115,12 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'f21-today': F21TodayWidget;
+    'f21-arrivals': F21ArrivalsWidget;
+    'f21-pending': F21PendingWidget;
+    'f21-availability': F21AvailabilityWidget;
+    'f21-outlook': F21OutlookWidget;
+    'f21-activity': F21ActivityWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -1030,6 +1036,66 @@ export interface ThemeSettingsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-today_widget".
+ */
+export interface F21TodayWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-arrivals_widget".
+ */
+export interface F21ArrivalsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-pending_widget".
+ */
+export interface F21PendingWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-availability_widget".
+ */
+export interface F21AvailabilityWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-outlook_widget".
+ */
+export interface F21OutlookWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "f21-activity_widget".
+ */
+export interface F21ActivityWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
