@@ -929,7 +929,7 @@ html[data-lightbox-open] { overflow: hidden; }
 .video-frame { aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--maroon-ink); }
 .video-frame video, .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
 
-.nearby { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.nearby { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
 .nearby > div { padding: 22px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); display: grid; gap: 8px; align-content: start; }
 .nearby h3 { font-size: 20px; color: var(--maroon); }
 .nearby ul { margin: 0; padding-left: 1.1em; color: var(--muted); font-size: 16px; display: grid; gap: 4px; }

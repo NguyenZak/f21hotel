@@ -350,10 +350,36 @@ export const directPerks = [
 export const distances = [
   { place: "Vinschool, cổng 1 Vinhomes Thăng Long", time: "1–2 phút" },
   { place: "Đại lộ Thăng Long", time: "~5 phút" },
+  { place: "Thiên đường Bảo Sơn", time: "~5 phút" },
   { place: "Trung tâm Hội nghị Quốc gia", time: "~15 phút" },
   { place: "Sân vận động Mỹ Đình", time: "15–20 phút" },
   { place: "Phố cổ Hoàn Kiếm", time: "~35 phút" },
 ]; // TODO: đo lại thời gian thực tế trên Google Maps
+
+// Tiện ích quanh khách sạn, hiện ở trang Vị trí
+// TODO: điền tên quán, tên sân pickleball, phòng gym cụ thể sau khi khảo sát thực tế
+export const nearby = [
+  {
+    title: "Ăn uống",
+    items: ["Quán ăn sáng, phở, bún trong khu Nam An Khánh", "Nhà hàng gia đình dọc Lê Trọng Tấn kéo dài", "Lễ tân gửi danh sách quán qua Zalo"],
+  },
+  {
+    title: "Cà phê & tiện lợi",
+    items: ["Cà phê trong khu đô thị Vinhomes Thăng Long", "Cửa hàng tiện lợi mở muộn", "Hiệu thuốc, ATM gần cổng khu"],
+  },
+  {
+    title: "Thể thao & vui chơi",
+    items: [
+      "Thiên đường Bảo Sơn: khu vui chơi, giải trí cho gia đình và trẻ nhỏ",
+      "Sân pickleball quanh khu đô thị",
+      "Phòng gym cho khách ở dài ngày",
+    ],
+  },
+  {
+    title: "Đi tiếp",
+    items: ["Sân vận động Mỹ Đình, Trung tâm Hội nghị Quốc gia", "Hoà Lạc, Ba Vì, Hoà Bình qua Đại lộ Thăng Long", "Taxi, xe công nghệ đón tận cửa"],
+  },
+];
 
 export const faqs = [
   {

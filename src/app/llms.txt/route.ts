@@ -1,5 +1,5 @@
 import { getOffers, getPriceNotes, getRooms, getSite } from "@/lib/cms";
-import { formatVnd, nav } from "@/lib/site";
+import { distances, formatVnd, nav, nearby } from "@/lib/site";
 
 // /llms.txt: tóm tắt khách sạn bằng văn bản thuần cho ChatGPT, Perplexity và các trợ lý AI.
 // Lấy cùng dữ liệu với website nên tự cập nhật khi sửa trong CMS.
@@ -23,6 +23,14 @@ export async function GET() {
       (r) =>
         `- ${r.name} (tối đa ${r.guests} người): qua đêm ${formatVnd(r.prices.overnight)}, ngày đêm ${formatVnd(r.prices.fullDay)}, nghỉ giờ ${formatVnd(r.prices.hourly)} cho 2 giờ đầu, thêm ${formatVnd(r.prices.extraHour)}/giờ. ${r.short}`,
     ),
+    "",
+    "## Khoảng cách",
+    "",
+    ...distances.map((d) => `- ${d.place}: ${d.time}`),
+    "",
+    "## Xung quanh khách sạn",
+    "",
+    ...nearby.map((n) => `- ${n.title}: ${n.items.join("; ")}`),
     "",
     "## Ưu đãi",
     "",

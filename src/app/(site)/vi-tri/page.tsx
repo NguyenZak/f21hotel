@@ -5,33 +5,17 @@ import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
 import { getSite } from "@/lib/cms";
-import { distances, locationPhotos } from "@/lib/site";
+import { distances, locationPhotos, nearby } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
   return pageMeta(
     site,
     "/vi-tri",
-    "Vị trí & chỉ đường: An Khánh, gần Mỹ Đình",
-    `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool, gần cổng 1 Vinhomes Thăng Long. Cách SVĐ Mỹ Đình khoảng 15–20 phút.`,
+    "Vị trí: An Khánh, gần Thiên đường Bảo Sơn, Mỹ Đình",
+    `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool. Khoảng 5 phút tới Thiên đường Bảo Sơn, 15–20 phút tới SVĐ Mỹ Đình. Gần sân pickleball, phòng gym.`,
   );
 }
-
-// TODO: điền tên quán cụ thể sau khi khảo sát thực tế quanh khách sạn
-const nearby = [
-  {
-    title: "Ăn uống",
-    items: ["Quán ăn sáng, phở, bún trong khu Nam An Khánh", "Nhà hàng gia đình dọc Lê Trọng Tấn kéo dài", "Lễ tân gửi danh sách quán qua Zalo"],
-  },
-  {
-    title: "Cà phê & tiện lợi",
-    items: ["Cà phê trong khu đô thị Vinhomes Thăng Long", "Cửa hàng tiện lợi mở muộn", "Hiệu thuốc, ATM gần cổng khu"],
-  },
-  {
-    title: "Đi tiếp",
-    items: ["Sân vận động Mỹ Đình, Trung tâm Hội nghị Quốc gia", "Hoà Lạc, Ba Vì, Hoà Bình qua Đại lộ Thăng Long", "Taxi, xe công nghệ đón tận cửa"],
-  },
-];
 
 export default async function LocationPage() {
   const site = await getSite();
