@@ -517,3 +517,15 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-datatable tr.is-active td { background: var(--c-maroon-soft); }
 .c-datatable tr.is-active td:first-child { box-shadow: inset 3px 0 0 var(--c-maroon); }
 .c-filter { max-width: 320px; }
+
+/* ---------- Kéo thả sắp xếp (dnd-kit) ---------- */
+.c-rows__list { display: grid; gap: 8px; }
+.c-drag {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 32px; min-height: 32px;
+  padding: 0; border: 0; border-radius: var(--r-s); background: none; color: var(--c-muted); cursor: grab; touch-action: none;
+}
+.c-drag:hover { color: var(--c-maroon); background: var(--c-maroon-soft); }
+.c-drag:active { cursor: grabbing; }
+.c-thumb__tools .c-drag { min-height: 28px; background: var(--c-card); }
+.is-dragging { position: relative; z-index: 3; box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.35); }
+.c-rows__row.is-dragging { background: var(--c-card); border-radius: var(--r-s); }

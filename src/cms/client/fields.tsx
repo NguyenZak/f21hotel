@@ -1,9 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Field } from "../schema";
 import { api } from "./api";
 import { MediaPicker, type MediaItem } from "./media";
+import type { SortableProps } from "./Sortable";
+
+// Kéo thả sắp xếp (dnd-kit): tải riêng, và tải sẵn ngay khi mở trang sửa để không bị chậm lúc hiện form
+const loadSortable = () => import("./Sortable");
+const Sortable = dynamic(loadSortable, { ssr: false }) as <T>(p: SortableProps<T>) => ReactNode;
+if (typeof window !== "undefined") void loadSortable();
+
+let keySeq = 0;
+const newKey = () => `k${++keySeq}`;
+// Dòng không có mã riêng: giữ một khoá ổn định cho mỗi dòng để kéo thả và ô nhập không bị nhảy
+function useRowKeys(count: number) {
+  const [keys, setKeys] = useState<string[]>(() => Array.from({ length: count }, newKey));
+  if (keys.length !== count) {
+    const next = keys.length < count ? [...keys, ...Array.from({ length: count - keys.length }, newKey)] : keys.slice(0, count);
+    setKeys(next);
+    return [next, setKeys] as const;
+  }
+  return [keys, setKeys] as const;
+}
 
 // Ô nhập theo khai báo trường (src/cms/schema.ts), dùng cho mọi mục nội dung
 type Value = unknown;
@@ -43,32 +63,37 @@ function useOptions(slug: string) {
 
 function Rows({ f, value, onChange }: { f: Extract<Field, { type: "rows" }>; value: Record<string, string>[]; onChange: (v: Value) => void }) {
   const rows = value ?? [];
+  const [keys, setKeys] = useRowKeys(rows.length);
   const set = (i: number, col: string, v: string) => onChange(rows.map((r, k) => (k === i ? { ...r, [col]: v } : r)));
-  const move = (i: number, d: number) => {
-    const next = [...rows];
-    [next[i], next[i + d]] = [next[i + d], next[i]];
-    onChange(next);
+  const remove = (i: number) => {
+    setKeys(keys.filter((_, k) => k !== i));
+    onChange(rows.filter((_, k) => k !== i));
   };
   return (
     <div className="c-rows">
-      {rows.map((r, i) => (
-        <div key={i} className="c-rows__row">
-          {f.columns.map((c) => (
-            <input key={c.column} className="c-input" placeholder={c.label} aria-label={`${c.label} ${i + 1}`} value={r[c.column] ?? ""} onChange={(e) => set(i, c.column, e.target.value)} />
-          ))}
-          <span className="c-rows__tools">
-            <button type="button" className="c-btn c-btn--small c-btn--ghost" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Lên">
-              ↑
-            </button>
-            <button type="button" className="c-btn c-btn--small c-btn--ghost" disabled={i === rows.length - 1} onClick={() => move(i, 1)} aria-label="Xuống">
-              ↓
-            </button>
-            <button type="button" className="c-btn c-btn--small c-btn--ghost c-btn--danger" onClick={() => onChange(rows.filter((_, k) => k !== i))} aria-label="Xoá dòng">
+      <Sortable
+        items={rows}
+        ids={keys}
+        layout="list"
+        className="c-rows__list"
+        itemClassName="c-rows__row"
+        label={(r, i) => `dòng ${i + 1}${r[f.columns[0]?.column] ? ` (${r[f.columns[0].column]})` : ""}`}
+        onReorder={(next, nextKeys) => {
+          setKeys(nextKeys);
+          onChange(next);
+        }}
+        render={(r, i, handle) => (
+          <>
+            {handle}
+            {f.columns.map((c) => (
+              <input key={c.column} className="c-input" placeholder={c.label} aria-label={`${c.label} ${i + 1}`} value={r[c.column] ?? ""} onChange={(e) => set(i, c.column, e.target.value)} />
+            ))}
+            <button type="button" className="c-btn c-btn--small c-btn--ghost c-btn--danger" onClick={() => remove(i)} aria-label={`Xoá dòng ${i + 1}`}>
               ✕
             </button>
-          </span>
-        </div>
-      ))}
+          </>
+        )}
+      />
       <div>
         <button type="button" className="c-btn c-btn--small" onClick={() => onChange([...rows, Object.fromEntries(f.columns.map((c) => [c.column, ""]))])}>
           + Thêm dòng
@@ -116,36 +141,34 @@ function MediaField({ value, onChange }: { value: number[]; onChange: (v: Value)
       .then((r) => setById(new Map(r.media.map((m) => [m.id, m]))))
       .catch(() => {});
   }, [open]);
-  const move = (i: number, d: number) => {
-    const next = [...ids];
-    [next[i], next[i + d]] = [next[i + d], next[i]];
-    onChange(next);
-  };
   return (
     <div className="c-mediafield">
-      <div className="c-thumbs">
-        {ids.map((id, i) => {
+      <Sortable
+        items={ids}
+        ids={ids.map(String)}
+        layout="grid"
+        className="c-thumbs"
+        itemClassName="c-thumb"
+        itemAs="figure"
+        label={(id, i) => `ảnh ${i + 1}${byId.get(id)?.alt ? ` (${byId.get(id)!.alt})` : ""}`}
+        onReorder={(next) => onChange(next)}
+        render={(id, i, handle) => {
           const m = byId.get(id);
           return (
-            <figure key={id} className="c-thumb">
+            <>
               {/* eslint-disable-next-line @next/next/no-img-element -- ảnh thu nhỏ từ Cloudinary */}
-              {m ? <img src={m.url.replace("/upload/", "/upload/w_240,h_160,c_fill/")} alt={m.alt} /> : <span className="c-muted">Ảnh #{id}</span>}
+              {m ? <img src={m.url.replace("/upload/", "/upload/w_240,h_160,c_fill/")} alt={m.alt} draggable={false} /> : <span className="c-muted">Ảnh #{id}</span>}
               {i === 0 ? <figcaption>Ảnh đại diện</figcaption> : null}
               <span className="c-thumb__tools">
-                <button type="button" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Lên trước">
-                  ←
-                </button>
-                <button type="button" disabled={i === ids.length - 1} onClick={() => move(i, 1)} aria-label="Ra sau">
-                  →
-                </button>
-                <button type="button" onClick={() => onChange(ids.filter((x) => x !== id))} aria-label="Bỏ ảnh">
+                {handle}
+                <button type="button" onClick={() => onChange(ids.filter((x) => x !== id))} aria-label={`Bỏ ảnh ${i + 1}`}>
                   ✕
                 </button>
               </span>
-            </figure>
+            </>
           );
-        })}
-      </div>
+        }}
+      />
       <button type="button" className="c-btn c-btn--small" onClick={() => setOpen(true)}>
         + Thêm ảnh
       </button>

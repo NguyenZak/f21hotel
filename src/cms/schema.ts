@@ -83,7 +83,7 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "money", name: "overnight", column: "prices_overnight", label: "Qua đêm (19:00 – 10:00)", required: true, half: true },
       { type: "money", name: "fullDay", column: "prices_full_day", label: "Ngày đêm (14:00 – 12:00)", required: true, half: true },
       { type: "rows", name: "amenities", table: "room_types_amenities", label: "Tiện nghi", columns: [{ column: "text", label: "Tiện nghi" }] },
-      { type: "media", name: "photos", relTable: "room_types_rels", path: "photos", relColumn: "media_id", label: "Ảnh phòng", help: "Ảnh đầu tiên là ảnh đại diện. Bấm ← → để đổi thứ tự." },
+      { type: "media", name: "photos", relTable: "room_types_rels", path: "photos", relColumn: "media_id", label: "Ảnh phòng", help: "Ảnh đầu tiên là ảnh đại diện. Kéo tay nắm ⠿ để đổi thứ tự." },
     ],
   },
   {
