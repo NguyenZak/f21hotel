@@ -1,13 +1,13 @@
 // Dữ liệu cho các widget bảng điều khiển CMS. Đọc theo quyền của người đang đăng nhập (req).
 import type { PayloadRequest, Where } from "payload";
-import { BLOCKING_STATUSES, BOOKING_SOURCES, BOOKING_STATUSES } from "@/lib/booking";
+import { BLOCKING_STATUSES, BOOKING_SOURCES } from "@/lib/booking";
+export { statusLabel } from "@/lib/booking";
 import { addDays, fromDbDate, nightsOf, todayInVietnam, toDbDate, toIsoDate } from "@/lib/dates";
 import type { Booking, RoomType } from "@/payload-types";
 
 export const today = () => todayInVietnam();
 export const plusDays = (iso: string, n: number) => toIsoDate(addDays(new Date(`${iso}T00:00:00`), n));
 
-export const statusLabel = (s: string) => BOOKING_STATUSES.find((x) => x.value === s)?.label ?? s;
 export const sourceLabel = (s: string) => BOOKING_SOURCES.find((x) => x.value === s)?.label ?? s;
 
 const findBookings = (req: PayloadRequest, where: Where, limit = 50, sort = "checkIn") =>

@@ -421,3 +421,283 @@ a:not(.btn):hover {
     font-size: 24px;
   }
 }
+
+/* ---------- Menu: liên kết nhanh (src/payload/admin/NavLinks.tsx) ---------- */
+.f21-navlinks {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--theme-elevation-100);
+}
+.f21-navlinks .nav__link {
+  font-weight: 600;
+}
+
+/* ---------- Đặt phòng: thanh thao tác, bộ lọc nhanh ---------- */
+.f21-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-l);
+  background: var(--f21-cream);
+}
+.f21-actions__status {
+  margin-right: auto;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.f21-actions__btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--style-radius-s);
+  border: 1px solid var(--theme-elevation-200);
+  background: #fff;
+  color: var(--theme-elevation-800);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.f21-actions__btn:hover:not(:disabled) {
+  border-color: var(--f21-maroon);
+  color: var(--f21-maroon);
+}
+.f21-actions__btn.is-primary {
+  background: var(--f21-maroon);
+  border-color: var(--f21-maroon);
+  color: #fff;
+}
+.f21-actions__btn.is-primary:hover:not(:disabled) {
+  background: var(--f21-maroon-deep);
+  color: #fff;
+}
+.f21-actions__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.f21-actions__hint {
+  font-size: 13px;
+  color: #8a5a00;
+}
+
+.f21-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.f21-filters a {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-elevation-150);
+  background: #fff;
+  color: var(--theme-elevation-700);
+  font-size: 14px;
+  text-decoration: none;
+}
+.f21-filters a:hover {
+  border-color: var(--f21-maroon);
+  color: var(--f21-maroon);
+}
+.f21-filters a.is-active {
+  background: var(--f21-maroon);
+  border-color: var(--f21-maroon);
+  color: #fff;
+}
+.f21-filters .f21-filters__calendar {
+  margin-left: auto;
+  border-color: transparent;
+  font-weight: 600;
+  color: var(--f21-maroon);
+}
+
+/* ---------- Lịch phòng (src/payload/admin/bookings/RoomCalendar.tsx) ---------- */
+.f21-cal-page {
+  padding-top: 24px;
+  padding-bottom: 48px;
+}
+.f21-cal__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.f21-cal__head h1 {
+  margin: 0;
+}
+.f21-cal__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.f21-cal__nav {
+  padding: 6px 12px;
+  border-radius: var(--style-radius-s);
+  border: 1px solid var(--theme-elevation-150);
+  background: #fff;
+  color: var(--theme-elevation-800);
+  text-decoration: none;
+  font-size: 14px;
+}
+.f21-cal__new {
+  margin: 0;
+}
+.f21-cal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+.f21-cal__legend-note {
+  font-size: 13px;
+  color: var(--theme-elevation-500);
+}
+.f21-cal {
+  --label: 120px;
+  overflow-x: auto;
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-l);
+  background: #fff;
+}
+.f21-cal__row {
+  display: grid;
+  grid-template-columns: var(--label) repeat(var(--days), minmax(56px, 1fr));
+  min-width: calc(var(--label) + var(--days) * 56px);
+  min-height: 44px;
+  border-top: 1px solid var(--theme-elevation-100);
+}
+.f21-cal__row--head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-top: 0;
+  background: var(--f21-cream);
+}
+.f21-cal__label {
+  grid-row: 1;
+  grid-column: 1;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 12px;
+  background: inherit;
+  background-color: #fff;
+  border-right: 1px solid var(--theme-elevation-100);
+  font-size: 14px;
+}
+.f21-cal__row--head .f21-cal__label {
+  background-color: var(--f21-cream);
+  font-weight: 600;
+}
+.f21-cal__label small {
+  font-size: 11px;
+  color: var(--theme-elevation-500);
+}
+.f21-cal__day {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--theme-elevation-600);
+  border-left: 1px solid var(--theme-elevation-100);
+}
+.f21-cal__day b {
+  font-size: 13px;
+  color: var(--theme-elevation-800);
+}
+.f21-cal__day.is-weekend {
+  background: rgba(201, 162, 63, 0.08);
+}
+.f21-cal__day.is-today {
+  background: var(--f21-maroon);
+  color: #fff;
+}
+.f21-cal__day.is-today b {
+  color: #fff;
+}
+.f21-cal__type {
+  padding: 8px 12px;
+  background: var(--theme-elevation-50);
+  border-top: 1px solid var(--theme-elevation-100);
+  font-weight: 600;
+  font-size: 14px;
+  position: sticky;
+  left: 0;
+}
+.f21-cal__type small {
+  font-weight: 400;
+  color: var(--theme-elevation-500);
+}
+.f21-cal__cell {
+  grid-row: 1;
+  border-left: 1px solid var(--theme-elevation-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.f21-cal__cell.is-today {
+  background: var(--f21-maroon-soft);
+}
+.f21-cal__bar {
+  grid-row: 1;
+  z-index: 1;
+  align-self: center;
+  margin: 0 3px;
+  padding: 5px 8px;
+  border-radius: var(--style-radius-s);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  box-shadow: inset 3px 0 0 currentColor;
+}
+.f21-cal__bar em {
+  font-style: normal;
+  font-size: 11px;
+  margin-right: 4px;
+  opacity: 0.8;
+}
+.f21-cal__bar.f21-status--checked_out {
+  opacity: 0.6;
+}
+.f21-cal__row--unassigned .f21-cal__label {
+  color: #8a5a00;
+  font-weight: 600;
+}
+.f21-cal__count {
+  min-width: 26px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #fdf0d5;
+  color: #8a5a00;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.f21-cal__pending {
+  margin-top: 28px;
+  max-width: 720px;
+}
+.f21-cal__pending h2 {
+  font-size: 18px;
+}
+.f21-cal__pending .f21-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}

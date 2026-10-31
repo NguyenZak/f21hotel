@@ -101,11 +101,17 @@ export const Bookings: CollectionConfig = {
     defaultColumns: ["code", "guestName", "phone", "checkIn", "checkOut", "status", "total", "source"],
     listSearchableFields: ["code", "guestName", "phone", "email"],
     description: "Đặt phòng từ website và do lễ tân nhập. Đặt phòng Chờ xác nhận và Đã xác nhận đều giữ phòng.",
+    // Giao diện vận hành cho lễ tân (src/payload/admin/bookings): lọc nhanh, đổi trạng thái theo trình tự
+    components: {
+      beforeListTable: ["/payload/admin/bookings/QuickFilters#QuickFilters"],
+    },
   },
   defaultSort: "-createdAt",
   access: { read: isStaff, create: isStaff, update: isStaff, delete: isManager },
   hooks: { beforeChange: [prepare] },
   fields: [
+    // Khung thao tác đầu form (Xác nhận → Nhận phòng → Trả phòng, gọi/Zalo). Trường "ui" không lưu dữ liệu.
+    { name: "actions", type: "ui", admin: { components: { Field: "/payload/admin/bookings/BookingActions#BookingActions" } } },
     {
       type: "row",
       fields: [
@@ -117,7 +123,7 @@ export const Bookings: CollectionConfig = {
           index: true,
           admin: { readOnly: true, description: "Tự tạo khi lưu." },
         },
-        { name: "status", label: "Trạng thái", type: "select", required: true, defaultValue: "pending", options: [...BOOKING_STATUSES], index: true },
+        { name: "status", label: "Trạng thái", type: "select", required: true, defaultValue: "pending", options: [...BOOKING_STATUSES], index: true, admin: { components: { Cell: "/payload/admin/bookings/StatusCell#StatusCell" } } },
         { name: "source", label: "Kênh", type: "select", required: true, defaultValue: "phone", options: [...BOOKING_SOURCES] },
       ],
     },

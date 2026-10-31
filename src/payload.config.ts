@@ -56,6 +56,10 @@ export default buildConfig({
     components: {
       graphics: { Logo: "/payload/admin/Graphics#Logo", Icon: "/payload/admin/Graphics#Icon" },
       beforeLogin: ["/payload/admin/LoginIntro#LoginIntro"],
+      beforeNavLinks: ["/payload/admin/NavLinks#NavLinks"],
+      views: {
+        roomCalendar: { Component: "/payload/admin/bookings/RoomCalendar#RoomCalendar", path: "/lich-phong", meta: { title: "Lịch phòng" } },
+      },
     },
     // Bảng điều khiển: widget theo vai trò (lễ tân thấy việc hôm nay, quản lý thấy thêm công suất, doanh thu)
     dashboard,
