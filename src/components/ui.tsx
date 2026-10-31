@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatVnd, type Photo as PhotoData, type Room } from "@/lib/site";
+// Chỉ lấy kiểu: ui.tsx được trình dựng trang nạp phía trình duyệt, không được kéo mã đọc D1 theo
+import type { SiteData } from "@/lib/site-data";
 import { Gallery } from "./Gallery";
-import { IconBed, IconClock, IconPhone, IconUsers, IconZalo } from "./Icons";
+import { IconArea, IconBed, IconClock, IconPhone, IconUsers, IconZalo } from "./Icons";
 
 // Ảnh hiển thị đúng tỉ lệ gốc của file
 export function Photo({ photo, sizes, priority }: { photo: PhotoData; sizes: string; priority?: boolean }) {
@@ -70,8 +72,13 @@ export function RoomSpecs({ room }: { room: Room }) {
       <span>
         <IconUsers /> {room.guests} người
       </span>
+      {room.area ? (
+        <span>
+          <IconArea /> {room.area} m²
+        </span>
+      ) : null}
       <span>
-        <IconBed /> {room.roomNumbers.length} phòng
+        <IconBed /> {room.bed ?? `${room.roomNumbers.length} phòng`}
       </span>
       <span>
         <IconClock /> Thêm giờ {formatVnd(room.prices.extraHour)}
@@ -124,6 +131,20 @@ export function RoomCard({ room }: { room: Room }) {
   );
 }
 
+// Điểm đánh giá chép từ Google Maps (CMS › Thông tin khách sạn › Điểm đánh giá). Chưa điền thì không hiện gì.
+export function RatingBadge({ rating, className = "" }: { rating: SiteData["rating"]; className?: string }) {
+  if (!rating) return null;
+  return (
+    <a className={`rating-badge ${className}`.trim()} href={rating.url || undefined} target="_blank" rel="noopener">
+      <span className="rating-stars" aria-hidden="true">★</span>
+      <b>{rating.score.toLocaleString("vi-VN")}</b>
+      <span>
+        {rating.count.toLocaleString("vi-VN")} đánh giá trên {rating.source}
+      </span>
+    </a>
+  );
+}
+
 // Dải kêu gọi đặt phòng (giao diện thuần, dùng được cả trong trình dựng trang).
 // Bản tự đọc liên hệ từ CMS: CtaBand trong ./CtaBand.tsx
 export function CtaBandView({
@@ -145,7 +166,7 @@ export function CtaBandView({
         {children ? <p>{children}</p> : null}
         <div className="actions">
           <Link className="btn btn-gold" href="/dat-phong">
-            Gửi yêu cầu đặt phòng
+            Xem phòng trống
           </Link>
           <a className="btn btn-ghost" href={contact.zaloLink} target="_blank" rel="noopener">
             <IconZalo /> Nhắn Zalo

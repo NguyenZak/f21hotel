@@ -89,8 +89,39 @@ export type RoomAvailability = {
   reason?: string;
 };
 
+// Giảm giá khi đặt online. Không cộng dồn: khách được mức lớn nhất trong
+// giảm đặt trực tiếp, mã ưu đãi (offers.discount_percent) và ở dài ngày.
+export type DiscountRules = { direct: number; longStay: { minNights: number; percent: number }[] };
+export type Discount = { kind: "direct" | "code" | "longStay"; percent: number; label: string };
+export type PromoCheck = { ok: true; code: string; percent: number; title: string } | { ok: false; error: string };
+
+export function bestDiscount(rules: DiscountRules, nights: number, promo?: { code: string; percent: number } | null): Discount | null {
+  const options: Discount[] = [];
+  if (rules.direct > 0) options.push({ kind: "direct", percent: rules.direct, label: `Giảm ${rules.direct}% đặt trực tiếp` });
+  const tier = rules.longStay.filter((t) => nights >= t.minNights).sort((a, b) => b.percent - a.percent)[0];
+  if (tier) options.push({ kind: "longStay", percent: tier.percent, label: `Giảm ${tier.percent}% ở từ ${tier.minNights} đêm` });
+  if (promo && promo.percent > 0) options.push({ kind: "code", percent: promo.percent, label: `Giảm ${promo.percent}% mã ${promo.code}` });
+  return options.sort((a, b) => b.percent - a.percent)[0] ?? null;
+}
+
+// Câu chính sách huỷ: có số ngày huỷ miễn phí thì dùng câu đó, không thì dùng câu "Hoàn tiền" trong CMS
+export const cancelPolicy = (freeCancelDays: number, refundText: string) =>
+  freeCancelDays > 0 ? `Đổi hoặc huỷ miễn phí trước ngày nhận phòng ${freeCancelDays} ngày, hoàn lại toàn bộ tiền cọc.` : refundText;
+
+// Giá sau giảm, làm tròn tới nghìn đồng
+export const discounted = (amount: number, percent: number) => (percent > 0 ? Math.round((amount * (100 - percent)) / 100 / 1000) * 1000 : amount);
+
 export type SearchResult =
-  | { ok: true; checkIn: string; checkOut: string; nights: number; rooms: Record<string, RoomAvailability>; depositPercent: number }
+  | {
+      ok: true;
+      checkIn: string;
+      checkOut: string;
+      nights: number;
+      rooms: Record<string, RoomAvailability>;
+      depositPercent: number;
+      discounts: DiscountRules;
+      freeCancelDays: number;
+    }
   | { ok: false; error: string };
 
 // Phòng khách chọn trong giỏ, theo mã hạng phòng
@@ -149,6 +180,7 @@ export function summarizeBooking(b: BookingView) {
     `Trả phòng: ${viDate(b.checkOut)} (${b.nights} đêm)`,
     `Số khách: ${b.guests}`,
     ...b.items.map((i) => `- ${i.quantity} × ${i.name}, ${STAY_LABELS[i.stayType] ?? i.stayType}: ${vnd(i.amount)}`),
+    b.items.reduce((s, i) => s + i.amount, 0) > b.total && `Ưu đãi: −${vnd(b.items.reduce((s, i) => s + i.amount, 0) - b.total)}`,
     `Tổng tiền: ${vnd(b.total)}`,
     b.deposit && `Đặt cọc: ${vnd(b.deposit)}`,
     b.arrivalTime && `Giờ đến dự kiến: ${b.arrivalTime}`,

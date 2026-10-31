@@ -14,15 +14,20 @@ import {
   summarizeBooking,
   type CartLine,
   type CreateBookingResult,
+  type DiscountRules,
   type GuestField,
   type OnlineStay,
+  type PromoCheck,
   type SearchResult,
+  bestDiscount,
+  discounted,
 } from "./booking";
 import { addDays, formatViDate, nightsBetween, todayInVietnam, toIsoDate } from "./dates";
 import { notifyFrontDesk } from "./notify";
 import { checkAvailability, deleteBooking, findBooking, insertBooking } from "./reservations";
 import { stayModes } from "./site";
-import { bool, num, str } from "./sql";
+import { readBookingSettings, type BookingSettings } from "./site-data";
+import { num, str } from "./sql";
 
 export type BookingApiOptions = {
   // URL Google Apps Script nhận thông báo đặt phòng (BOOKING_WEBHOOK_URL)
@@ -31,18 +36,29 @@ export type BookingApiOptions = {
   waitUntil: (p: Promise<unknown>) => void;
 };
 
-type Settings = { enabled: boolean; depositPercent: number; maxRooms: number; maxNights: number };
+type Settings = BookingSettings;
+const bookingSettings = readBookingSettings;
 
-async function bookingSettings(d: D1Database): Promise<Settings> {
-  const s = await d
-    .prepare("select booking_enabled, booking_deposit_percent, booking_max_rooms, booking_max_nights from site_settings limit 1")
+const discountRules = (s: Settings): DiscountRules => ({
+  direct: s.directDiscount,
+  longStay: s.longStay.map(({ minNights, percent }) => ({ minNights, percent })),
+});
+
+// Mã ưu đãi đang hiệu lực: trả về % giảm (0 nếu ưu đãi không trừ tiền tự động)
+async function findPromo(d: D1Database, code: string) {
+  return d
+    .prepare("select title, discount_percent from offers where active = 1 and upper(code) = ? limit 1")
+    .bind(code.trim().toUpperCase())
     .first<Record<string, unknown>>();
-  return {
-    enabled: bool(s?.booking_enabled, true),
-    depositPercent: num(s?.booking_deposit_percent, 50),
-    maxRooms: num(s?.booking_max_rooms, 5),
-    maxNights: num(s?.booking_max_nights, 30),
-  };
+}
+
+export async function checkPromo(d: D1Database, raw: string): Promise<PromoCheck> {
+  const code = raw.trim().toUpperCase().slice(0, 40);
+  if (!code) return { ok: false, error: "Vui lòng nhập mã ưu đãi." };
+  const offer = await findPromo(d, code);
+  if (!offer) return { ok: false, error: "Mã ưu đãi không đúng hoặc đã hết hạn." };
+  const percent = num(offer.discount_percent);
+  return { ok: true, code, percent: percent > 0 && percent <= 50 ? percent : 0, title: str(offer.title) };
 }
 
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
@@ -70,7 +86,16 @@ export async function searchRooms(d: D1Database, checkIn: string, checkOut: stri
   const rooms = Object.fromEntries(
     Object.entries(avail).map(([slug, a]) => [slug, { available: Math.max(0, a.available), plans: a.plans, reason: a.reason }]),
   );
-  return { ok: true, checkIn, checkOut, nights: nightsBetween(checkIn, checkOut)!, rooms, depositPercent: settings.depositPercent };
+  return {
+    ok: true,
+    checkIn,
+    checkOut,
+    nights: nightsBetween(checkIn, checkOut)!,
+    rooms,
+    depositPercent: settings.depositPercent,
+    discounts: discountRules(settings),
+    freeCancelDays: settings.freeCancelDays,
+  };
 }
 
 export type CreateBookingInput = { checkIn: string; checkOut: string; lines: CartLine[]; guest: Partial<Record<GuestField | "website", string>> };
@@ -98,10 +123,13 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
   if (g.agree !== "yes") errors.agree = "Vui lòng đồng ý với chính sách đặt phòng.";
 
   let promoCode = "";
+  let promoPercent = 0;
   if (g.code) {
-    promoCode = g.code.toUpperCase();
-    const found = await d.prepare("select 1 from offers where active = 1 and upper(code) = ? limit 1").bind(promoCode).first();
-    if (!found) errors.code = "Mã ưu đãi không đúng hoặc đã hết hạn.";
+    const promo = await checkPromo(d, g.code);
+    if (promo.ok) {
+      promoCode = promo.code;
+      promoPercent = promo.percent;
+    } else errors.code = promo.error;
   }
   if (Object.keys(errors).length) return { ok: false, error: "Vui lòng kiểm tra lại các ô được đánh dấu.", errors };
 
@@ -149,6 +177,13 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
       error: `Các phòng đã chọn ở tối đa ${capacity} người. Vui lòng chọn thêm phòng hoặc gọi lễ tân nếu muốn thêm người.`,
     };
 
+  // Giá niêm yết của từng dòng giữ nguyên trong items; tổng tiền và tiền cọc tính theo giá sau giảm
+  // (lễ tân thu "tổng - đã trả", doanh thu cộng theo tổng)
+  const listTotal = total;
+  const discount = bestDiscount(discountRules(settings), nightsBetween(checkIn, checkOut)!, promoCode ? { code: promoCode, percent: promoPercent } : null);
+  if (discount) total = discounted(listTotal, discount.percent);
+  const vnd = (n: number) => n.toLocaleString("vi-VN") + "đ";
+
   const booking = await insertBooking(d, {
     status: "pending",
     source: "website",
@@ -164,6 +199,7 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
     note: g.note || undefined,
     total,
     deposit: Math.round((total * settings.depositPercent) / 100 / 1000) * 1000,
+    staffNote: discount ? `Giá niêm yết ${vnd(listTotal)}; ${discount.label} (−${vnd(listTotal - total)}), đã trừ vào tổng tiền.` : undefined,
   });
 
   // Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, ai làm vượt số phòng thì huỷ đặt phòng đó
@@ -280,7 +316,7 @@ const json = (body: unknown, status = 200) =>
 
 // Xử lý POST /api/booking/<op>. Trả null nếu không phải đường dẫn của API này.
 export async function handleBookingApi(request: Request, d: D1Database, opts: BookingApiOptions): Promise<Response | null> {
-  const op = new URL(request.url).pathname.match(/^\/api\/booking\/(search|create|request)\/?$/)?.[1];
+  const op = new URL(request.url).pathname.match(/^\/api\/booking\/(search|create|request|promo)\/?$/)?.[1];
   if (!op) return null;
   if (request.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405);
   let body: Record<string, unknown>;
@@ -292,6 +328,7 @@ export async function handleBookingApi(request: Request, d: D1Database, opts: Bo
   try {
     if (op === "search") return json(await searchRooms(d, str(body.checkIn), str(body.checkOut)));
     if (op === "request") return json(await submitRequest(d, body, opts));
+    if (op === "promo") return json(await checkPromo(d, str(body.code)));
     return json(await createBooking(d, body as unknown as CreateBookingInput, opts));
   } catch (e) {
     console.error("[booking-api]", e);

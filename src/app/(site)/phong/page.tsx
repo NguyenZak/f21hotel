@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { breadcrumbJsonLd, JsonLd, pageMeta, roomsJsonLd } from "@/lib/seo";
 import Link from "next/link";
 import { Gallery } from "@/components/Gallery";
-import { PageHero, SectionHead } from "@/components/ui";
+import { PageHero, RatingBadge, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
-import { getPriceNotes, getRooms, getSite } from "@/lib/cms";
+import { cancelPolicy } from "@/lib/booking";
+import { getBookingSettings, getPriceNotes, getRooms, getSite } from "@/lib/cms";
 import { formatVnd, stayModes } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,13 +20,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RoomsPage() {
-  const [rooms, priceNotes, site] = await Promise.all([getRooms(), getPriceNotes(), getSite()]);
+  const [rooms, priceNotes, site, booking] = await Promise.all([getRooms(), getPriceNotes(), getSite(), getBookingSettings()]);
   return (
     <>
       <JsonLd data={roomsJsonLd(site, rooms)} />
       <JsonLd data={breadcrumbJsonLd(site, "/phong", "Phòng & giá")} />
       <PageHero crumb="Phòng & giá" eyebrow="Phòng & bảng giá" title="Bốn hạng phòng, ba cách nghỉ">
         Nghỉ ngày đêm, qua đêm hoặc nghỉ giờ. Giá đã gồm 2 chai nước suối miễn phí trong phòng.
+        {booking.directDiscount ? ` Đặt online trên website được giảm thêm ${booking.directDiscount}%.` : ""}
+        <RatingBadge rating={site.rating} className="on-hero" />
       </PageHero>
 
       {/* Bảng giá */}
@@ -88,7 +91,7 @@ export default async function RoomsPage() {
               <h3>Đặt cọc & thay đổi</h3>
               <ul>
                 <li>{priceNotes.deposit}</li>
-                <li>{priceNotes.refund}</li>
+                <li>{cancelPolicy(booking.freeCancelDays, priceNotes.refund)}</li>
                 <li>Thêm người so với quy định: phụ thu {formatVnd(priceNotes.extraPerson)}/người.</li>
               </ul>
             </div>
@@ -122,6 +125,13 @@ export default async function RoomsPage() {
                 <span className="eyebrow">Tối đa {room.guests} người</span>
                 <h2>{room.name}</h2>
                 <p>{room.description}</p>
+                {room.area || room.bed || room.view ? (
+                  <ul className="room-facts">
+                    {room.area ? <li>Diện tích {room.area} m²</li> : null}
+                    {room.bed ? <li>{room.bed}</li> : null}
+                    {room.view ? <li>{room.view}</li> : null}
+                  </ul>
+                ) : null}
                 <dl className="spec-table">
                   {stayModes.map((m) => (
                     <div key={m.key}>

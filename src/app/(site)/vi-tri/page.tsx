@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
+import { LocationMap3D } from "@/components/LocationMap3D";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
@@ -26,7 +27,17 @@ export default async function LocationPage() {
         {site.address.full}
       </PageHero>
 
-      <section className="section">
+      {/* Bản đồ 3D đứng đầu trang: nhìn một lần là thấy F21 nằm đâu so với Mỹ Đình, Bảo Sơn, Hoàn Kiếm.
+          Google Maps để chỉ đường nằm ở mục bên dưới */}
+      <section className="section loc-map">
+        <div className="wrap">
+          <LocationMap3D distances={distances}>
+            <MapEmbed />
+          </LocationMap3D>
+        </div>
+      </section>
+
+      <section className="section cream">
         <div className="wrap location">
           <div className="location-copy reveal">
             <span className="eyebrow">Chỉ đường</span>
@@ -49,7 +60,7 @@ export default async function LocationPage() {
         </div>
       </section>
 
-      <section className="section cream">
+      <section className="section">
         <div className="wrap split">
           <div className="reveal">
             <SectionHead eyebrow="Khoảng cách" title="Từ F21 đi đâu, mất bao lâu" />
@@ -86,7 +97,7 @@ export default async function LocationPage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section cream">
         <div className="wrap">
           <SectionHead eyebrow="Xung quanh" title="Gần khách sạn có gì" />
           <div className="nearby reveal-stagger">

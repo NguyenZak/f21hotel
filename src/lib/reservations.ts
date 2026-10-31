@@ -145,6 +145,8 @@ export type NewBooking = {
   note?: string;
   total: number;
   deposit: number;
+  // Ghi chú nội bộ cho lễ tân (khách không thấy), ví dụ giá niêm yết và khoản giảm
+  staffNote?: string;
 };
 
 // Tạo đặt phòng (bản ghi + các dòng phòng) trong một lần ghi D1. Tự làm phần việc mà hook "prepare"
@@ -159,8 +161,8 @@ export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id:
         d
           .prepare(
             `insert into bookings (code, status, source, check_in, check_out, nights, guest_name, phone, email, guests,
-              arrival_time, promo_code, note, total, deposit, paid, updated_at, created_at)
-             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?) returning id`,
+              arrival_time, promo_code, note, total, deposit, paid, staff_note, updated_at, created_at)
+             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?) returning id`,
           )
           .bind(
             code,
@@ -178,6 +180,7 @@ export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id:
             b.note ?? null,
             b.total,
             b.deposit,
+            b.staffNote ?? null,
             now,
             now,
           ),

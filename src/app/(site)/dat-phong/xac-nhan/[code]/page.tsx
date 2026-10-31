@@ -8,7 +8,7 @@ import { IconCheck, IconPhone } from "@/components/Icons";
 import { PageHero } from "@/components/ui";
 import { STAY_LABELS, statusLabel, summarizeBooking } from "@/lib/booking";
 import { getBookingSettings, getSite } from "@/lib/cms";
-import { shortDate } from "@/lib/dates";
+import { addDays, shortDate, toIsoDate } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { findBooking } from "@/lib/reservations";
 import { formatVnd } from "@/lib/site";
@@ -57,6 +57,12 @@ async function Confirmation({ params }: { params: Promise<{ code: string }> }) {
   const stay = booking.items[0]?.stayType;
   const arrive = stay === "overnight" ? "sau 19:00" : `từ ${site.checkIn}`;
   const leave = stay === "overnight" ? "trước 10:00" : `trước ${site.checkOut}`;
+  // Giá từng dòng là giá niêm yết; tổng tiền thấp hơn nghĩa là đã được giảm (đặt trực tiếp, mã ưu đãi, ở dài ngày)
+  const listTotal = booking.items.reduce((s, i) => s + i.amount, 0);
+  const saved = listTotal > booking.total ? listTotal - booking.total : 0;
+  const cancelBy = settings.freeCancelDays
+    ? toIsoDate(addDays(new Date(`${booking.checkIn}T00:00`), -settings.freeCancelDays))
+    : "";
 
   return (
     <div className="bk">
@@ -123,7 +129,7 @@ async function Confirmation({ params }: { params: Promise<{ code: string }> }) {
             <div>
               <dt>Mã ưu đãi</dt>
               <dd>
-                {booking.promoCode} <small>lễ tân áp dụng khi xác nhận</small>
+                {booking.promoCode} <small>{saved ? "đã trừ vào tổng tiền" : "lễ tân áp dụng khi xác nhận"}</small>
               </dd>
             </div>
           ) : null}
@@ -131,6 +137,14 @@ async function Confirmation({ params }: { params: Promise<{ code: string }> }) {
             <div>
               <dt>Yêu cầu thêm</dt>
               <dd>{booking.note}</dd>
+            </div>
+          ) : null}
+          {saved ? (
+            <div>
+              <dt>Ưu đãi</dt>
+              <dd>
+                <s>{formatVnd(listTotal)}</s> <b>−{formatVnd(saved)}</b>
+              </dd>
             </div>
           ) : null}
           <div className="bk-total">
@@ -157,7 +171,10 @@ async function Confirmation({ params }: { params: Promise<{ code: string }> }) {
           </a>
         </div>
         <p className="bk-more">
-          Cần đổi ngày hoặc huỷ? Gọi lễ tân và đọc mã đặt phòng. <Link href="/dat-phong">Đặt thêm phòng</Link>
+          {cancelBy && !cancelled
+            ? `Đổi hoặc huỷ miễn phí đến hết ${shortDate(cancelBy)}/${cancelBy.slice(0, 4)}: gọi lễ tân và đọc mã đặt phòng. `
+            : "Cần đổi ngày hoặc huỷ? Gọi lễ tân và đọc mã đặt phòng. "}
+          <Link href="/dat-phong">Đặt thêm phòng</Link>
         </p>
       </div>
 

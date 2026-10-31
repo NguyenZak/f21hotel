@@ -4,24 +4,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { createBooking, searchRooms } from "@/lib/booking-client";
-import type { CartLine, GuestField, OnlineStay, SearchResult } from "@/lib/booking";
+import { checkPromo, createBooking, searchRooms } from "@/lib/booking-client";
+import { bestDiscount, discounted, type CartLine, type GuestField, type OnlineStay, type SearchResult } from "@/lib/booking";
 import { addDays, nightsBetween, shortDate, toIsoDate } from "@/lib/dates";
 import { formatVnd, type Photo } from "@/lib/site";
 import { track } from "@/lib/track";
+import { DateRangePicker } from "./DateRangePicker";
 import { IconCheck, IconPhone, IconUsers } from "./Icons";
 
 // Đặt phòng trực tuyến kiểu các trang đặt phòng: chọn ngày → chọn phòng → thông tin người đặt.
 // Phòng trống và giá lấy từ API /api/booking/search (src/lib/booking-api.ts) mỗi khi đổi ngày; đặt xong chuyển sang trang xác nhận.
 
-export type EngineRoom = { slug: string; name: string; short: string; guests: number; amenities: string[]; photo: Photo | null };
+export type EngineRoom = {
+  slug: string;
+  name: string;
+  short: string;
+  guests: number;
+  amenities: string[];
+  photo: Photo | null;
+  area?: number;
+  bed?: string;
+};
 
 type Props = {
   rooms: EngineRoom[];
   contact: { telLink: string; phoneDisplay: string; zaloLink: string };
   policy: { deposit: string; refund: string };
   maxRooms: number;
+  // Điểm đánh giá chép từ Google Maps (CMS › Thông tin khách sạn); null thì ẩn
+  rating?: { score: number; count: number; source: string; url: string } | null;
 };
+
+type PromoState = { code: string; percent: number; title: string } | null;
 
 const STAYS: { key: OnlineStay; label: string; time: string }[] = [
   { key: "fullDay", label: "Ngày đêm", time: "Nhận phòng 14:00, trả trước 12:00 hôm sau" },
@@ -33,7 +47,7 @@ const ARRIVALS = ["Chưa rõ", "Trước 14:00", "14:00 – 17:00", "17:00 – 2
 type Cart = Record<string, number>; // "slug:stay" -> số phòng
 const lineKey = (slug: string, stay: OnlineStay) => `${slug}:${stay}`;
 
-export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
+export function BookingEngine({ rooms, contact, policy, maxRooms, rating }: Props) {
   const router = useRouter();
   const top = useRef<HTMLDivElement>(null);
   const [today, setToday] = useState("");
@@ -42,6 +56,8 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
   const [guests, setGuests] = useState(2);
   const [focusRoom, setFocusRoom] = useState("");
   const [promo, setPromo] = useState("");
+  const [promoOk, setPromoOk] = useState<PromoState>(null);
+  const [promoMsg, setPromoMsg] = useState("");
   const [result, setResult] = useState<SearchResult | null>(null);
   const [cart, setCart] = useState<Cart>({});
   const [step, setStep] = useState<"rooms" | "guest">("rooms");
@@ -98,19 +114,10 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
     if (focusRoom && result?.ok) document.getElementById(`be-${focusRoom}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [focusRoom, result]);
 
-  function onCheckIn(value: string) {
-    setCheckIn(value);
-    let out = checkOut;
-    if (value && (!out || out <= value)) {
-      out = toIsoDate(addDays(new Date(`${value}T00:00`), 1));
-      setCheckOut(out);
-    }
-    search(value, out);
-  }
-
-  function onCheckOut(value: string) {
-    setCheckOut(value);
-    search(checkIn, value);
+  function onDates(inDate: string, outDate: string) {
+    setCheckIn(inDate);
+    setCheckOut(outDate);
+    search(inDate, outDate);
   }
 
   const avail = result?.ok ? result : null;
@@ -127,8 +134,14 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
     .filter((l) => l.room);
   const roomCount = lines.reduce((s, l) => s + l.qty, 0);
   const capacity = lines.reduce((s, l) => s + l.qty * l.room!.guests, 0);
-  const total = lines.reduce((s, l) => s + l.amount, 0);
+  // Giá niêm yết; giảm giá lấy mức lớn nhất (đặt trực tiếp, ở dài ngày, mã ưu đãi), máy chủ tính lại y hệt khi đặt
+  const listTotal = lines.reduce((s, l) => s + l.amount, 0);
+  const discount = avail && listTotal ? bestDiscount(avail.discounts, nights, promoOk) : null;
+  const total = discount ? discounted(listTotal, discount.percent) : listTotal;
   const deposit = avail ? Math.round((total * avail.depositPercent) / 100 / 1000) * 1000 : 0;
+  const direct = avail?.discounts.direct ?? 0;
+  const freeCancelDays = avail?.freeCancelDays ?? 0;
+  const cancelBy = freeCancelDays && checkIn ? shortDate(toIsoDate(addDays(new Date(`${checkIn}T00:00`), -freeCancelDays))) : "";
   const tooFew = roomCount > 0 && capacity < guests;
 
   function setQty(slug: string, stay: OnlineStay, qty: number) {
@@ -136,7 +149,20 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
     setCart((c) => ({ ...c, [lineKey(slug, stay)]: qty }));
   }
 
+  // Kiểm tra mã ưu đãi để tổng tiền hiện ngay phần giảm (máy chủ vẫn kiểm tra lại khi đặt)
+  async function verifyPromo(code: string) {
+    setPromoOk(null);
+    setPromoMsg("");
+    if (!code.trim()) return;
+    const r = await checkPromo(code);
+    if (r.ok) {
+      setPromoOk({ code: r.code, percent: r.percent, title: r.title });
+      setPromoMsg(r.percent ? `Mã ${r.code}: giảm ${r.percent}% (${r.title}).` : `Mã ${r.code} hợp lệ (${r.title}). Lễ tân áp dụng ưu đãi khi xác nhận.`);
+    } else setPromoMsg(r.error);
+  }
+
   function goTo(next: "rooms" | "guest") {
+    if (next === "guest" && promo && !promoOk) verifyPromo(promo);
     setStep(next);
     setNotice("");
     top.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -190,21 +216,7 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
           }}
           aria-label="Chọn ngày ở"
         >
-          <div className="field">
-            <label htmlFor="be-in">Nhận phòng</label>
-            <input id="be-in" type="date" min={today} value={checkIn} onChange={(e) => onCheckIn(e.target.value)} required />
-          </div>
-          <div className="field">
-            <label htmlFor="be-out">Trả phòng</label>
-            <input
-              id="be-out"
-              type="date"
-              min={checkIn ? toIsoDate(addDays(new Date(`${checkIn}T00:00`), 1)) : today}
-              value={checkOut}
-              onChange={(e) => onCheckOut(e.target.value)}
-              required
-            />
-          </div>
+          <DateRangePicker className="be-when" checkIn={checkIn} checkOut={checkOut} min={today || undefined} onChange={onDates} />
           <div className="field">
             <label htmlFor="be-guests">Số khách</label>
             <select id="be-guests" value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
@@ -253,6 +265,7 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
                     startDate={avail?.checkIn ?? checkIn}
                     cart={cart}
                     roomsLeftInCart={maxRooms - roomCount}
+                    direct={direct}
                     focused={focusRoom === room.slug}
                     onQty={setQty}
                     telLink={contact.telLink}
@@ -321,9 +334,19 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
                     name="code"
                     autoCapitalize="characters"
                     value={promo}
-                    onChange={(e) => setPromo(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setPromo(e.target.value.toUpperCase());
+                      setPromoOk(null);
+                      setPromoMsg("");
+                    }}
+                    onBlur={(e) => verifyPromo(e.target.value)}
                   />
                   <span className="err">{err("code")}</span>
+                  {promoMsg && !err("code") ? (
+                    <span className={promoOk ? "be-promo ok" : "be-promo"} aria-live="polite">
+                      {promoMsg}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="field full">
                   <label htmlFor="g-note">
@@ -338,7 +361,12 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
                 <ul>
                   <li>Không cần thanh toán trên website. Đặt phòng giữ chỗ ngay, lễ tân xác nhận trong khoảng 15 phút.</li>
                   <li>{policy.deposit}</li>
-                  <li>{policy.refund}</li>
+                  <li>
+                    {freeCancelDays
+                      ? `Đổi hoặc huỷ miễn phí trước ngày nhận phòng ${freeCancelDays} ngày${cancelBy ? ` (đến hết ${cancelBy})` : ""}, hoàn lại toàn bộ tiền cọc.`
+                      : policy.refund}
+                  </li>
+                  {discount ? <li>Ưu đãi không cộng dồn: bạn được mức giảm lớn nhất, đã trừ vào tổng tiền.</li> : null}
                   <li>Mang CCCD hoặc hộ chiếu khi nhận phòng.</li>
                 </ul>
                 <label className={`be-agree${err("agree") ? " invalid" : ""}`}>
@@ -390,6 +418,16 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
           ) : (
             <p className="be-empty">Chưa chọn phòng.</p>
           )}
+          {discount ? (
+            <div className="be-discount">
+              <span>
+                Giá niêm yết <s>{formatVnd(listTotal)}</s>
+              </span>
+              <span>
+                {discount.label} <b>−{formatVnd(listTotal - total)}</b>
+              </span>
+            </div>
+          ) : null}
           <div className="be-total">
             <span>Tổng tiền</span>
             <strong>{formatVnd(total)}</strong>
@@ -413,9 +451,15 @@ export function BookingEngine({ rooms, contact, policy, maxRooms }: Props) {
               Sửa phòng đã chọn
             </button>
           )}
+          {rating ? (
+            <a className="be-rating" href={rating.url || undefined} target="_blank" rel="noopener">
+              <b>★ {rating.score.toLocaleString("vi-VN")}</b> · {rating.count.toLocaleString("vi-VN")} đánh giá trên {rating.source}
+            </a>
+          ) : null}
           <ul className="be-perks">
             <li>Không cần thẻ tín dụng</li>
-            <li>Giá đặt trực tiếp, không qua trung gian</li>
+            <li>{direct ? `Rẻ hơn ${direct}% so với giá niêm yết khi đặt trực tiếp` : "Giá đặt trực tiếp, không qua trung gian"}</li>
+            {freeCancelDays ? <li>Đổi, huỷ miễn phí trước {freeCancelDays} ngày</li> : null}
             <li>Lễ tân xác nhận trong 15 phút</li>
           </ul>
         </aside>
@@ -449,7 +493,9 @@ function RoomRow({
   focused,
   onQty,
   telLink,
+  direct,
 }: {
+  direct: number;
   room: EngineRoom;
   avail: Extract<SearchResult, { ok: true }>["rooms"][string] | undefined;
   nights: number;
@@ -476,7 +522,9 @@ function RoomRow({
           {avail && !soldOut && avail.available <= 2 ? <span className="be-left">Chỉ còn {avail.available} phòng</span> : null}
         </header>
         <p className="be-specs">
-          <IconUsers /> Tối đa {room.guests} người · {room.amenities.slice(0, 3).join(" · ")}
+          <IconUsers /> Tối đa {room.guests} người
+          {room.area ? ` · ${room.area} m²` : ""}
+          {room.bed ? ` · ${room.bed}` : ""} · {room.amenities.slice(0, room.area || room.bed ? 2 : 3).join(" · ")}
         </p>
 
         {soldOut ? (
@@ -503,7 +551,14 @@ function RoomRow({
                   <div className="be-rate-price">
                     {plan ? (
                       <>
-                        <strong>{formatVnd(plan.total)}</strong>
+                        {direct ? (
+                          <>
+                            <s className="be-list-price">{formatVnd(plan.total)}</s>
+                            <strong>{formatVnd(discounted(plan.total, direct))}</strong>
+                          </>
+                        ) : (
+                          <strong>{formatVnd(plan.total)}</strong>
+                        )}
                         <small>
                           {nights > 1 ? `${nights} đêm, ` : ""}
                           {varies ? "giá từng đêm khác nhau" : `${formatVnd(plan.nightly[0])}/đêm`}

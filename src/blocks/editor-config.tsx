@@ -1,12 +1,13 @@
 "use client";
 
 // Cấu hình đầy đủ cho trình dựng trang: giao diện khối (render.tsx) + trường chỉnh sửa + giá trị mặc định.
-import type { ComponentConfig, Config, Field } from "@puckeditor/core";
+import { RichTextMenu, type ComponentConfig, type Config, type Field } from "@puckeditor/core";
 import type { Photo } from "@/lib/site";
 import { blockRenders, type BlockName } from "./config";
 import { backgroundField, headFields, iconField, imageField, text, textarea } from "./fields";
 import * as D from "./home";
 import * as B from "./render";
+import { isHtml, plainToHtml, sanitizeRichText } from "@/lib/richtext";
 
 const sectionFields = {
   background: backgroundField,
@@ -262,7 +263,33 @@ const components = {
   Text: {
     label: "Đoạn văn",
     fields: {
-      text: textarea("Nội dung (cách đoạn bằng một dòng trống)"),
+      // Trình soạn thảo rich text: in đậm, nghiêng, gạch chân, gạch đầu dòng, đánh số, trích dẫn, liên kết.
+      // Website chỉ giữ các định dạng này (src/lib/richtext.ts); căn lề dùng ô "Căn lề" bên dưới.
+      text: {
+        type: "richtext",
+        label: "Nội dung",
+        contentEditable: true,
+        initialHeight: 220,
+        options: { heading: false, code: false, codeBlock: false, horizontalRule: false, textAlign: false },
+        renderMenu: ({ editor, editorState }) => (
+          <RichTextMenu>
+            <RichTextMenu.Group>
+              <RichTextMenu.Bold />
+              <RichTextMenu.Italic />
+              <RichTextMenu.Underline />
+              <RichTextMenu.Strikethrough />
+            </RichTextMenu.Group>
+            <RichTextMenu.Group>
+              <RichTextMenu.BulletList />
+              <RichTextMenu.OrderedList />
+              <RichTextMenu.Blockquote />
+            </RichTextMenu.Group>
+            <RichTextMenu.Group>
+              <LinkControl editor={editor} active={Boolean(editor?.isActive("link"))} disabled={!editorState} />
+            </RichTextMenu.Group>
+          </RichTextMenu>
+        ),
+      },
       size: {
         type: "radio",
         label: "Cỡ chữ",
@@ -273,7 +300,14 @@ const components = {
       },
       align: alignField,
     },
-    defaultProps: { text: "Nội dung đoạn văn.", size: "", align: "left" },
+    defaultProps: { text: "<p>Nội dung đoạn văn.</p>", size: "", align: "left" },
+    // Trang lưu trước khi có rich text: đổi chữ thường sang các đoạn <p> để mở ra không mất xuống dòng.
+    // HTML cũng được lọc lại như trên website, để bản lưu chỉ chứa các thẻ định dạng cho phép.
+    resolveData: ({ props }) => {
+      if (typeof props.text !== "string" || !props.text) return { props };
+      const clean = sanitizeRichText(isHtml(props.text) ? props.text : plainToHtml(props.text));
+      return clean === props.text ? { props } : { props: { ...props, text: clean } };
+    },
   },
   Image: {
     label: "Ảnh",
@@ -329,3 +363,48 @@ export const editorConfig = {
     ]),
   ),
 } as unknown as Config;
+
+type LinkEditor = {
+  getAttributes: (name: string) => { href?: string };
+  chain: () => {
+    focus: () => {
+      extendMarkRange: (name: string) => {
+        setLink: (a: { href: string }) => { run: () => boolean };
+        unsetLink: () => { run: () => boolean };
+      };
+    };
+  };
+};
+
+// Nút chèn liên kết cho trình rich text: nhập đường dẫn, để trống thì bỏ liên kết
+function LinkControl({ editor, active, disabled }: { editor: unknown; active: boolean; disabled: boolean }) {
+  const ed = editor as LinkEditor | null;
+  return (
+    <RichTextMenu.Control
+      title="Liên kết"
+      active={active}
+      disabled={disabled || !ed}
+      icon={
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path
+            d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      }
+      onClick={(e) => {
+        e.preventDefault();
+        if (!ed) return;
+        const current = ed.getAttributes("link").href ?? "";
+        const href = window.prompt("Đường dẫn (https://…, /dat-phong, tel:0968…). Để trống để bỏ liên kết.", current);
+        if (href === null) return;
+        const chain = ed.chain().focus().extendMarkRange("link");
+        if (href.trim()) chain.setLink({ href: href.trim() }).run();
+        else chain.unsetLink().run();
+      }}
+    />
+  );
+}

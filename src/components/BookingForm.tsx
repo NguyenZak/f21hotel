@@ -3,9 +3,10 @@
 import { useActionState, useEffect, useState } from "react";
 import { submitRequest } from "@/lib/booking-client";
 import { groupTypes, initialBookingState, type BookingField, type BookingKind } from "@/lib/booking";
-import { addDays, formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
+import { formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
 import { formatVnd, stayModes, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
+import { DateRangePicker } from "./DateRangePicker";
 import { IconCheck, IconPhone, IconZalo } from "./Icons";
 
 // Hạng phòng rút gọn cho ô chọn phòng; contact lấy từ CMS ở trang cha
@@ -43,11 +44,6 @@ export function BookingForm({ kind = "booking", rooms, contact }: Props) {
       document.getElementById("form-top")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [state, kind]);
-
-  function onCheckIn(value: string) {
-    setCheckIn(value);
-    if (value && (!checkOut || checkOut <= value)) setCheckOut(toIsoDate(addDays(new Date(`${value}T00:00`), 1)));
-  }
 
   async function sendViaZalo() {
     track("click_zalo", { from: "booking_success" });
@@ -121,32 +117,19 @@ export function BookingForm({ kind = "booking", rooms, contact }: Props) {
               </>
             ) : null}
 
-            <div className={fieldClass("checkIn")}>
-              <label htmlFor="checkIn">Ngày nhận phòng</label>
-              <input
-                id="checkIn"
-                name="checkIn"
-                type="date"
-                required
-                min={today}
-                value={checkIn}
-                onChange={(e) => onCheckIn(e.target.value)}
-              />
-              <span className="err">{err("checkIn")}</span>
-            </div>
-            <div className={fieldClass("checkOut")}>
-              <label htmlFor="checkOut">Ngày trả phòng</label>
-              <input
-                id="checkOut"
-                name="checkOut"
-                type="date"
-                required
-                min={checkIn || today}
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-              />
-              <span className="err">{err("checkOut")}</span>
-            </div>
+            <DateRangePicker
+              className="full"
+              checkIn={checkIn}
+              checkOut={checkOut}
+              min={today || undefined}
+              names={["checkIn", "checkOut"]}
+              errors={{ checkIn: err("checkIn"), checkOut: err("checkOut") }}
+              clearable
+              onChange={(a, b) => {
+                setCheckIn(a);
+                setCheckOut(b);
+              }}
+            />
 
             {isGroup ? (
               <>

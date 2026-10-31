@@ -28,7 +28,7 @@ type Row = Record<string, unknown>;
 async function siteSettings(d: D1Database) {
   const [rows, longStay] = await batch<[Row, Row]>(d,
     d.prepare("select * from site_settings limit 1"),
-    d.prepare("select label, discount from site_settings_price_notes_long_stay order by _order"),
+    d.prepare("select label, discount, min_nights, percent from site_settings_price_notes_long_stay order by _order"),
   );
   return { s: rows[0] as Row | undefined, longStay };
 }
@@ -57,6 +57,8 @@ export type SiteData = {
   checkOut: string;
   priceFrom: number;
   social: { facebook: string; tiktok: string; googleMaps: string };
+  // Điểm đánh giá chép từ Google Maps / OTA; null khi CMS chưa điền (website ẩn)
+  rating: { score: number; count: number; source: string; url: string } | null;
   telLink: string;
   zaloLink: string;
 };
@@ -95,7 +97,13 @@ export async function readSite(d: D1Database): Promise<SiteData> {
       ? { facebook: get("social_facebook"), tiktok: get("social_tiktok"), googleMaps: get("social_google_maps") || defaultSite.social.googleMaps }
       : { ...defaultSite.social },
   };
-  return { ...merged, telLink: `tel:${merged.phone}`, zaloLink: `https://zalo.me/${merged.zalo}` } as SiteData;
+  const score = num(s?.rating_score);
+  const count = num(s?.rating_count);
+  const rating =
+    score >= 1 && score <= 5 && count > 0
+      ? { score: Math.round(score * 10) / 10, count: Math.round(count), source: get("rating_source") || "Google", url: get("rating_url") || merged.social.googleMaps }
+      : null;
+  return { ...merged, rating, telLink: `tel:${merged.phone}`, zaloLink: `https://zalo.me/${merged.zalo}` } as SiteData;
 }
 
 export type PriceNotes = typeof defaultPriceNotes;
@@ -112,16 +120,30 @@ export async function readPriceNotes(d: D1Database): Promise<PriceNotes> {
   };
 }
 
+export type LongStayTier = { minNights: number; percent: number; label: string };
+
 export type BookingSettings = {
   enabled: boolean;
   depositPercent: number;
   maxRooms: number;
   maxNights: number;
   bank: { bankId: string; accountNo: string; accountName: string } | null;
+  // Giảm giá đặt online (%), đổi/huỷ miễn phí trước bao nhiêu ngày (0 = không)
+  directDiscount: number;
+  freeCancelDays: number;
+  longStay: LongStayTier[];
 };
 
+// Các mức giảm ở dài ngày có điền số đêm và % (bỏ dòng chỉ có chữ), mức cao trước
+export function longStayTiers(rows: Record<string, unknown>[]): LongStayTier[] {
+  return rows
+    .map((r) => ({ minNights: num(r.min_nights), percent: num(r.percent), label: str(r.label) }))
+    .filter((t) => t.minNights > 0 && t.percent > 0 && t.percent <= 50)
+    .sort((a, b) => b.minNights - a.minNights);
+}
+
 export async function readBookingSettings(d: D1Database): Promise<BookingSettings> {
-  const { s } = await siteSettings(d);
+  const { s, longStay } = await siteSettings(d);
   const bankId = str(s?.booking_bank_bank_id).trim();
   const accountNo = str(s?.booking_bank_account_no).trim();
   return {
@@ -130,6 +152,9 @@ export async function readBookingSettings(d: D1Database): Promise<BookingSetting
     maxRooms: num(s?.booking_max_rooms, 5),
     maxNights: num(s?.booking_max_nights, 30),
     bank: bankId && accountNo ? { bankId, accountNo, accountName: str(s?.booking_bank_account_name).trim() } : null,
+    directDiscount: Math.min(30, Math.max(0, num(s?.booking_direct_discount, 0))),
+    freeCancelDays: Math.max(0, Math.round(num(s?.booking_free_cancel_days, 0))),
+    longStay: longStayTiers(longStay),
   };
 }
 
@@ -167,6 +192,9 @@ export async function readRooms(d: D1Database): Promise<Room[]> {
       .map((p): Photo => ({ src: mediaUrl(p), alt: str(p.alt), w: num(p.width, 1600), h: num(p.height, 1067) }))
       .filter((p) => p.src),
     roomNumbers: rooms.filter((r) => r.room_type_id === t.id).map((r) => str(r.number)),
+    area: num(t.area) || undefined,
+    bed: str(t.bed).trim() || undefined,
+    view: str(t.view).trim() || undefined,
   }));
 }
 
@@ -185,6 +213,7 @@ export async function readOffers(d: D1Database): Promise<Offer[]> {
     code: str(o.code) || undefined,
     details: details.filter((x) => x._parent_id === o.id).map((x) => str(x.text)),
     featured: bool(o.featured),
+    discountPercent: num(o.discount_percent) || undefined,
   }));
 }
 

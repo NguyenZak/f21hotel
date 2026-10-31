@@ -9,7 +9,8 @@ import { Gallery } from "@/components/Gallery";
 import { HeroSearch } from "@/components/HeroSearch";
 import { HeroSlider } from "@/components/HeroSlider";
 import { LocationMap3D } from "@/components/LocationMap3D";
-import { CtaBandView, Faq, RoomCard, SectionHead } from "@/components/ui";
+import { CtaBandView, Faq, RatingBadge, RoomCard, SectionHead } from "@/components/ui";
+import { isHtml, plainToHtml, sanitizeRichText } from "@/lib/richtext";
 import type { Photo } from "@/lib/site";
 import { ICONS, type IconName } from "./icons";
 import { photosOf, type BlockMeta, type PhotoItem } from "./types";
@@ -86,7 +87,13 @@ export function HeroBlock({ heading, slides, search, tabs, puck }: P<HeroProps>)
       </a>
       {search || tabs?.length ? (
         <div className="hero-bar">
-          {search ? <HeroSearch /> : null}
+          {search ? (
+            <div className="hero-bar-start">
+              {/* Điểm đánh giá Google (CMS › Thông tin khách sạn); chưa điền thì không hiện */}
+              <RatingBadge rating={meta(puck).site.rating} className="on-hero" />
+              <HeroSearch />
+            </div>
+          ) : null}
           {tabs?.length ? (
             <nav className="hero-tabs" aria-label="Đi tới mục">
               {tabs.map((t, i) => (
@@ -471,22 +478,16 @@ export function HeadingBlock({ text, level, align }: P<HeadingProps>) {
   return <Tag style={{ textAlign: align, margin: 0 }}>{text}</Tag>;
 }
 
-export type TextProps = { text: string; size: "" | "lead"; align: "left" | "center" };
+export type TextProps = { text: string | ReactNode; size: "" | "lead"; align: "left" | "center" };
 
-// Mỗi đoạn cách nhau một dòng trống
+// Nội dung soạn bằng trình rich text (HTML đã lọc thẻ, src/lib/richtext.ts).
+// Trang cũ lưu chữ thường: mỗi đoạn cách nhau một dòng trống.
+// Trong trình dựng, Puck truyền sẵn ô soạn thảo (ReactNode) để sửa trực tiếp trên trang.
 export function TextBlock({ text, size, align }: P<TextProps>) {
-  return (
-    <div style={{ textAlign: align }}>
-      {(text ?? "")
-        .split(/\n\s*\n/)
-        .filter(Boolean)
-        .map((para, i) => (
-          <p key={i} className={size || undefined}>
-            {para}
-          </p>
-        ))}
-    </div>
-  );
+  const className = `rt-body${size ? ` ${size}` : ""}`;
+  if (typeof text !== "string") return <div className={className} style={{ textAlign: align }}>{text}</div>;
+  const html = sanitizeRichText(isHtml(text) ? text : plainToHtml(text));
+  return <div className={className} style={{ textAlign: align }} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export type ImageProps = PhotoItem & { caption: string; album: PhotoItem[] };

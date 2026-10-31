@@ -92,6 +92,10 @@ export type Room = {
   prices: Record<StayModeKey, number> & { extraHour: number };
   amenities: string[];
   photos: Photo[];
+  // Thông số để khách so sánh với OTA; để trống trong CMS thì website ẩn
+  area?: number;
+  bed?: string;
+  view?: string;
 };
 
 // TODO: xác nhận tiện nghi trong phòng (điều hoà, wifi, TV, ban công…)
@@ -185,7 +189,7 @@ export const heroSlides: HeroSlide[] = [
     kicker: "Khu biệt thự Hoa Phượng · An Khánh",
     bold: "F21 Hotel",
     light: "ở khu biệt thự",
-    sub: "Giá khách sạn, cách Sân vận động Mỹ Đình 15–20 phút",
+    sub: "Giá bình dân, cách Sân vận động Mỹ Đình 15–20 phút",
     cost: { value: formatVnd(600000), label: "Qua đêm từ · 19:00 – 10:00", href: "/phong" },
     book: { label: "Đặt phòng", href: "/dat-phong" },
   },
@@ -275,6 +279,8 @@ export type Offer = {
   code?: string;
   details: string[];
   featured?: boolean;
+  // Có giá trị thì đặt online bằng mã này được trừ % vào tổng tiền
+  discountPercent?: number;
 };
 
 export const offers: Offer[] = [

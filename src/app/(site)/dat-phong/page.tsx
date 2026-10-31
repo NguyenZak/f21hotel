@@ -4,6 +4,7 @@ import { BookingEngine, type EngineRoom } from "@/components/BookingEngine";
 import { BookingForm } from "@/components/BookingForm";
 import { IconClock, IconMail, IconPhone, IconPin, IconZalo } from "@/components/Icons";
 import { PageHero, SectionHead } from "@/components/ui";
+import { cancelPolicy } from "@/lib/booking";
 import { getBookingSettings, getPriceNotes, getRooms, getSite, toFormContact, toRoomOptions } from "@/lib/cms";
 import { directPerks, formatVnd, stayModes } from "@/lib/site";
 
@@ -27,7 +28,10 @@ export default async function BookingPage() {
     guests: r.guests,
     amenities: r.amenities,
     photo: r.photos[0] ?? null,
+    area: r.area,
+    bed: r.bed,
   }));
+  const refund = cancelPolicy(booking.freeCancelDays, priceNotes.refund);
   const contactAside = (
     <aside className="side-stack">
       <div className="side-card">
@@ -93,9 +97,12 @@ export default async function BookingPage() {
       <JsonLd data={breadcrumbJsonLd(site, "/dat-phong", "Đặt phòng")} />
       {booking.enabled ? (
         <>
-          <PageHero crumb="Đặt phòng" eyebrow="Đặt phòng trực tiếp" title="Đặt phòng F21 Hotel">
-            Xem phòng trống và giá theo ngày, giữ phòng ngay trên website. Không cần thẻ tín dụng.
-          </PageHero>
+          {/* Tiêu đề gọn (be-hero) để trên điện thoại khách thấy ô chọn ngày ngay màn hình đầu */}
+          <div className="be-hero">
+            <PageHero crumb="Đặt phòng" eyebrow="Đặt phòng trực tiếp" title="Đặt phòng F21 Hotel">
+              Xem phòng trống và giá theo ngày, giữ phòng ngay trên website. Không cần thẻ tín dụng.
+            </PageHero>
+          </div>
 
           <section className="section be-section">
             <div className="wrap">
@@ -104,6 +111,7 @@ export default async function BookingPage() {
                 contact={{ telLink, phoneDisplay: site.phoneDisplay, zaloLink }}
                 policy={{ deposit: priceNotes.deposit, refund: priceNotes.refund }}
                 maxRooms={booking.maxRooms}
+                rating={site.rating}
               />
             </div>
           </section>
@@ -146,7 +154,7 @@ export default async function BookingPage() {
               <h3>Đặt cọc và thay đổi</h3>
               <ul>
                 <li>{priceNotes.deposit}</li>
-                <li>{priceNotes.refund}</li>
+                <li>{refund}</li>
                 <li>Thêm người so với quy định: phụ thu {formatVnd(priceNotes.extraPerson)}/người</li>
               </ul>
             </div>

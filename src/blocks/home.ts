@@ -32,7 +32,8 @@ export const heroDefaults: B.HeroProps = {
 
 export const introDefaults: B.IntroProps = {
   anchor: "tong-quan",
-  media: "map",
+  // Ảnh mặt tiền: bản đồ 3D đã có ở khối Vị trí ngay sau Phòng
+  media: "photo",
   background: "",
   photos: facadePhotos.map(photo),
   badgeValue: "15–20′",
@@ -68,7 +69,7 @@ export const perksDefaults: B.PerksProps = {
   intro: "Giá trên website bằng giá niêm yết. Đặt qua điện thoại, Zalo hoặc website, bạn nhận thêm:",
   items: directPerks.map((p) => ({ ...p })),
   foot: "Lễ tân trả lời Zalo trong vòng 15 phút, từ {gio}.",
-  buttonLabel: "Gửi yêu cầu đặt phòng",
+  buttonLabel: "Xem phòng trống & đặt ngay",
   buttonHref: "/dat-phong",
 };
 
@@ -118,7 +119,7 @@ export const guestsDefaults: B.GuestsProps = {
 
 export const locationDefaults: B.LocationProps = {
   anchor: "vi-tri",
-  background: "cream",
+  background: "",
   eyebrow: "Vị trí",
   title: "Dễ tìm, nếu bạn nhớ một câu",
   distances: distances.map((d) => ({ ...d })),
@@ -129,7 +130,7 @@ export const locationDefaults: B.LocationProps = {
 
 export const offersDefaults: B.OffersProps = {
   anchor: "uu-dai",
-  background: "",
+  background: "cream",
   eyebrow: "Ưu đãi",
   title: "Ưu đãi theo dịp",
   intro: "Nói mã ưu đãi khi nhắn Zalo, hoặc nhập vào form đặt phòng.",
@@ -169,10 +170,11 @@ export const defaultHome: Data = {
     block("Hero", 1, heroDefaults),
     block("Intro", 1, introDefaults),
     block("Rooms", 1, roomsDefaults),
+    // Vị trí (gần Mỹ Đình, Bảo Sơn) là lý do chọn F21, nên đứng ngay sau danh sách phòng
+    block("Location", 1, locationDefaults),
     block("Perks", 1, perksDefaults),
     block("Gallery", 1, galleryDefaults),
     block("Guests", 1, guestsDefaults),
-    block("Location", 1, locationDefaults),
     block("Offers", 1, offersDefaults),
     block("Reviews", 1, reviewsDefaults),
     block("Faq", 1, faqDefaults),

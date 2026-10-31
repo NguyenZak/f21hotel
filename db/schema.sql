@@ -1,6 +1,7 @@
 -- Cấu trúc D1 của F21 Hotel (bảng do CMS Payload tạo trước đây, CMS mới dùng lại nguyên vẹn).
 -- Dùng khi dựng D1 mới (máy dev mới): npx wrangler d1 execute D1 --local --file db/schema.sql
--- D1 thật trên Cloudflare đã có sẵn các bảng này; đổi cấu trúc thì thêm file db/migrations/NNNN_*.sql.
+-- D1 thật trên Cloudflare đã có sẵn các bảng này; đổi cấu trúc thì thêm file db/migrations/NNNN_*.sql
+-- (và sửa luôn file này để D1 mới dựng từ đầu có đủ cột). Đã gồm: 0001_conversion.
 PRAGMA foreign_keys = OFF;
 
 CREATE TABLE IF NOT EXISTS `audit_logs` (
@@ -88,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `offers` (
 	`summary` text NOT NULL,
 	`when` text NOT NULL,
 	`code` text,
+	`discount_percent` numeric,
 	`featured` integer DEFAULT false,
 	`active` integer DEFAULT true,
 	`order` numeric DEFAULT 0,
@@ -224,6 +226,9 @@ CREATE TABLE IF NOT EXISTS `room_types` (
 	`prices_overnight` numeric NOT NULL,
 	`prices_full_day` numeric NOT NULL,
 	`prices_extra_hour` numeric NOT NULL,
+	`area` numeric,
+	`bed` text,
+	`view` text,
 	`order` numeric DEFAULT 0,
 	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
 	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
@@ -287,13 +292,15 @@ CREATE TABLE IF NOT EXISTS `site_settings` (
 	`price_notes_water` text,
 	`updated_at` text,
 	`created_at` text
-, `booking_enabled` integer DEFAULT true, `booking_deposit_percent` numeric DEFAULT 50, `booking_max_rooms` numeric DEFAULT 5, `booking_max_nights` numeric DEFAULT 30, `booking_bank_bank_id` text, `booking_bank_account_no` text, `booking_bank_account_name` text);
+, `booking_enabled` integer DEFAULT true, `booking_deposit_percent` numeric DEFAULT 50, `booking_max_rooms` numeric DEFAULT 5, `booking_max_nights` numeric DEFAULT 30, `booking_bank_bank_id` text, `booking_bank_account_no` text, `booking_bank_account_name` text, `rating_score` numeric, `rating_count` numeric, `rating_source` text, `rating_url` text, `booking_direct_discount` numeric DEFAULT 0, `booking_free_cancel_days` numeric DEFAULT 0);
 CREATE TABLE IF NOT EXISTS `site_settings_price_notes_long_stay` (
 	`_order` integer NOT NULL,
 	`_parent_id` integer NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`label` text NOT NULL,
 	`discount` text NOT NULL,
+	`min_nights` numeric,
+	`percent` numeric,
 	FOREIGN KEY (`_parent_id`) REFERENCES `site_settings`(`id`) ON UPDATE no action ON DELETE cascade
 );
 CREATE TABLE IF NOT EXISTS `theme_settings` (
