@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { submitBooking } from "@/app/(site)/actions";
+import { submitRequest } from "@/lib/booking-client";
 import { groupTypes, initialBookingState, type BookingField, type BookingKind } from "@/lib/booking";
 import { addDays, formatViDate, nightsBetween, toIsoDate } from "@/lib/dates";
 import { formatVnd, stayModes, type Contact } from "@/lib/site";
@@ -14,7 +14,7 @@ type Props = { kind?: BookingKind; rooms: RoomOption[]; contact: Contact & { rep
 
 export function BookingForm({ kind = "booking", rooms, contact }: Props) {
   const { telLink, zaloLink, phoneDisplay, replyHours } = contact;
-  const [state, formAction, pending] = useActionState(submitBooking, initialBookingState);
+  const [state, formAction, pending] = useActionState(submitRequest, initialBookingState);
   const [today, setToday] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");

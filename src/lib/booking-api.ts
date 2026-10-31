@@ -1,8 +1,13 @@
-// API đặt phòng của website: POST /api/booking/search và /api/booking/create (JSON).
+// API đặt phòng của website (JSON): POST /api/booking/search, /api/booking/create (đặt phòng online)
+// và /api/booking/request (form yêu cầu đặt phòng / báo giá đoàn, chỉ báo lễ tân, không giữ phòng).
 // Trên Cloudflare, worker.ts gọi handleBookingApi trước khi nạp Next.js, nên mỗi yêu cầu chỉ tốn vài ms CPU
 // (vừa gói Workers Free). Khi chạy `next dev`, route src/app/api/booking/[op]/route.ts gọi cùng hàm này.
 // Không import gì từ Next.js / OpenNext ở đây.
 import {
+  type BookingField,
+  type BookingKind,
+  type BookingState,
+  type BookingValues,
   isValidEmail,
   isValidPhone,
   normalizePhone,
@@ -13,9 +18,10 @@ import {
   type OnlineStay,
   type SearchResult,
 } from "./booking";
-import { addDays, nightsBetween, todayInVietnam, toIsoDate } from "./dates";
+import { addDays, formatViDate, nightsBetween, todayInVietnam, toIsoDate } from "./dates";
 import { notifyFrontDesk } from "./notify";
 import { checkAvailability, deleteBooking, findBooking, insertBooking } from "./reservations";
+import { stayModes } from "./site";
 import { bool, num, str } from "./sql";
 
 export type BookingApiOptions = {
@@ -198,12 +204,83 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
   return { ok: true, code };
 }
 
+// ---------- Form yêu cầu đặt phòng / báo giá đoàn (BookingForm) ----------
+
+const REQUEST_FIELDS: BookingField[] = [
+  "name",
+  "phone",
+  "checkIn",
+  "checkOut",
+  "guests",
+  "room",
+  "stayType",
+  "roomCount",
+  "code",
+  "company",
+  "groupType",
+  "invoice",
+  "note",
+];
+
+export async function submitRequest(d: D1Database, form: Record<string, unknown>, opts: BookingApiOptions): Promise<BookingState> {
+  const kind: BookingKind = form.kind === "group" ? "group" : "booking";
+  const values: BookingValues = {};
+  for (const f of REQUEST_FIELDS) {
+    const v = form[f];
+    if (typeof v === "string") values[f] = v.trim().slice(0, f === "note" ? 1000 : 120);
+  }
+
+  // Ô ẩn chống spam: người thật không điền ô này
+  if (form.website) return { status: "ok", values: {}, summary: "", delivered: true };
+
+  const errors: BookingState["errors"] = {};
+  if (!values.name) errors.name = "Vui lòng nhập họ tên.";
+  if (!values.phone) errors.phone = "Vui lòng nhập số điện thoại.";
+  else if (!isValidPhone(values.phone)) errors.phone = "Số điện thoại chưa đúng, ví dụ 0912 345 678.";
+  if (!values.checkIn || !isoDate.test(values.checkIn)) errors.checkIn = "Vui lòng chọn ngày nhận phòng.";
+  if (!values.checkOut || !isoDate.test(values.checkOut)) errors.checkOut = "Vui lòng chọn ngày trả phòng.";
+  else if (values.checkIn && !nightsBetween(values.checkIn, values.checkOut)) errors.checkOut = "Ngày trả phòng phải sau ngày nhận phòng.";
+  if (Object.keys(errors).length > 0) return { status: "error", message: "Vui lòng kiểm tra lại các ô được đánh dấu.", errors, values };
+
+  const roomName = values.room
+    ? str((await d.prepare("select name from room_types where slug = ? limit 1").bind(values.room).first<{ name: string }>())?.name)
+    : "";
+  const v = values;
+  const nights = nightsBetween(v.checkIn!, v.checkOut!);
+  const stay = stayModes.find((m) => m.key === v.stayType)?.label;
+  const summary = [
+    kind === "group" ? "YÊU CẦU BÁO GIÁ ĐOÀN – F21 HOTEL" : "YÊU CẦU ĐẶT PHÒNG – F21 HOTEL",
+    `Họ tên: ${v.name}`,
+    `Điện thoại: ${normalizePhone(v.phone!)}`,
+    v.company && `Công ty / gia đình: ${v.company}`,
+    v.groupType && `Loại đoàn: ${v.groupType}`,
+    `Nhận phòng: ${formatViDate(v.checkIn!)}`,
+    `Trả phòng: ${formatViDate(v.checkOut!)}${nights ? ` (${nights} đêm)` : ""}`,
+    v.guests && `Số khách: ${v.guests}`,
+    roomName && `Loại phòng: ${roomName}`,
+    stay && `Hình thức: ${stay}`,
+    v.roomCount && `Số phòng: ${v.roomCount}`,
+    v.invoice === "yes" && "Cần xuất hoá đơn VAT",
+    v.code && `Mã ưu đãi: ${v.code.toUpperCase()}`,
+    v.note && `Ghi chú: ${v.note}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const delivered = await notifyFrontDesk(
+    { kind, ...v, phone: v.phone ? normalizePhone(v.phone) : "", nights },
+    summary,
+    opts.webhookUrl,
+  );
+  return { status: "ok", summary, delivered, values: {} };
+}
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
 
 // Xử lý POST /api/booking/<op>. Trả null nếu không phải đường dẫn của API này.
 export async function handleBookingApi(request: Request, d: D1Database, opts: BookingApiOptions): Promise<Response | null> {
-  const op = new URL(request.url).pathname.match(/^\/api\/booking\/(search|create)\/?$/)?.[1];
+  const op = new URL(request.url).pathname.match(/^\/api\/booking\/(search|create|request)\/?$/)?.[1];
   if (!op) return null;
   if (request.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405);
   let body: Record<string, unknown>;
@@ -214,6 +291,7 @@ export async function handleBookingApi(request: Request, d: D1Database, opts: Bo
   }
   try {
     if (op === "search") return json(await searchRooms(d, str(body.checkIn), str(body.checkOut)));
+    if (op === "request") return json(await submitRequest(d, body, opts));
     return json(await createBooking(d, body as unknown as CreateBookingInput, opts));
   } catch (e) {
     console.error("[booking-api]", e);
