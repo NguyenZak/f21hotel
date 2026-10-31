@@ -3,15 +3,27 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import type { BookingDTO } from "../../types";
 import { api, ApiError } from "../api";
 import { dayLabel, money, roomsText, sourceLabel, statusLabel, telHref } from "../booking";
+import { BookingPreview } from "../BookingPreview";
 import type { ColumnDef, DataTableProps } from "../DataTable";
 
 const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: () => <p className="c-empty">Đang tải…</p> }) as <T>(
   p: DataTableProps<T>,
 ) => ReactNode;
+
+const SplitView = dynamic(() => import("../SplitView"), { ssr: false });
+
+// Màn hình rộng: danh sách và khung xem nhanh nằm cạnh nhau
+const WIDE = "(min-width: 1180px)";
+const onWideChange = (cb: () => void) => {
+  const m = matchMedia(WIDE);
+  m.addEventListener("change", cb);
+  return () => m.removeEventListener("change", cb);
+};
+const useWide = () => useSyncExternalStore(onWideChange, () => matchMedia(WIDE).matches, () => false);
 
 const editHref = (b: BookingDTO) => `/quan-tri/dat-phong/sua?id=${b.id}`;
 
@@ -66,6 +78,9 @@ const FILTERS = [
   { key: "upcoming", label: "Sắp đến" },
 ];
 
+// Khi chia đôi màn hình, bảng chỉ giữ các cột chính; phòng và kênh xem ở khung bên phải
+const COMPACT = COLUMNS.filter((c) => c.id !== "rooms" && c.id !== "source");
+
 export function BookingsPage() {
   const params = useSearchParams();
   const router = useRouter();
@@ -75,6 +90,9 @@ export function BookingsPage() {
   const [rows, setRows] = useState<BookingDTO[] | null>(null);
   const [more, setMore] = useState(false);
   const [error, setError] = useState("");
+  const wide = useWide();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selected = rows?.find((b) => b.id === selectedId) ?? null;
 
   useEffect(() => {
     let alive = true;
@@ -101,6 +119,20 @@ export function BookingsPage() {
     e.preventDefault();
     go({ q: String(new FormData(e.currentTarget).get("q") ?? "").trim() });
   };
+
+  const list = (
+    <div className="c-card c-table-wrap">
+      {!rows ? (
+        <p className="c-empty">Đang tải…</p>
+      ) : !rows.length ? (
+        <p className="c-empty">Không có đặt phòng nào{q ? ` khớp “${q}”` : ""}.</p>
+      ) : wide ? (
+        <DataTable data={rows} columns={COMPACT} onRowClick={(b) => setSelectedId(b.id)} activeId={selectedId} getRowId={(b) => String(b.id)} />
+      ) : (
+        <DataTable data={rows} columns={COLUMNS} rowHref={editHref} getRowId={(b) => String(b.id)} />
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -131,15 +163,7 @@ export function BookingsPage() {
       </div>
 
       {error ? <p className="c-alert c-alert--error">{error}</p> : null}
-      <div className="c-card c-table-wrap">
-        {!rows ? (
-          <p className="c-empty">Đang tải…</p>
-        ) : !rows.length ? (
-          <p className="c-empty">Không có đặt phòng nào{q ? ` khớp “${q}”` : ""}.</p>
-        ) : (
-          <DataTable data={rows} columns={COLUMNS} rowHref={editHref} getRowId={(b) => String(b.id)} />
-        )}
-      </div>
+      {wide ? <SplitView id="cms-bookings" left={list} right={<BookingPreview booking={selected} />} rightLabel="xem nhanh" /> : list}
       {more ? (
         <div className="c-row" style={{ justifyContent: "center", marginTop: 16 }}>
           <button className="c-btn" type="button" onClick={() => setPage((p) => p + 1)}>

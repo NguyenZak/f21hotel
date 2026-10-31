@@ -529,3 +529,23 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-thumb__tools .c-drag { min-height: 28px; background: var(--c-card); }
 .is-dragging { position: relative; z-index: 3; box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.35); }
 .c-rows__row.is-dragging { background: var(--c-card); border-radius: var(--r-s); }
+
+/* ---------- Đặt phòng: danh sách + xem nhanh, kéo vạch giữa (react-resizable-panels) ---------- */
+.c-split { align-items: flex-start; }
+.c-split__pane { min-width: 0; }
+.c-split__pane:last-child { position: sticky; top: 72px; }
+.c-split__handle { position: relative; width: 18px; align-self: stretch; cursor: col-resize; outline: none; }
+.c-split__handle::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; translate: -50% 0; border-radius: 2px; background: var(--c-line); transition: background 0.2s, width 0.2s; }
+.c-split__handle:hover::before, .c-split__handle[data-separator="active"]::before, .c-split__handle:focus-visible::before { width: 4px; background: var(--c-gold); }
+.c-preview { display: grid; gap: 16px; padding: 20px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-l); box-shadow: var(--shadow); max-height: calc(100vh - 100px); overflow-y: auto; }
+.c-preview--empty { justify-items: center; text-align: center; padding: 48px 20px; color: var(--c-muted); }
+.c-preview--empty p { margin: 0; }
+.c-preview__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.c-preview__head p { margin: 2px 0 0; font-size: 13px; }
+.c-preview__facts { margin: 0; display: grid; gap: 12px; }
+.c-preview__facts > div { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 10px; padding-top: 12px; border-top: 1px solid var(--c-line); }
+.c-preview__facts dt { color: var(--c-muted); font-size: 13px; }
+.c-preview__facts dd { margin: 0; display: grid; gap: 2px; }
+.c-preview__facts small { color: var(--c-muted); font-size: 13px; }
+.c-preview__room small { margin-left: 4px; }
+.c-preview__note { white-space: pre-wrap; }
