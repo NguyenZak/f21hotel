@@ -357,7 +357,8 @@ export const distances = [
 ]; // TODO: đo lại thời gian thực tế trên Google Maps
 
 // Tiện ích quanh khách sạn, hiện ở trang Vị trí
-// TODO: điền tên quán, tên sân pickleball, phòng gym cụ thể sau khi khảo sát thực tế
+// TODO: điền tên quán, phòng gym cụ thể sau khi khảo sát thực tế.
+// Sân pickleball lấy theo danh bạ sân (pickleballplus.vn, thegioithethao.vn), khách sạn xác nhận lại giờ mở cửa
 export const nearby = [
   {
     title: "Ăn uống",
@@ -371,7 +372,8 @@ export const nearby = [
     title: "Thể thao & vui chơi",
     items: [
       "Thiên đường Bảo Sơn: khu vui chơi, giải trí cho gia đình và trẻ nhỏ",
-      "Sân pickleball quanh khu đô thị",
+      "Sân pickleball The ClubHouse ngay trong khu biệt thự Hoa Phượng, có sân mái che",
+      "Sân pickleball trong Thiên đường Bảo Sơn",
       "Phòng gym cho khách ở dài ngày",
     ],
   },
