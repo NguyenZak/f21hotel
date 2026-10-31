@@ -17,13 +17,8 @@ const NAV: Group[] = [
   {
     items: [
       { href: "/quan-tri", label: "Hôm nay" },
-      { href: "/admin/lich-phong", label: "Lịch phòng", legacy: true },
-    ],
-  },
-  {
-    title: "Đặt phòng",
-    items: [
-      { href: "/admin/collections/bookings", label: "Đặt phòng", legacy: true },
+      { href: "/quan-tri/dat-phong", label: "Đặt phòng" },
+      { href: "/quan-tri/lich-phong", label: "Lịch phòng" },
     ],
   },
   {
@@ -110,7 +105,7 @@ function Nav({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
                   <Link
                     className="c-nav__link"
                     href={it.href}
-                    aria-current={path === it.href ? "page" : undefined}
+                    aria-current={path === it.href || (it.href !== "/quan-tri" && path.startsWith(`${it.href}/`)) ? "page" : undefined}
                     prefetch={!it.legacy}
                   >
                     <span>{it.label}</span>

@@ -3,21 +3,11 @@
 // Dùng chung bảng của CMS Payload (users, audit_logs…) để hai CMS chạy song song trong lúc chuyển đổi.
 // Không import gì từ Next.js / OpenNext / Payload ở đây.
 import { str } from "@/lib/sql";
+import { bookingRoutes } from "./bookings";
 import { hashPassword, needsRehash, readSession, signSession, verifyPassword } from "./crypto";
+import { audit, body, can, fail, json, ROLES, toUser, type CmsContext, type CmsUser, type Role } from "./http";
 
-export const ROLES = ["owner", "manager", "staff"] as const;
-export type Role = (typeof ROLES)[number];
-export type CmsUser = { id: number; name: string; email: string; role: Role; active: boolean };
-
-export type CmsContext = {
-  d: D1Database;
-  // Khoá ký phiên đăng nhập (PAYLOAD_SECRET)
-  secret: string;
-  // Làm mới trang website dùng các nhãn này (src/lib/cms-tags.ts). Trong worker: ghi KV tag cache của OpenNext
-  // (kvTagRevalidator bên dưới); khi chạy next dev: revalidateTag của Next.js.
-  revalidate: (tags: string[]) => Promise<void>;
-  waitUntil: (p: Promise<unknown>) => void;
-};
+export { type CmsContext } from "./http";
 
 type Req = { request: Request; url: URL; ctx: CmsContext; path: string[] };
 type Handler = (r: Req & { user: CmsUser }) => Promise<Response>;
@@ -26,24 +16,6 @@ const COOKIE = "f21_cms";
 const SESSION_DAYS = 7;
 const MAX_ATTEMPTS = 5;
 const LOCK_MINUTES = 10;
-
-// ---------- Tiện ích ----------
-
-export const json = (body: unknown, status = 200, headers: Record<string, string> = {}) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...headers },
-  });
-
-export const fail = (status: number, error: string) => json({ ok: false, error }, status);
-
-export async function body<T = Record<string, unknown>>(request: Request): Promise<T | null> {
-  try {
-    return (await request.json()) as T;
-  } catch {
-    return null;
-  }
-}
 
 const cookieOf = (request: Request) =>
   request.headers
@@ -54,24 +26,6 @@ const cookieOf = (request: Request) =>
 
 const setCookie = (url: URL, value: string, maxAge: number) =>
   `${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${url.protocol === "https:" ? "; Secure" : ""}`;
-
-const toUser = (r: Record<string, unknown>): CmsUser => ({
-  id: Number(r.id),
-  name: str(r.name),
-  email: str(r.email),
-  role: (ROLES as readonly string[]).includes(str(r.role)) ? (str(r.role) as Role) : "staff",
-  active: r.active === null || r.active === undefined ? true : Boolean(Number(r.active)),
-});
-
-export const can = (user: CmsUser, ...roles: Role[]) => roles.includes(user.role);
-
-// Ghi nhật ký thao tác (cùng bảng với CMS cũ)
-export async function audit(ctx: CmsContext, user: CmsUser, action: "create" | "update" | "delete", target: string, docId: unknown, title?: string) {
-  await ctx.d
-    .prepare("insert into audit_logs (user_id, action, target, doc_id, title) values (?, ?, ?, ?, ?)")
-    .bind(user.id, action, target, docId === undefined ? null : String(docId), title ?? null)
-    .run();
-}
 
 // Đánh dấu dữ liệu website đã đổi trong KV tag cache của OpenNext (khoá "<buildId>/<tag>"), giống
 // revalidateTag(tag, { expire: 0 }): trang dùng nhãn này được dựng lại ở lần truy cập sau.
@@ -230,7 +184,7 @@ const listAudit: Handler = async ({ ctx, url }) => {
 
 // ---------- Định tuyến ----------
 
-type Route = { method: string; match: (p: string[]) => boolean; roles?: Role[]; handler: Handler };
+type Route = { method: string; match: (p: string[]) => boolean; roles?: readonly Role[]; handler: Handler };
 
 // Các nhóm tính năng (đặt phòng, nội dung…) thêm route vào đây ở các giai đoạn sau
 export const routes: Route[] = [
@@ -240,6 +194,8 @@ export const routes: Route[] = [
   { method: "POST", match: (p) => p[0] === "users" && p.length === 1, roles: ["owner"], handler: createUser },
   { method: "PATCH", match: (p) => p[0] === "users" && p.length === 2, roles: ["owner"], handler: updateUser },
   { method: "GET", match: (p) => p[0] === "audit-logs" && p.length === 1, roles: ["owner", "manager"], handler: listAudit },
+  // Vận hành: hôm nay, đặt phòng, lịch phòng (mọi vai trò; xoá đặt phòng: Chủ, Quản lý)
+  ...bookingRoutes,
 ];
 
 // Xử lý /api/cms/*. Trả null nếu không phải đường dẫn của API này.
