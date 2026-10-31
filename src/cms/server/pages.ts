@@ -2,6 +2,7 @@
 // Bố cục lưu trong bảng pages như CMS cũ: "draft" là bản đang sửa, "data" là bản đang hiện trên website.
 import { CMS_TAGS } from "@/lib/cms-tags";
 import { readFaqs, readOffers, readReviews, readRooms, readSite, readThemeFonts } from "@/lib/site-data";
+import { isHtml, sanitizeRichText } from "@/lib/richtext";
 import { num, str } from "@/lib/sql";
 import { audit, body, fail, json, type CmsContext, type CmsUser } from "./http";
 
@@ -9,6 +10,17 @@ type Row = Record<string, unknown>;
 type Ctx = { ctx: CmsContext; user: CmsUser; request: Request; path: string[] };
 const MANAGE = ["owner", "manager"] as const;
 const parse = (v: unknown) => (v ? (typeof v === "string" ? JSON.parse(v) : v) : null);
+
+// Lọc HTML của khối Đoạn văn ngay khi lưu (cả khối lồng trong zones/slot), để HTML lạ gửi thẳng vào API
+// không chạy được trong trình dựng của người khác. Website và trình dựng vẫn lọc thêm lần nữa khi hiển thị.
+function cleanBlocks(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(cleanBlocks);
+  if (!v || typeof v !== "object") return v;
+  const o = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, cleanBlocks(x)])) as Row;
+  const props = o.props as Row | undefined;
+  if (o.type === "Text" && props && typeof props.text === "string" && isHtml(props.text)) o.props = { ...props, text: sanitizeRichText(props.text) };
+  return o;
+}
 
 const list = async ({ ctx }: Ctx) => {
   const { results } = await ctx.d.prepare("select id, title, slug, published_at, draft is not null as has_draft, updated_at from pages order by slug = 'home' desc, title").all<Row>();
@@ -32,7 +44,7 @@ const save = async ({ ctx, user, request, path }: Ctx) => {
   const page = await ctx.d.prepare("select title from pages where id = ?").bind(id).first<Row>();
   if (!page) return fail(404, "Không tìm thấy trang.");
   const now = new Date().toISOString();
-  const data = JSON.stringify(b.data);
+  const data = JSON.stringify(cleanBlocks(b.data));
   if (b.publish) await ctx.d.prepare("update pages set data = ?, draft = null, published_at = ?, updated_at = ? where id = ?").bind(data, now, now, id).run();
   else await ctx.d.prepare("update pages set draft = ?, updated_at = ? where id = ?").bind(data, now, id).run();
   await audit(ctx, user, "update", "pages", id, str(page.title));
