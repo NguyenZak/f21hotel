@@ -23,10 +23,10 @@ export const heroDefaults: B.HeroProps = {
   })),
   search: true,
   tabs: [
-    { label: "Tổng quan", href: "#tong-quan" },
-    { label: "Phòng & giá", href: "#phong" },
-    { label: "Ưu đãi", href: "#uu-dai" },
     { label: "Vị trí", href: "#vi-tri" },
+    { label: "Phòng & giá", href: "#phong" },
+    { label: "Tổng quan", href: "#tong-quan" },
+    { label: "Ưu đãi", href: "#uu-dai" },
   ],
 };
 
@@ -75,7 +75,7 @@ export const perksDefaults: B.PerksProps = {
 
 export const galleryDefaults: B.GalleryProps = {
   anchor: "",
-  background: "",
+  background: "cream",
   eyebrow: "Không gian",
   title: "Bên trong F21 Hotel",
   intro: "Sảnh lát đá cẩm thạch, phòng sàn gỗ, cửa sổ vòm nhìn ra hàng cây khu biệt thự.",
@@ -139,7 +139,7 @@ export const offersDefaults: B.OffersProps = {
 
 export const reviewsDefaults: B.ReviewsProps = {
   anchor: "danh-gia",
-  background: "",
+  background: "cream",
   eyebrow: "Khách nói gì",
   title: "Đánh giá từ khách đã ở",
   intro: "",
@@ -149,7 +149,7 @@ export const reviewsDefaults: B.ReviewsProps = {
 
 export const faqDefaults: B.FaqProps = {
   anchor: "hoi-dap",
-  background: "cream",
+  background: "",
   eyebrow: "Hỏi đáp",
   title: "Câu hỏi thường gặp",
   intro: "",
@@ -168,15 +168,16 @@ export const defaultHome: Data = {
   root: { props: { title: "Trang chủ" } },
   content: [
     block("Hero", 1, heroDefaults),
-    block("Intro", 1, introDefaults),
-    block("Rooms", 1, roomsDefaults),
-    // Vị trí (gần Mỹ Đình, Bảo Sơn) là lý do chọn F21, nên đứng ngay sau danh sách phòng
+    // Vị trí (gần Mỹ Đình, Bảo Sơn) là lý do chọn F21, nên đứng ngay dưới Hero, rồi tới giá phòng.
+    // "Đặt trực tiếp" để sát Ưu đãi, lúc khách đã xem phòng và không gian. Màu nền xen kẽ trắng/kem.
     block("Location", 1, locationDefaults),
-    block("Perks", 1, perksDefaults),
+    block("Rooms", 1, roomsDefaults),
+    block("Intro", 1, introDefaults),
     block("Gallery", 1, galleryDefaults),
     block("Guests", 1, guestsDefaults),
-    block("Offers", 1, offersDefaults),
     block("Reviews", 1, reviewsDefaults),
+    block("Perks", 1, perksDefaults),
+    block("Offers", 1, offersDefaults),
     block("Faq", 1, faqDefaults),
     block("Cta", 1, ctaDefaults),
   ],

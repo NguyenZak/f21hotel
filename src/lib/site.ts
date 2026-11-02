@@ -190,7 +190,7 @@ export const heroSlides: HeroSlide[] = [
     bold: "F21 Hotel",
     light: "ở khu biệt thự",
     sub: "Giá bình dân, cách Sân vận động Mỹ Đình 15–20 phút",
-    cost: { value: formatVnd(600000), label: "Qua đêm từ · 19:00 – 10:00", href: "/phong" },
+    cost: { value: formatVnd(300000), label: `Theo giờ từ · qua đêm từ ${formatVnd(600000)}`, href: "/phong" },
     book: { label: "Đặt phòng", href: "/dat-phong" },
   },
   {

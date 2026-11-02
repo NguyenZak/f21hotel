@@ -325,9 +325,14 @@ p { margin: 0; }
   display: grid; place-items: center; background: var(--gold-grad); color: var(--maroon-ink);
   font: 700 16px/1 var(--font-sans);
 }
-.hero-cost strong { font-family: var(--font-sans); font-weight: 700; font-size: clamp(34px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em; }
-.hero-cost small { font-size: 13px; color: rgba(255, 255, 255, 0.75); letter-spacing: 0.04em; }
-.hero-cost:hover strong { color: var(--gold-light); }
+/* Giá là điều khách tìm đầu tiên: số lớn, vàng ánh kim */
+.hero-cost strong {
+  font-family: var(--font-sans); font-weight: 800; font-size: clamp(40px, 4.4vw, 66px); line-height: 1.1; letter-spacing: -0.03em;
+  background: var(--gold-sheen) 0 0 / 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  transition: background-position var(--dur-2) var(--ease-lux);
+}
+.hero-cost small { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.9); letter-spacing: 0.04em; }
+.hero-cost:hover strong { background-position: 50% 0; }
 
 /* Thanh đáy: chọn ngày bên trái, tab bên phải, cùng nằm trên một đường kẻ mảnh */
 .hero-bar {
