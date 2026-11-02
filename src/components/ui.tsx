@@ -91,11 +91,11 @@ export function RoomCard({ room }: { room: Room }) {
   return (
     <article className="room-card">
       <div className="media">
-        {/* Bấm ảnh mở album của phòng. leadTransitionName cùng tên với ảnh lớn ở trang Phòng:
+        {/* Slider cả album của phòng, bấm ảnh mở xem lớn. leadTransitionName cùng tên với ảnh lớn ở trang Phòng:
             khi chuyển trang ảnh bay sang vị trí mới */}
         <Gallery
           photos={room.photos}
-          visible={1}
+          slider
           leadTransitionName={`room-${room.slug}`}
           sizes="(max-width: 640px) 100vw, (max-width: 1140px) 50vw, 25vw"
         />
