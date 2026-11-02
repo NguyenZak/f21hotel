@@ -2,8 +2,6 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	// worker.ts bọc worker của OpenNext (API đặt phòng nhẹ chạy trước khi nạp Next.js)
 	"main": "worker.ts",
-	// worker.ts đọc build id của Next.js dưới dạng chữ (khoá KV tag cache)
-	"rules": [{ "type": "Text", "globs": ["**/BUILD_ID"], "fallthrough": true }],
 	"name": "f21hotel",
 	// Tài khoản Cloudflare của khách sạn (Azlabs.it@gmail.com's Account)
 	"account_id": "a53fd282b8369dffc65cf51b9e234e2a",
@@ -34,5 +32,25 @@
 		{ "binding": "NEXT_INC_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" },
 		{ "binding": "NEXT_TAG_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" }
 	],
-	"observability": { "enabled": true }
+	"observability": { "enabled": true },
+	// Chỉ dùng lúc build (package.json "deploy": NEXT_DEV_WRANGLER_ENV=build). Trang website được dựng sẵn lúc build
+	// và không dựng lại trên Workers (worker.ts), nên phải đọc D1 thật ("remote": true), không phải D1 giả lập ở máy.
+	// Chỉ đọc, không ghi. `next dev` và `wrangler deploy` không dùng env này.
+	"env": {
+		"build": {
+			"services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "f21hotel" }],
+			"d1_databases": [
+				{
+					"binding": "D1",
+					"database_name": "f21-hotel-cms",
+					"database_id": "a35fdcd2-8455-43f3-9c39-c0641ebee789",
+					"remote": true
+				}
+			],
+			"kv_namespaces": [
+				{ "binding": "NEXT_INC_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" },
+				{ "binding": "NEXT_TAG_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" }
+			]
+		}
+	}
 }

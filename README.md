@@ -60,7 +60,7 @@ Website chạy trên **Cloudflare Workers gói Free**, giới hạn **10 ms CPU 
 
 - **Giao diện CMS** là các trang tĩnh chạy trong trình duyệt ([src/cms/client](src/cms/client), route ở [src/app/(cms)](src/app/(cms))).
 - **API** `/api/cms/*` (CMS) và `/api/booking/*` (đặt phòng trên website) chạy trong [worker.ts](worker.ts), **trước khi nạp Next.js**: mỗi yêu cầu chỉ là vài câu SQL trên D1 (0–5 ms CPU). Code: [src/cms/server](src/cms/server), [src/lib/booking-api.ts](src/lib/booking-api.ts). Khi chạy `next dev`, các route [src/app/api](src/app/api) gọi cùng hàm đó.
-- **Trang website** đọc D1 bằng SQL ([src/lib/site-data.ts](src/lib/site-data.ts)), được lưu đệm theo nhãn ([src/lib/cms.ts](src/lib/cms.ts)). Lưu trong CMS thì API ghi nhãn đã đổi vào KV tag cache của OpenNext, trang được dựng lại ở lần xem sau.
+- **Trang website** đọc D1 bằng SQL ([src/lib/site-data.ts](src/lib/site-data.ts)), được lưu đệm theo nhãn ([src/lib/cms.ts](src/lib/cms.ts)). Trang chỉ được dựng lúc build, đọc D1 thật; **không dựng lại trên Workers** (gói Free 10 ms CPU, dựng một trang tốn ~650 ms làm worker treo và cả website trả 500). Nội dung sửa trong CMS lên website ở lần deploy tiếp theo.
 - Không dùng server action cho thao tác của khách hay của CMS: mỗi lần gọi phải nạp cả Next.js (200–500 ms CPU khi worker vừa khởi động).
 
 Chi tiết:
@@ -97,4 +97,4 @@ Trang `/dat-phong`: chọn ngày và số khách → xem phòng trống và giá
 
 ### Deploy
 
-Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), rồi `npx opennextjs-cloudflare build` và `npx opennextjs-cloudflare deploy`. Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).
+Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), có `.env.local` (cần `CLOUDINARY_CLOUD_NAME` để dựng URL ảnh), rồi `npm run build:cf` và `npx opennextjs-cloudflare deploy`. `build:cf` dùng env `build` trong wrangler.jsonc: D1 đọc thẳng database thật, nên trang dựng sẵn khớp nội dung CMS (`next dev` vẫn dùng D1 giả lập ở máy). Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).

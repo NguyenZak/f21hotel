@@ -2,13 +2,9 @@
 // các API nhẹ (đặt phòng) được xử lý ngay ở đây, trước khi nạp máy chủ Next.js, để mỗi yêu cầu chỉ tốn
 // vài ms CPU (gói Workers Free giới hạn 10 ms). Mọi đường dẫn khác chuyển cho Next.js như bình thường.
 // File này không nằm trong tsconfig (wrangler đóng gói riêng).
-import { handleCmsApi, kvTagRevalidator } from "./src/cms/server/api";
+import { handleCmsApi } from "./src/cms/server/api";
 import { cloudinaryFrom, mediaUrlOf } from "./src/cms/server/media";
 import { handleBookingApi } from "./src/lib/booking-api";
-// Build id của Next.js: khoá trong KV tag cache có dạng "<buildId>/<tag>" (wrangler.jsonc rules: Text)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- file do `opennextjs-cloudflare build` tạo ra
-// @ts-ignore
-import nextBuildId from "./.open-next/server-functions/default/.next/BUILD_ID";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- file do `opennextjs-cloudflare build` tạo ra, có thể chưa tồn tại
 // @ts-ignore
 import nextWorker from "./.open-next/worker.js";
@@ -24,7 +20,10 @@ export default {
       const res = await handleCmsApi(request, {
         d: env.D1,
         secret: (env as unknown as { PAYLOAD_SECRET?: string }).PAYLOAD_SECRET ?? "",
-        revalidate: kvTagRevalidator(env.NEXT_TAG_CACHE_KV, String(nextBuildId).trim()),
+        // Không đánh dấu trang cũ khi lưu: dựng lại trang ngay trên Workers tốn ~650 ms CPU, gói Free (10 ms)
+        // làm worker treo và cả website trả 500 (sự cố 2026-11-02). Trang chỉ dựng lúc build (đọc D1 thật,
+        // wrangler.jsonc env "build"), nên nội dung sửa trong CMS lên website ở lần deploy tiếp theo.
+        revalidate: async () => {},
         waitUntil: (p) => ctx.waitUntil(p),
         cloudinary: cloudinaryFrom(env as unknown as Record<string, unknown>),
       });

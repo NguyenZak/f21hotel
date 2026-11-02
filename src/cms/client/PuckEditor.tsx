@@ -157,7 +157,7 @@ export function Editor({ save: savePage, backHref = "/quan-tri/trang", id, title
       dirty.current = false;
       setStatus({
         tone: "ok",
-        text: publish ? `Đã xuất bản lúc ${timeVi(res.publishedAt!)}` : "Đã lưu nháp, website chưa đổi",
+        text: publish ? `Đã xuất bản lúc ${timeVi(res.publishedAt!)}, website đổi ở lần cập nhật tiếp theo` : "Đã lưu nháp, website chưa đổi",
       });
     });
 
