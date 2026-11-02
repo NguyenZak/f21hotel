@@ -367,7 +367,7 @@ export const distances = [
   { place: "Trung tâm Hội nghị Quốc gia", time: "~15 phút" },
   { place: "Sân vận động Mỹ Đình", time: "15–20 phút" },
   { place: "Phố cổ Hoàn Kiếm", time: "~35 phút" },
-]; // TODO: đo lại thời gian thực tế trên Google Maps
+]; // Thiên đường Bảo Sơn ~5 phút: khách sạn đã xác nhận (02/11/2026). TODO: đo lại các mốc còn lại trên Google Maps
 
 // Tiện ích quanh khách sạn, hiện ở trang Vị trí
 // TODO: điền tên quán, phòng gym cụ thể sau khi khảo sát thực tế.
