@@ -957,6 +957,44 @@ html[data-lightbox-open] { overflow: hidden; }
 @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .footer-grid { grid-template-columns: 1fr; } }
 
+/* ---------- Trang lỗi 404 / 500 (ErrorView.tsx) ---------- */
+.errpage {
+  position: relative; overflow: hidden; display: grid; place-items: center;
+  min-height: min(calc(100svh - var(--header-h)), 820px); padding: clamp(56px, 9vw, 120px) var(--gutter);
+  background: radial-gradient(ellipse at 50% 0%, var(--maroon) 0%, var(--maroon-deep) 45%, var(--maroon-ink) 100%);
+  color: #fff; text-align: center;
+}
+.errpage-standalone { min-height: 100svh; }
+/* Vòm mảnh phía sau, gợi cửa sổ vòm của mặt tiền */
+.errpage::before {
+  content: ""; position: absolute; left: 50%; top: clamp(40px, 8vw, 90px); bottom: 0; translate: -50% 0;
+  width: min(560px, 86vw); border: 1px solid rgba(226, 190, 73, 0.28); border-bottom: 0;
+  border-radius: 999px 999px 0 0; pointer-events: none;
+}
+.errpage-inner { position: relative; display: grid; justify-items: center; gap: 18px; max-width: 620px; }
+.errpage-logo img { display: block; width: 180px; height: auto; margin-bottom: 8px; }
+.errpage-code {
+  margin: 0; font: 800 clamp(96px, 18vw, 200px) / 0.9 var(--font-sans); letter-spacing: -0.05em;
+  background: var(--gold-sheen) 0 0 / 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.errpage h1 { margin: 0; color: #fff; font-size: clamp(26px, 3.2vw, 40px); }
+.errpage-text p { margin: 0; color: rgba(255, 255, 255, 0.82); font-size: 18px; }
+.errpage-text .errpage-digest { margin-top: 10px; font: 500 13px var(--font-ui); color: rgba(255, 255, 255, 0.55); letter-spacing: 0.04em; }
+.errpage-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+.errpage-links {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: 18px; padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2); font: 600 15px var(--font-ui);
+}
+.errpage-links a { color: var(--gold-pale); text-decoration: none; }
+.errpage-links a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+.errpage-contact {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 18px; margin: 4px 0 0;
+  font: 15px var(--font-ui); color: rgba(255, 255, 255, 0.72);
+}
+.errpage-contact a { display: inline-flex; align-items: center; gap: 7px; color: #fff; font-weight: 600; text-decoration: none; }
+.errpage-contact a:hover { color: var(--gold-light); }
+.errpage-contact svg { width: 18px; height: 18px; flex: none; }
+
 /* ---------- Thanh liên hệ cố định trên điện thoại ---------- */
 .mobile-bar { display: none; }
 @media (max-width: 900px) {
@@ -991,6 +1029,8 @@ html[data-lightbox-open] { overflow: hidden; }
 .float-contact a:hover { transform: translateY(-2px) scale(1.06); }
 .float-contact a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .float-contact img { display: block; width: 100%; height: 100%; }
+/* Menu điện thoại đang mở (Header.tsx gắn data-menu-open): ẩn nút nổi để không đè lên menu */
+html[data-menu-open] .float-contact { display: none; }
 /* Tránh thanh đặt phòng ở cuối màn hình (trang Đặt phòng) và thanh liên hệ trên điện thoại */
 @media (max-width: 960px) { body:has(.be-mobile-bar) .float-contact { bottom: calc(84px + env(safe-area-inset-bottom)); } }
 @media (max-width: 900px) {

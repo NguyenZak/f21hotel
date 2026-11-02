@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import type { CSSProperties } from "react";
 import { ContactBar } from "@/components/ContactBar";
 import { FloatContact } from "@/components/FloatContact";
 import { Footer } from "@/components/Footer";
@@ -8,7 +7,7 @@ import { Motion } from "@/components/Motion";
 import { motionBootScript } from "@/lib/motion";
 import { getRooms, getSite, getThemeFonts } from "@/lib/cms";
 import { hotelJsonLd, JsonLd, websiteJsonLd } from "@/lib/seo";
-import { fontVar, fontVariables } from "./fonts";
+import { fontRoleStyle, fontVariables } from "./fonts";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,13 +34,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [site, fonts, rooms] = await Promise.all([getSite(), getThemeFonts(), getRooms()]);
-  // Trỏ từng vai trò chữ vào font chọn trong CMS (Cài đặt › Giao diện)
-  const fontRoles = {
-    "--font-role-heading": fontVar(fonts.heading),
-    "--font-role-hero": fontVar(fonts.hero),
-    "--font-role-body": fontVar(fonts.body),
-    "--font-role-ui": fontVar(fonts.ui),
-  } as CSSProperties;
+  const fontRoles = fontRoleStyle(fonts);
   const contact = { name: site.name, phoneDisplay: site.phoneDisplay, telLink: site.telLink, zaloLink: site.zaloLink };
 
   return (

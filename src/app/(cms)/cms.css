@@ -580,3 +580,10 @@ button.c-cal__cell:hover { background: var(--c-cream); }
   .c-page { animation: c-page-in 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
 }
 @keyframes c-page-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* Trang lỗi của CMS ((cms)/error.tsx) */
+.c-error { display: grid; gap: 14px; max-width: 520px; margin: 12vh auto; padding: 0 20px; color: var(--c-text); }
+.c-error h1 { margin: 0; font-size: 24px; }
+.c-error p { margin: 0; color: var(--c-muted); }
+.c-error__digest { font-size: 13px; font-family: ui-monospace, monospace; }
+.c-error__actions { display: flex; gap: 10px; flex-wrap: wrap; }

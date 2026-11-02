@@ -12,7 +12,8 @@ import {
   STIX_Two_Text,
 } from "next/font/google";
 import localFont from "next/font/local";
-import type { FontKey } from "@/lib/theme";
+import type { CSSProperties } from "react";
+import { theme, type FontKey } from "@/lib/theme";
 
 // Nạp sẵn mọi font có thể chọn (tự host qua next/font, không gọi Google Fonts lúc chạy).
 // Mỗi font gắn một biến CSS riêng; layout chỉ trỏ vai trò (heading/hero/body) vào font được chọn.
@@ -119,3 +120,13 @@ export const fontVariables = Object.values(fonts)
 
 // Biến CSS của font theo khoá, ví dụ "inter" -> "var(--font-inter)"
 export const fontVar = (key: FontKey) => `var(--font-${key})`;
+
+// Trỏ từng vai trò chữ vào font chọn trong CMS (Cài đặt › Giao diện). Trang lỗi đứng riêng
+// (global-not-found, global-error) không đọc CMS nên dùng font mặc định trong theme.ts.
+export const fontRoleStyle = (f: Record<keyof typeof theme.fonts, FontKey> = theme.fonts) =>
+  ({
+    "--font-role-heading": fontVar(f.heading),
+    "--font-role-hero": fontVar(f.hero),
+    "--font-role-body": fontVar(f.body),
+    "--font-role-ui": fontVar(f.ui),
+  }) as CSSProperties;

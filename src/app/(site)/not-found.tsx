@@ -1,21 +1,28 @@
+// 404 bên trong website (trang gọi notFound(), ví dụ phòng hoặc ưu đãi đã bị xoá): vẫn có header, footer.
+// Đường dẫn không khớp trang nào thì dùng src/app/global-not-found.tsx.
+import type { Metadata } from "next";
 import Link from "next/link";
+import { ErrorView } from "@/components/ErrorView";
+
+export const metadata: Metadata = { title: "Không tìm thấy trang" };
 
 export default function NotFound() {
   return (
-    <section className="section">
-      <div className="wrap section-head center" style={{ marginBottom: 0 }}>
-        <span className="eyebrow">Lỗi 404</span>
-        <h1 style={{ color: "var(--maroon)" }}>Không tìm thấy trang</h1>
-        <p>Đường dẫn có thể đã thay đổi. Quay về trang chủ hoặc gửi yêu cầu đặt phòng.</p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <Link className="btn" href="/">
+    <ErrorView
+      code="404"
+      title="Không tìm thấy trang"
+      actions={
+        <>
+          <Link className="btn btn-gold" href="/">
             Về trang chủ
           </Link>
-          <Link className="btn btn-ghost" href="/dat-phong">
-            Đặt phòng
+          <Link className="btn btn-ghost" href="/phong">
+            Xem phòng & giá
           </Link>
-        </div>
-      </div>
-    </section>
+        </>
+      }
+    >
+      <p>Trang này không còn hoặc đã đổi địa chỉ. Bạn xem các trang dưới đây, hoặc gọi lễ tân để được tư vấn phòng.</p>
+    </ErrorView>
   );
 }
