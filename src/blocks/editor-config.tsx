@@ -99,7 +99,7 @@ const components = {
           { label: "Ảnh vòm", value: "photo" },
         ],
       },
-      photos: photoList("Album ảnh (khi chọn Ảnh vòm: ảnh đầu hiện trong khung vòm)"),
+      photos: photoList("Album ảnh (khi chọn Ảnh vòm: chạy thành slider trong khung vòm)"),
       badgeValue: text("Huy hiệu: số"),
       badgeLabel: text("Huy hiệu: chú thích"),
       eyebrow: text("Nhãn nhỏ"),

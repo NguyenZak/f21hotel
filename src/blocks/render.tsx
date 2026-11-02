@@ -135,7 +135,7 @@ export function IntroBlock(p: P<IntroProps>) {
             photos.length ? (
               <Gallery
                 photos={photos}
-                visible={1}
+                slider
                 className="arch"
                 sizes="(max-width: 900px) 100vw, 45vw"
               />
