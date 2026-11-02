@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import { LocationMap3D } from "@/components/LocationMap3D";
 import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
@@ -15,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "/vi-tri",
     "Vị trí: An Khánh, gần Thiên đường Bảo Sơn, Mỹ Đình",
     `${site.name} ở khu biệt thự Hoa Phượng, An Khánh, cạnh Vinschool. Khoảng 5 phút tới Thiên đường Bảo Sơn, 15–20 phút tới SVĐ Mỹ Đình. Gần sân pickleball, phòng gym.`,
+    OG_IMAGES.location,
   );
 }
 

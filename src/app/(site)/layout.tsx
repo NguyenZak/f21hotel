@@ -6,12 +6,13 @@ import { Header } from "@/components/Header";
 import { Motion } from "@/components/Motion";
 import { motionBootScript } from "@/lib/motion";
 import { getRooms, getSite, getThemeFonts } from "@/lib/cms";
-import { hotelJsonLd, JsonLd, websiteJsonLd } from "@/lib/seo";
+import { hotelJsonLd, JsonLd, OG_IMAGES, ogImageMeta, websiteJsonLd } from "@/lib/seo";
 import { fontRoleStyle, fontVariables } from "./fonts";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
+  const og = ogImageMeta(OG_IMAGES.home);
   return {
     metadataBase: new URL(site.url),
     title: {
@@ -23,7 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       locale: "vi_VN",
       siteName: site.name,
+      // Trang nào không khai báo ảnh riêng (pageMeta) thì dùng ảnh mặt tiền
+      images: og.images,
     },
+    twitter: og.twitter,
+    // Cho Google hiện ảnh lớn ở kết quả tìm kiếm và Discover (mặc định chỉ được hiện ảnh nhỏ)
+    robots: { googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
     // canonical đặt riêng ở từng trang: đặt ở đây thì trang nào quên khai báo sẽ trỏ nhầm về trang chủ
   };
 }

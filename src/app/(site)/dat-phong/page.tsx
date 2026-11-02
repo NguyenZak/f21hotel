@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import { BookingEngine, type EngineRoom } from "@/components/BookingEngine";
 import { BookingForm } from "@/components/BookingForm";
 import { IconClock, IconMail, IconPhone, IconPin, IconZalo } from "@/components/Icons";
@@ -15,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "/dat-phong",
     "Đặt phòng trực tiếp & liên hệ",
     `Đặt phòng trực tiếp với ${site.name} ở An Khánh, gần Mỹ Đình: xem phòng trống và giá theo ngày, giữ phòng ngay, không cần thẻ. Hoặc gọi hotline ${site.phoneDisplay}, nhắn Zalo.`,
+    OG_IMAGES.booking,
   );
 }
 

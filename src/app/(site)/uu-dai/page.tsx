@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
@@ -13,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "/uu-dai",
     "Ưu đãi đặt phòng trực tiếp, sự kiện Mỹ Đình",
     `Ưu đãi đặt phòng trực tiếp tại ${site.name}: sự kiện Mỹ Đình, mùa cưới, giá doanh nghiệp, Noel và tất niên.`,
+    OG_IMAGES.offers,
   );
 }
 

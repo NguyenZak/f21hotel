@@ -3,6 +3,7 @@ import { Render } from "@puckeditor/core/rsc";
 import { renderConfig } from "@/blocks/config";
 import { defaultHome } from "@/blocks/home";
 import { getBlockMeta, getPageData, getSite } from "@/lib/cms";
+import { OG_IMAGES, ogImageMeta } from "@/lib/seo";
 
 // Trang chủ dựng bằng trình kéo thả: CMS › Nội dung › Trang › "home".
 // Chưa xuất bản lần nào thì dùng bố cục mặc định trong src/blocks/home.ts.
@@ -10,10 +11,12 @@ import { getBlockMeta, getPageData, getSite } from "@/lib/cms";
 export async function generateMetadata(): Promise<Metadata> {
   const [page, site] = await Promise.all([getPageData("home"), getSite()]);
   const description = (page?.data.root.props as { description?: string } | undefined)?.description;
+  const og = ogImageMeta(OG_IMAGES.home);
   return {
     ...(description ? { description } : {}),
     alternates: { canonical: "/" },
-    openGraph: { type: "website", locale: "vi_VN", siteName: site.name, url: "/" },
+    openGraph: { type: "website", locale: "vi_VN", siteName: site.name, url: "/", images: og.images },
+    twitter: og.twitter,
   };
 }
 

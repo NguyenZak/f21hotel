@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, JsonLd, pageMeta, roomsJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta, roomsJsonLd } from "@/lib/seo";
 import Link from "next/link";
 import { Gallery } from "@/components/Gallery";
 import { PageHero, RatingBadge, SectionHead } from "@/components/ui";
@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "/phong",
     `Phòng & bảng giá, qua đêm từ ${from("overnight")}`,
     `Bảng giá ${site.name}: ${rooms.map((r) => r.name).join(", ")}. Qua đêm từ ${from("overnight")}, ngày đêm từ ${from("fullDay")}, nghỉ giờ từ ${from("hourly")}.`,
+    OG_IMAGES.rooms,
   );
 }
 

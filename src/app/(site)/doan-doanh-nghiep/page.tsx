@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, JsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import { BookingForm } from "@/components/BookingForm";
 import { IconBriefcase, IconRings, IconTicket } from "@/components/Icons";
 import { PageHero, SectionHead } from "@/components/ui";
@@ -13,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "/doan-doanh-nghiep",
     "Khách đoàn, cưới hỏi & công tác dài ngày",
     `Khối phòng cưới hỏi, đoàn công tác và ở dài ngày tại ${site.name}, khu biệt thự Hoa Phượng, An Khánh. Giảm tới 15% khi ở dài ngày.`,
+    OG_IMAGES.groups,
   );
 }
 

@@ -9,14 +9,38 @@ export const absUrl = (site: SiteData, path: string) => new URL(path, site.url).
 const hotelId = (site: SiteData) => absUrl(site, "/#hotel");
 const websiteId = (site: SiteData) => absUrl(site, "/#website");
 
-// Meta cho từng trang: canonical, og:url. openGraph của trang thay hẳn openGraph của layout
+// Ảnh xem trước khi chia sẻ link (Facebook, Zalo, Messenger) và ảnh nhỏ cạnh kết quả Google.
+// File ở public/og, khổ 1200×630, cắt từ ảnh thật của khách sạn. Đường dẫn tương đối, Next.js ghép với
+// metadataBase (layout: "Địa chỉ website" trong CMS) thành URL tuyệt đối.
+export const OG_IMAGES = {
+  home: { file: "trang-chu", alt: "Mặt tiền F21 Hotel ở góc đường khu biệt thự Hoa Phượng, An Khánh" },
+  rooms: { file: "phong", alt: "Phòng đôi hai giường tại F21 Hotel" },
+  location: { file: "vi-tri", alt: "F21 Hotel nhìn từ đường nội khu biệt thự Hoa Phượng" },
+  offers: { file: "uu-dai", alt: "Biển đèn F21 Hotel trên sân thượng buổi tối" },
+  booking: { file: "dat-phong", alt: "Quầy lễ tân và sảnh F21 Hotel" },
+  groups: { file: "doan-doanh-nghiep", alt: "Phòng hai giường cho khách đoàn tại F21 Hotel" },
+} as const;
+
+export type OgImage = (typeof OG_IMAGES)[keyof typeof OG_IMAGES];
+
+export const ogImageMeta = ({ file, alt }: OgImage) => {
+  const url = `/og/${file}.jpg`;
+  return {
+    images: [{ url, width: 1200, height: 630, alt, type: "image/jpeg" }],
+    twitter: { card: "summary_large_image", images: [{ url, alt }] },
+  } satisfies { images: unknown; twitter: Metadata["twitter"] };
+};
+
+// Meta cho từng trang: canonical, og:url, ảnh xem trước. openGraph của trang thay hẳn openGraph của layout
 // nên phải ghi lại đủ siteName, locale, type.
-export function pageMeta(site: SiteData, path: string, title: string, description: string): Metadata {
+export function pageMeta(site: SiteData, path: string, title: string, description: string, image: OgImage): Metadata {
+  const og = ogImageMeta(image);
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { type: "website", locale: "vi_VN", siteName: site.name, url: path, title: `${title} | ${site.name}`, description },
+    openGraph: { type: "website", locale: "vi_VN", siteName: site.name, url: path, title: `${title} | ${site.name}`, description, images: og.images },
+    twitter: og.twitter,
   };
 }
 
