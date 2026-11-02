@@ -6,7 +6,7 @@ import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
 import { getSite } from "@/lib/cms";
-import { distances, locationPhotos, nearby } from "@/lib/site";
+import { directionsUrl, distances, locationPhotos, nearby } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -42,15 +42,15 @@ export default async function LocationPage() {
         <div className="wrap location">
           <div className="location-copy reveal">
             <span className="eyebrow">Chỉ đường</span>
-            <h2>Nhớ một câu là tới</h2>
+            <h2>Đường tới F21</h2>
             <p className="directions">“{site.directions}”</p>
             <p style={{ color: "var(--muted)" }}>
               Từ đường Lê Trọng Tấn kéo dài, đi theo hướng cổng số 1 Vinhomes Thăng Long. Khi thấy Vinschool, rẽ vào khu
               biệt thự Hoa Phượng. Đường nội khu rộng, có đèn chiếu sáng buổi tối.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-              <a className="btn" href={site.social.googleMaps} target="_blank" rel="noopener">
-                Mở Google Maps
+              <a className="btn" href={directionsUrl(site.mapQuery)} target="_blank" rel="noopener">
+                Chỉ đường bằng Google Maps
               </a>
             </div>
             <p className="fine">Đặt phòng xong, lễ tân sẽ gửi ghim vị trí chính xác qua Zalo.</p>

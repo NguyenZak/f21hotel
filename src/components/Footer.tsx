@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getSite } from "@/lib/cms";
-import { nav } from "@/lib/site";
+import { directionsUrl, nav } from "@/lib/site";
 import { IconZalo } from "./Icons";
 
 export async function Footer() {
@@ -73,7 +73,7 @@ export async function Footer() {
               <li>{site.address.full}</li>
               <li style={{ fontStyle: "italic" }}>{site.directions}</li>
               <li>
-                <a href={site.social.googleMaps} target="_blank" rel="noopener">
+                <a href={directionsUrl(site.mapQuery)} target="_blank" rel="noopener">
                   Chỉ đường trên Google Maps →
                 </a>
               </li>

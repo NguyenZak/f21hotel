@@ -28,7 +28,7 @@ export const site = {
     full: "BT13.1, Lô số 1, Khu biệt thự Hoa Phượng, An Khánh, Hà Nội",
   },
   // Câu chỉ đường thống nhất trên mọi kênh
-  directions: "Trong khu biệt thự Hoa Phượng, cạnh Vinschool, đi về phía cổng 1 Vinhomes Thăng Long.",
+  directions: "Trong khu biệt thự Hoa Phượng, An Khánh: khoảng 5 phút tới Thiên đường Bảo Sơn, 15–20 phút tới SVĐ Mỹ Đình.",
   mapQuery: "F21 HOTEL, Khu biệt thự Hoa Phượng, An Khánh, Hà Nội",
 
   replyHours: "7:00 – 23:00", // TODO: giờ lễ tân trực Zalo
@@ -65,6 +65,13 @@ export const nav = [
   { href: "/vi-tri", label: "Vị trí" },
   { href: "/dat-phong", label: "Liên hệ" },
 ] as const;
+
+// Link Google Maps theo tên + địa chỉ (CMS: "Từ khoá bản đồ", cũng là ghim của bản đồ nhúng).
+// Không dùng link share.google trong CMS cho việc chỉ đường: link đó mở trang tìm kiếm Google, không mở Maps.
+// directionsUrl mở thẳng chỉ đường từ vị trí của khách (trên điện thoại mở ứng dụng Google Maps).
+export const mapsUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+export const directionsUrl = (query: string) =>
+  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
 
 export function formatVnd(n: number) {
   return n.toLocaleString("vi-VN") + "đ";

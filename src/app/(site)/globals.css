@@ -271,6 +271,7 @@ p { margin: 0; }
   background: var(--maroon-ink); color: #fff; font-family: var(--font-sans);
   --hero-x: max(var(--gutter), calc((100vw - var(--wrap)) / 2));
 }
+.hero-swipe { display: contents; }
 .hero-visual { position: absolute; inset: 0; z-index: -1; }
 /* Một lớp phủ màu đỏ mận đồng nhất, đậm hơn ở đáy cho thanh chọn ngày */
 .hero-visual::after {
@@ -1034,6 +1035,7 @@ html[data-menu-open] .float-contact { display: none; }
 /* Tránh thanh đặt phòng ở cuối màn hình (trang Đặt phòng) và thanh liên hệ trên điện thoại */
 @media (max-width: 960px) { body:has(.be-mobile-bar) .float-contact { bottom: calc(84px + env(safe-area-inset-bottom)); } }
 @media (max-width: 900px) {
+  .float-contact .float-zalo { display: none; }
   .float-contact { right: 14px; bottom: calc(80px + env(safe-area-inset-bottom)); gap: 10px; }
   .float-contact a { width: 46px; height: 46px; }
   body:has(.be-mobile-bar) .float-contact { bottom: calc(144px + env(safe-area-inset-bottom)); }
@@ -1277,6 +1279,16 @@ html[data-menu-open] .float-contact { display: none; }
 .be-steps li.on { color: var(--maroon); font-weight: 600; }
 .be-steps li.on span { background: var(--maroon); border-color: var(--maroon); color: #fff; }
 .be-steps li.done span { background: var(--gold-pale); border-color: var(--gold); color: var(--maroon-ink); }
+/* Điện thoại: ba bước chia đều một hàng, số ở trên, chữ ở dưới, nối bằng đường mảnh (không xuống dòng lộn xộn) */
+@media (max-width: 640px) {
+  .be-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; font-size: 12.5px; letter-spacing: 0.02em; text-align: center; }
+  .be-steps li { position: relative; flex-direction: column; gap: 6px; line-height: 1.3; padding-inline: 4px; text-wrap: balance; }
+  .be-steps span { position: relative; z-index: 1; }
+  .be-steps li + li::before {
+    content: ""; position: absolute; top: 14px; right: calc(50% + 18px); width: calc(100% - 36px); height: 1px; background: var(--line);
+  }
+  .be-steps li.on::before, .be-steps li.done + li::before { background: var(--gold); }
+}
 
 /* Thanh chọn ngày */
 .be-search {

@@ -21,7 +21,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const paused = userPaused || focusPaused;
   // Tăng mỗi lần chạy tiếp để thanh thời gian bắt đầu lại từ đầu
   const [run, setRun] = useState(0);
-  const touchX = useRef<number | null>(null);
+  const touch = useRef<{ x: number; y: number } | null>(null);
 
   // Lùi/tiến d slide, luôn tính từ slide hiện tại (bấm nhanh nhiều lần vẫn đúng)
   const step = useCallback(
@@ -66,17 +66,23 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   );
 
   return (
-    <>
-      <div
-        className="hero-visual"
-        onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
-        onTouchEnd={(e) => {
-          if (touchX.current === null) return;
-          const dx = e.changedTouches[0].clientX - touchX.current;
-          if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
-          touchX.current = null;
-        }}
-      >
+    // Vuốt ngang để đổi slide. Bắt sự kiện ở lớp bọc (display: contents) chứ không ở .hero-visual:
+    // ảnh nằm dưới lớp chữ .hero-body phủ kín hero nên không bao giờ nhận được chạm.
+    // Vuốt dọc (cuộn trang) và chạm nhẹ (bấm nút) không đổi slide.
+    <div
+      className="hero-swipe"
+      onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
+      onTouchEnd={(e) => {
+        const start = touch.current;
+        touch.current = null;
+        if (!start || slides.length < 2) return;
+        const dx = e.changedTouches[0].clientX - start.x;
+        const dy = e.changedTouches[0].clientY - start.y;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+      }}
+      onTouchCancel={() => (touch.current = null)}
+    >
+      <div className="hero-visual">
         <div className="hero-media" data-paused={paused || undefined}>
           {slides.map((s, i) => (
             <picture key={s.src} className={`hero-slide${i === active ? " active" : i === prev ? " prev" : ""}`}>
@@ -157,6 +163,6 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
           </button>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

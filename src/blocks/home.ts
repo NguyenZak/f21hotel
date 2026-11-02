@@ -121,7 +121,7 @@ export const locationDefaults: B.LocationProps = {
   anchor: "vi-tri",
   background: "",
   eyebrow: "Vị trí",
-  title: "Dễ tìm, nếu bạn nhớ một câu",
+  title: "Gần Thiên đường Bảo Sơn và SVĐ Mỹ Đình",
   distances: distances.map((d) => ({ ...d })),
   linkLabel: "Xem chỉ đường chi tiết",
   linkHref: "/vi-tri",

@@ -6,7 +6,7 @@ import { IconClock, IconMail, IconPhone, IconPin, IconZalo } from "@/components/
 import { PageHero, SectionHead } from "@/components/ui";
 import { cancelPolicy } from "@/lib/booking";
 import { getBookingSettings, getPriceNotes, getRooms, getSite, toFormContact, toRoomOptions } from "@/lib/cms";
-import { directPerks, formatVnd, stayModes } from "@/lib/site";
+import { directPerks, directionsUrl, formatVnd, stayModes } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -60,7 +60,7 @@ export default async function BookingPage() {
               <span>{site.email}</span>
             </a>
           ) : null}
-          <a href={site.social.googleMaps} target="_blank" rel="noopener">
+          <a href={directionsUrl(site.mapQuery)} target="_blank" rel="noopener">
             <IconPin />
             <span>
               {site.address.full}

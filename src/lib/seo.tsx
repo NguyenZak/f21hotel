@@ -2,7 +2,7 @@
 // Mọi đường dẫn tuyệt đối lấy theo "Địa chỉ website" trong CMS (Cài đặt › Thông tin chung).
 import type { Metadata } from "next";
 import type { SiteData } from "./cms";
-import type { Room } from "./site";
+import { mapsUrl, type Room } from "./site";
 
 export const absUrl = (site: SiteData, path: string) => new URL(path, site.url).toString();
 
@@ -83,7 +83,7 @@ export function hotelJsonLd(site: SiteData, rooms: Room[]) {
       addressRegion: site.address.region,
       addressCountry: site.address.country,
     },
-    ...(site.social.googleMaps ? { hasMap: site.social.googleMaps } : {}),
+    hasMap: mapsUrl(site.mapQuery),
     ...(sameAs.length ? { sameAs } : {}),
     amenityFeature: amenities(rooms).map((name) => ({ "@type": "LocationFeatureSpecification", name, value: true })),
   };

@@ -11,7 +11,7 @@ import { HeroSlider } from "@/components/HeroSlider";
 import { LocationMap3D } from "@/components/LocationMap3D";
 import { CtaBandView, Faq, RatingBadge, RoomCard, SectionHead } from "@/components/ui";
 import { isHtml, plainToHtml, sanitizeRichText } from "@/lib/richtext";
-import type { Photo } from "@/lib/site";
+import { mapsUrl, type Photo } from "@/lib/site";
 import { ICONS, type IconName } from "./icons";
 import { photosOf, type BlockMeta, type PhotoItem } from "./types";
 
@@ -126,7 +126,7 @@ export type IntroProps = Section & {
 
 export function IntroBlock(p: P<IntroProps>) {
   const photos = photosOf(p.photos);
-  const href = p.linkHref || meta(p.puck).site.social.googleMaps;
+  const href = p.linkHref || mapsUrl(meta(p.puck).site.mapQuery);
   return (
     <section {...sectionProps(p)}>
       <div className="wrap intro">
