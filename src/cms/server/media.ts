@@ -98,7 +98,7 @@ const create = async ({ ctx, user, request }: Ctx) => {
     .prepare(
       "insert into media (alt, prefix, url, filename, mime_type, filesize, width, height, updated_at, created_at) values (?, '', ?, ?, ?, ?, ?, ?, ?, ?) returning *",
     )
-    .bind(alt, `/api/media/file/${filename}`, filename, str(b?.mimeType) || null, num(b?.filesize) || null, num(b?.width) || null, num(b?.height) || null, now, now)
+    .bind(alt, mediaUrlOf(ctx.cloudinary, filename, `/api/media/file/${filename}`), filename, str(b?.mimeType) || null, num(b?.filesize) || null, num(b?.width) || null, num(b?.height) || null, now, now)
     .first<Row>();
   await audit(ctx, user, "create", "media", row?.id, alt);
   return json({ ok: true, media: row ? toMedia(ctx.cloudinary, row) : null });

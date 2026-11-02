@@ -3,7 +3,7 @@
 // vài ms CPU (gói Workers Free giới hạn 10 ms). Mọi đường dẫn khác chuyển cho Next.js như bình thường.
 // File này không nằm trong tsconfig (wrangler đóng gói riêng).
 import { handleCmsApi, kvTagRevalidator } from "./src/cms/server/api";
-import { cloudinaryFrom } from "./src/cms/server/media";
+import { cloudinaryFrom, mediaUrlOf } from "./src/cms/server/media";
 import { handleBookingApi } from "./src/lib/booking-api";
 // Build id của Next.js: khoá trong KV tag cache có dạng "<buildId>/<tag>" (wrangler.jsonc rules: Text)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- file do `opennextjs-cloudflare build` tạo ra
@@ -36,6 +36,15 @@ export default {
         waitUntil: (p) => ctx.waitUntil(p),
       });
       if (res) return res;
+    }
+    // Đường dẫn ảnh của CMS Payload cũ. Trang dựng sẵn lúc build mà thiếu CLOUDINARY_CLOUD_NAME (hoặc dòng media cũ)
+    // vẫn trỏ về đây: chuyển sang ảnh trên Cloudinary thay vì trả 404
+    if (pathname.startsWith("/api/media/file/")) {
+      const filename = pathname.slice("/api/media/file/".length);
+      const url = /^[a-z0-9-]+\.[a-z0-9]+$/i.test(filename)
+        ? mediaUrlOf(cloudinaryFrom(env as unknown as Record<string, unknown>), filename)
+        : "";
+      if (url) return new Response(null, { status: 301, headers: { location: url, "cache-control": "public, max-age=86400" } });
     }
     // Mọi API đều xử lý ở trên; đường dẫn /api khác (vd. bot dò API của CMS cũ) trả 404 ngay,
     // không nạp Next.js chỉ để dựng trang lỗi (tốn hơn 200 ms CPU)
