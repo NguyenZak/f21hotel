@@ -444,6 +444,12 @@ function Editor({ initial, meta }: { initial: Draft; meta: Meta }) {
 
         <section className="c-card c-form">
           <h2>Ghi chú nội bộ</h2>
+          {b.dataConsentAt ? (
+            // Chỉ thêm khách vào danh sách Zalo nhận ưu đãi khi khách đã đồng ý (Luật 91/2025 Điều 28)
+            <p className="c-kvline">
+              Nhận ưu đãi qua Zalo/SMS: <b>{b.marketingConsent ? "Khách đồng ý" : "Khách không đồng ý, không gửi khuyến mại"}</b>
+            </p>
+          ) : null}
           <div className="c-field">
             <label htmlFor="staffNote" className="sr-only">
               Ghi chú nội bộ
@@ -495,6 +501,8 @@ const empty = (meta: Meta, params: URLSearchParams): Draft => {
     paid: 0,
     staffNote: "",
     externalRef: "",
+    dataConsentAt: "",
+    marketingConsent: false,
     items: [{ roomType, stayType: "fullDay", quantity: 1, amount: null, rooms: room ? [room] : [] }],
   };
 };

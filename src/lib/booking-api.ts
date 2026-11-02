@@ -121,6 +121,8 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
   const guests = Number(g.guests);
   if (!Number.isInteger(guests) || guests < 1 || guests > 50) errors.guests = "Vui lòng chọn số khách.";
   if (g.agree !== "yes") errors.agree = "Vui lòng đồng ý với chính sách đặt phòng.";
+  // Đồng ý xử lý dữ liệu tách riêng khỏi đồng ý điều khoản (Luật 91/2025 Điều 9, NĐ 356/2025)
+  if (g.agreeData !== "yes") errors.agreeData = "Vui lòng đồng ý để F21 xử lý thông tin liên hệ cho việc giữ phòng.";
 
   let promoCode = "";
   let promoPercent = 0;
@@ -200,6 +202,8 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
     total,
     deposit: Math.round((total * settings.depositPercent) / 100 / 1000) * 1000,
     staffNote: discount ? `Giá niêm yết ${vnd(listTotal)}; ${discount.label} (−${vnd(listTotal - total)}), đã trừ vào tổng tiền.` : undefined,
+    dataConsentAt: new Date().toISOString(),
+    marketingConsent: g.marketing === "yes",
   });
 
   // Hai khách cùng đặt phòng cuối cùng: kiểm tra lại sau khi lưu, ai làm vượt số phòng thì huỷ đặt phòng đó
@@ -256,6 +260,7 @@ const REQUEST_FIELDS: BookingField[] = [
   "groupType",
   "invoice",
   "note",
+  "agreeData",
 ];
 
 export async function submitRequest(d: D1Database, form: Record<string, unknown>, opts: BookingApiOptions): Promise<BookingState> {
@@ -276,6 +281,7 @@ export async function submitRequest(d: D1Database, form: Record<string, unknown>
   if (!values.checkIn || !isoDate.test(values.checkIn)) errors.checkIn = "Vui lòng chọn ngày nhận phòng.";
   if (!values.checkOut || !isoDate.test(values.checkOut)) errors.checkOut = "Vui lòng chọn ngày trả phòng.";
   else if (values.checkIn && !nightsBetween(values.checkIn, values.checkOut)) errors.checkOut = "Ngày trả phòng phải sau ngày nhận phòng.";
+  if (values.agreeData !== "yes") errors.agreeData = "Vui lòng đồng ý để F21 dùng thông tin liên hệ cho yêu cầu này.";
   if (Object.keys(errors).length > 0) return { status: "error", message: "Vui lòng kiểm tra lại các ô được đánh dấu.", errors, values };
 
   const roomName = values.room

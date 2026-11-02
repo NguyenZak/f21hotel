@@ -366,13 +366,41 @@ export function BookingEngine({ rooms, contact, policy, maxRooms, rating }: Prop
                       ? `Đổi hoặc huỷ miễn phí trước ngày nhận phòng ${freeCancelDays} ngày${cancelBy ? ` (đến hết ${cancelBy})` : ""}, hoàn lại toàn bộ tiền cọc.`
                       : policy.refund}
                   </li>
+                  <li>Hoàn lại toàn bộ tiền cọc nếu khách sạn không bố trí được phòng như đã xác nhận.</li>
                   {discount ? <li>Ưu đãi không cộng dồn: bạn được mức giảm lớn nhất, đã trừ vào tổng tiền.</li> : null}
                   <li>Mang CCCD hoặc hộ chiếu khi nhận phòng.</li>
                 </ul>
+                {/* Ba ô tách riêng theo từng mục đích, không đánh sẵn (Luật 91/2025 Điều 9, NĐ 356/2025).
+                    Link mở tab mới để khách không mất các phòng đã chọn */}
                 <label className={`be-agree${err("agree") ? " invalid" : ""}`}>
-                  <input type="checkbox" name="agree" value="yes" required /> Tôi đồng ý với chính sách đặt phòng của F21 Hotel
+                  <input type="checkbox" name="agree" value="yes" required />
+                  <span>
+                    Tôi đồng ý với chính sách đặt phòng ở trên và{" "}
+                    <a href="/dieu-khoan" target="_blank" rel="noopener">
+                      Điều khoản đặt phòng
+                    </a>{" "}
+                    của F21 Hotel.
+                  </span>
                 </label>
                 {err("agree") ? <span className="be-err">{err("agree")}</span> : null}
+                <label className={`be-agree${err("agreeData") ? " invalid" : ""}`}>
+                  <input type="checkbox" name="agreeData" value="yes" required />
+                  <span>
+                    Tôi đồng ý để F21 Hotel dùng họ tên, số điện thoại, email ở trên để giữ phòng, gọi hoặc nhắn Zalo xác nhận
+                    và hướng dẫn đặt cọc, theo{" "}
+                    <a href="/chinh-sach-bao-mat" target="_blank" rel="noopener">
+                      Chính sách bảo vệ dữ liệu cá nhân
+                    </a>
+                    .
+                  </span>
+                </label>
+                {err("agreeData") ? <span className="be-err">{err("agreeData")}</span> : null}
+                <label className="be-agree">
+                  <input type="checkbox" name="marketing" value="yes" />
+                  <span>
+                    Gửi cho tôi ưu đãi của F21 qua Zalo hoặc SMS <span className="opt">(không bắt buộc, huỷ bất cứ lúc nào)</span>
+                  </span>
+                </label>
               </div>
 
               <div className="form-foot">

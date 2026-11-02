@@ -21,6 +21,9 @@ export type BookingDTO = {
   paid: number;
   staffNote: string;
   externalRef: string;
+  // Chỉ đọc, ghi khi khách đặt online: thời điểm đồng ý xử lý dữ liệu, có đồng ý nhận ưu đãi qua Zalo/SMS không
+  dataConsentAt: string;
+  marketingConsent: boolean;
   createdAt: string;
   items: BookingItem[];
 };

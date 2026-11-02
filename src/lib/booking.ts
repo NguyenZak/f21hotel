@@ -15,7 +15,8 @@ export type BookingField =
   | "company"
   | "groupType"
   | "invoice"
-  | "note";
+  | "note"
+  | "agreeData";
 
 export type BookingValues = Partial<Record<BookingField, string>>;
 
@@ -127,7 +128,7 @@ export type SearchResult =
 // Phòng khách chọn trong giỏ, theo mã hạng phòng
 export type CartLine = { room: string; stay: OnlineStay; qty: number };
 
-export type GuestField = "name" | "phone" | "email" | "guests" | "arrivalTime" | "code" | "note" | "agree";
+export type GuestField = "name" | "phone" | "email" | "guests" | "arrivalTime" | "code" | "note" | "agree" | "agreeData" | "marketing";
 
 export type CreateBookingResult =
   | { ok: true; code: string }

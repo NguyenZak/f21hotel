@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS `bookings` (
 	`paid` numeric DEFAULT 0,
 	`staff_note` text,
 	`external_ref` text,
+	`data_consent_at` text,
+	`marketing_consent` integer DEFAULT 0,
 	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
 	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
 );
@@ -292,7 +294,7 @@ CREATE TABLE IF NOT EXISTS `site_settings` (
 	`price_notes_water` text,
 	`updated_at` text,
 	`created_at` text
-, `booking_enabled` integer DEFAULT true, `booking_deposit_percent` numeric DEFAULT 50, `booking_max_rooms` numeric DEFAULT 5, `booking_max_nights` numeric DEFAULT 30, `booking_bank_bank_id` text, `booking_bank_account_no` text, `booking_bank_account_name` text, `rating_score` numeric, `rating_count` numeric, `rating_source` text, `rating_url` text, `booking_direct_discount` numeric DEFAULT 0, `booking_free_cancel_days` numeric DEFAULT 0);
+, `booking_enabled` integer DEFAULT true, `booking_deposit_percent` numeric DEFAULT 50, `booking_max_rooms` numeric DEFAULT 5, `booking_max_nights` numeric DEFAULT 30, `booking_bank_bank_id` text, `booking_bank_account_no` text, `booking_bank_account_name` text, `rating_score` numeric, `rating_count` numeric, `rating_source` text, `rating_url` text, `booking_direct_discount` numeric DEFAULT 0, `booking_free_cancel_days` numeric DEFAULT 0, `legal_name` text, `tax_code` text, `business_reg` text, `moit_url` text, `price_notes_vat` text);
 CREATE TABLE IF NOT EXISTS `site_settings_price_notes_long_stay` (
 	`_order` integer NOT NULL,
 	`_parent_id` integer NOT NULL,

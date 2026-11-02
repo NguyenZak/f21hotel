@@ -94,6 +94,7 @@ export default async function RoomsPage() {
                 <li>{priceNotes.deposit}</li>
                 <li>{cancelPolicy(booking.freeCancelDays, priceNotes.refund)}</li>
                 <li>Thêm người so với quy định: phụ thu {formatVnd(priceNotes.extraPerson)}/người.</li>
+                {priceNotes.vat ? <li>{priceNotes.vat}</li> : null}
               </ul>
             </div>
             <div>

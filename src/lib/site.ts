@@ -270,6 +270,8 @@ export const priceNotes = {
   deposit: "Đặt cọc tối thiểu 50% giá trị tiền phòng.",
   refund: "Khách đặt trước không được hoàn tiền khi thay đổi.",
   water: "Giá phòng đã gồm 2 chai nước suối miễn phí.",
+  // Giá đã gồm hay chưa gồm VAT (CMS › Thông tin khách sạn). Trống thì website không ghi
+  vat: "" as string,
   longStay: [
     { label: "Ở trên 7 ngày liên tiếp, lấy trên 7 phòng", discount: "Giảm 5% tổng thanh toán" },
     { label: "Ở trên 15 ngày liên tiếp, lấy trên 15 phòng", discount: "Giảm 10% tổng thanh toán" },

@@ -57,6 +57,8 @@ export type SiteData = {
   checkOut: string;
   priceFrom: number;
   social: { facebook: string; tiktok: string; googleMaps: string };
+  // Thông tin bắt buộc công bố của chủ website (CMS › Doanh nghiệp & pháp lý); chuỗi rỗng khi chưa điền
+  legal: { name: string; taxCode: string; businessReg: string; moitUrl: string };
   // Điểm đánh giá chép từ Google Maps / OTA; null khi CMS chưa điền (website ẩn)
   rating: { score: number; count: number; source: string; url: string } | null;
   telLink: string;
@@ -103,7 +105,8 @@ export async function readSite(d: D1Database): Promise<SiteData> {
     score >= 1 && score <= 5 && count > 0
       ? { score: Math.round(score * 10) / 10, count: Math.round(count), source: get("rating_source") || "Google", url: get("rating_url") || merged.social.googleMaps }
       : null;
-  return { ...merged, rating, telLink: `tel:${merged.phone}`, zaloLink: `https://zalo.me/${merged.zalo}` } as SiteData;
+  const legal = { name: get("legal_name"), taxCode: get("tax_code"), businessReg: get("business_reg"), moitUrl: get("moit_url") };
+  return { ...merged, legal, rating, telLink: `tel:${merged.phone}`, zaloLink: `https://zalo.me/${merged.zalo}` } as SiteData;
 }
 
 export type PriceNotes = typeof defaultPriceNotes;
@@ -116,6 +119,7 @@ export async function readPriceNotes(d: D1Database): Promise<PriceNotes> {
     deposit: str(s.price_notes_deposit) || defaultPriceNotes.deposit,
     refund: str(s.price_notes_refund) || defaultPriceNotes.refund,
     water: str(s.price_notes_water) || defaultPriceNotes.water,
+    vat: str(s.price_notes_vat),
     longStay: longStay.length ? longStay.map((x) => ({ label: str(x.label), discount: str(x.discount) })) : defaultPriceNotes.longStay,
   };
 }

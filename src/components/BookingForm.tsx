@@ -223,6 +223,18 @@ export function BookingForm({ kind = "booking", rooms, contact }: Props) {
             </div>
           </div>
 
+          <label className={`be-agree${err("agreeData") ? " invalid" : ""}`}>
+            <input type="checkbox" name="agreeData" value="yes" required defaultChecked={val("agreeData") === "yes"} />
+            <span>
+              Tôi đồng ý để F21 Hotel dùng họ tên, số điện thoại ở trên để liên hệ {isGroup ? "báo giá" : "giữ phòng"}, theo{" "}
+              <a href="/chinh-sach-bao-mat" target="_blank" rel="noopener">
+                Chính sách bảo vệ dữ liệu cá nhân
+              </a>
+              .
+            </span>
+          </label>
+          {err("agreeData") ? <span className="be-err">{err("agreeData")}</span> : null}
+
           <div className="form-foot">
             <p className="nights" aria-live="polite">
               {nights ? `${nights} đêm · ${formatViDate(checkIn)} – ${formatViDate(checkOut)}` : ""}

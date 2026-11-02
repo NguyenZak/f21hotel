@@ -147,6 +147,9 @@ export type NewBooking = {
   deposit: number;
   // Ghi chú nội bộ cho lễ tân (khách không thấy), ví dụ giá niêm yết và khoản giảm
   staffNote?: string;
+  // Đặt online: thời điểm khách đồng ý xử lý dữ liệu, và có đồng ý nhận ưu đãi qua Zalo/SMS không
+  dataConsentAt?: string;
+  marketingConsent?: boolean;
 };
 
 // Tạo đặt phòng (bản ghi + các dòng phòng) trong một lần ghi D1. Tự làm phần việc mà hook "prepare"
@@ -161,8 +164,8 @@ export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id:
         d
           .prepare(
             `insert into bookings (code, status, source, check_in, check_out, nights, guest_name, phone, email, guests,
-              arrival_time, promo_code, note, total, deposit, paid, staff_note, updated_at, created_at)
-             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?) returning id`,
+              arrival_time, promo_code, note, total, deposit, paid, staff_note, data_consent_at, marketing_consent, updated_at, created_at)
+             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?) returning id`,
           )
           .bind(
             code,
@@ -181,6 +184,8 @@ export async function insertBooking(d: D1Database, b: NewBooking): Promise<{ id:
             b.total,
             b.deposit,
             b.staffNote ?? null,
+            b.dataConsentAt ?? null,
+            b.marketingConsent ? 1 : 0,
             now,
             now,
           ),

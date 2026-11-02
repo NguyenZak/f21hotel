@@ -62,6 +62,8 @@ export function hotelJsonLd(site: SiteData, rooms: Room[]) {
     "@type": "Hotel",
     "@id": hotelId(site),
     name: site.name,
+    ...(site.legal.name ? { legalName: site.legal.name } : {}),
+    ...(site.legal.taxCode ? { taxID: site.legal.taxCode } : {}),
     description: site.description,
     url: absUrl(site, "/"),
     image: ["/img/anh/mat-tien-ngay.webp", "/img/anh/mat-tien-dem.webp", "/img/anh/sanh-le-tan.webp"].map((p) =>

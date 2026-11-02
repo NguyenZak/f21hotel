@@ -30,7 +30,10 @@ export async function Footer() {
                 </li>
               ))}
               <li>
-                <Link href="/dat-phong#chinh-sach">Chính sách</Link>
+                <Link href="/dieu-khoan">Điều khoản đặt phòng</Link>
+              </li>
+              <li>
+                <Link href="/chinh-sach-bao-mat">Chính sách bảo vệ dữ liệu cá nhân</Link>
               </li>
             </ul>
           </div>
@@ -81,6 +84,25 @@ export async function Footer() {
           </div>
         </div>
       </div>
+      {/* Thông tin bắt buộc công bố (Luật TMĐT 122/2025 Điều 11), điền ở CMS › Thông tin khách sạn › Doanh nghiệp & pháp lý */}
+      {site.legal.name || site.legal.moitUrl ? (
+        <div className="wrap footer-legal">
+          <p>
+            {[
+              site.legal.name,
+              site.legal.taxCode && `Mã số thuế: ${site.legal.taxCode}`,
+              site.legal.businessReg && `Giấy đăng ký kinh doanh: ${site.legal.businessReg}`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+          {site.legal.moitUrl ? (
+            <a className="footer-moit" href={site.legal.moitUrl} target="_blank" rel="noopener">
+              Đã thông báo Bộ Công Thương
+            </a>
+          ) : null}
+        </div>
+      ) : null}
       <div className="wrap footer-bottom">
         <span>© {site.name}. Bảo lưu mọi quyền.</span>
         <span>

@@ -58,6 +58,8 @@ async function loadBookings(d: D1Database, where: string, binds: unknown[], tail
       paid: num(b.paid),
       staffNote: str(b.staff_note),
       externalRef: str(b.external_ref),
+      dataConsentAt: str(b.data_consent_at),
+      marketingConsent: num(b.marketing_consent) === 1,
       createdAt: str(b.created_at),
       items: mine.map((i, idx) => ({
         roomType: num(i.room_type_id),

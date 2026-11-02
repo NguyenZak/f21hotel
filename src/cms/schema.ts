@@ -257,6 +257,12 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "textarea", name: "directions", column: "directions", label: "Câu chỉ đường", required: true },
       { type: "text", name: "mapQuery", column: "map_query", label: "Từ khoá bản đồ nhúng", half: true },
       { type: "text", name: "entranceVideo", column: "entrance_video", label: "Video đường vào (đường dẫn)", half: true },
+      // Thông tin bắt buộc công bố trên website bán hàng (Luật TMĐT 122/2025 Điều 11). Hiện ở footer và trang Điều khoản
+      { type: "section", name: "s-legal", label: "Doanh nghiệp & pháp lý" },
+      { type: "text", name: "legalName", column: "legal_name", label: "Tên chủ sở hữu", half: true, help: "Tên công ty hoặc hộ kinh doanh đúng như trên giấy đăng ký. Để trống thì footer ẩn khối thông tin doanh nghiệp." },
+      { type: "text", name: "taxCode", column: "tax_code", label: "Mã số thuế", half: true },
+      { type: "text", name: "businessReg", column: "business_reg", label: "Giấy đăng ký kinh doanh", help: "Ví dụ: Số 0123456789 do Sở Tài chính Hà Nội cấp ngày 01/01/2025" },
+      { type: "text", name: "moitUrl", column: "moit_url", label: "Link xác nhận Bộ Công Thương", help: "Link online.gov.vn nhận được sau khi thông báo website. Có link thì footer hiện dấu đã thông báo." },
       { type: "section", name: "s-policy", label: "Chính sách & giờ" },
       { type: "text", name: "checkIn", column: "check_in", label: "Nhận phòng (ngày đêm)", required: true, half: true },
       { type: "text", name: "checkOut", column: "check_out", label: "Trả phòng (ngày đêm)", required: true, half: true },
@@ -264,6 +270,7 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "text", name: "deposit", column: "price_notes_deposit", label: "Đặt cọc", half: true },
       { type: "text", name: "refund", column: "price_notes_refund", label: "Hoàn tiền", half: true },
       { type: "text", name: "water", column: "price_notes_water", label: "Đã gồm trong giá", half: true },
+      { type: "text", name: "vat", column: "price_notes_vat", label: "Thuế VAT", half: true, help: "Ví dụ: Giá đã gồm VAT. Hiện dưới bảng giá; để trống thì ẩn." },
       {
         type: "rows",
         name: "longStay",
