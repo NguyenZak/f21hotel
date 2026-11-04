@@ -163,9 +163,32 @@ const listBookings: (r: Ctx) => Promise<Response> = async ({ ctx, url }) => {
   const conds = [where, q ? "(b.code like ? or b.guest_name like ? or b.phone like ?)" : ""].filter(Boolean).join(" and ");
   const qb = q ? [`%${q.toUpperCase()}%`, `%${q}%`, `%${q.replace(/\D/g, "") || q}%`] : [];
   const order = url.searchParams.get("filter") === "upcoming" || url.searchParams.get("filter") === "arrivals" ? "b.check_in, b.id" : "b.created_at desc";
-  const bookings = await loadBookings(ctx.d, conds, [...binds, ...qb], `order by ${order} limit 31 offset ${(page - 1) * 30}`);
-  return json({ ok: true, bookings: bookings.slice(0, 30), more: bookings.length > 30 });
+  const [bookings, counts] = await Promise.all([
+    loadBookings(ctx.d, conds, [...binds, ...qb], `order by ${order} limit 31 offset ${(page - 1) * 30}`),
+    page === 1 ? filterCounts(ctx.d, todayInVietnam()) : null,
+  ]);
+  return json({ ok: true, bookings: bookings.slice(0, 30), more: bookings.length > 30, counts });
 };
+
+// Số đơn của từng bộ lọc nhanh (hiện cạnh nút lọc), cùng điều kiện với FILTERS
+async function filterCounts(d: D1Database, day: string) {
+  const live = "status not in ('cancelled', 'no_show')";
+  const r = await d
+    .prepare(
+      `select count(*) total, sum(status = 'pending') pending, sum(check_in = ?1 and ${live}) arrivals, sum(check_out = ?1 and ${live}) departures,
+       sum(status = 'checked_in') inhouse, sum(check_in > ?1 and status in ('pending', 'confirmed')) upcoming from bookings`,
+    )
+    .bind(toDbDate(day))
+    .first<Row>();
+  return {
+    all: num(r?.total),
+    pending: num(r?.pending),
+    arrivals: num(r?.arrivals),
+    departures: num(r?.departures),
+    inhouse: num(r?.inhouse),
+    upcoming: num(r?.upcoming),
+  };
+}
 
 const getBooking: (r: Ctx) => Promise<Response> = async ({ ctx, path }) => {
   const id = Number(path[1]);

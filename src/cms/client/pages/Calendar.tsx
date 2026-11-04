@@ -7,7 +7,7 @@ import { BLOCKING_STATUSES } from "@/lib/booking";
 import { addDays, nightsOf, todayInVietnam, toIsoDate } from "@/lib/dates";
 import type { BookingDTO, Meta } from "../../types";
 import { api, ApiError } from "../api";
-import { dayLabel, loadMeta, statusLabel } from "../booking";
+import { dayLabel, loadMeta, money, statusLabel } from "../booking";
 
 // Lịch phòng: mỗi dòng một phòng, mỗi cột một đêm. Đặt phòng đã gán số phòng hiện thành thanh; phòng chưa gán
 // được đếm ở dòng "Chưa gán" của từng hạng phòng. Bấm ô trống để tạo đặt phòng cho phòng và ngày đó.
@@ -59,6 +59,18 @@ export function CalendarPage() {
     }
   }
 
+  // Số phòng còn trống mỗi đêm: trừ phòng có thanh (kể cả nghỉ giờ) và phòng đã bán nhưng chưa gán số
+  const activeRooms = data?.meta.rooms.filter((r) => r.active) ?? [];
+  const free = days.map((_, d) => {
+    let busy = 0;
+    for (const r of activeRooms) if ((bars.get(r.id) ?? []).some((x) => BLOCKING_STATUSES.includes(x.b.status) && x.start <= d && d < x.start + x.span)) busy++;
+    for (const counts of unassigned.values()) busy += counts[d];
+    return Math.max(0, activeRooms.length - busy);
+  });
+  const freeTone = (n: number) => (n === 0 ? "full" : n <= Math.max(2, Math.round(activeRooms.length * 0.2)) ? "low" : "ok");
+  const barTitle = (b: BookingDTO) =>
+    [b.guestName, statusLabel(b.status), `${dayLabel(b.checkIn)} → ${dayLabel(b.checkOut)}`, b.nights ? `${b.nights} đêm` : "trong ngày", money(b.total), b.code].join(" · ");
+
   const nav = (iso: string, label: string) => (
     <Link className="c-btn c-btn--small" href={`/quan-tri/lich-phong?from=${iso}`}>
       {label}
@@ -81,7 +93,8 @@ export function CalendarPage() {
       </div>
       <p className="c-row" style={{ marginBottom: 12 }}>
         {["pending", "confirmed", "checked_in", "checked_out"].map((s) => (
-          <span key={s} className={`c-status c-status--${s}`}>
+          <span key={s} className="c-legend">
+            <i className={`c-cal__bar--${s}`} aria-hidden="true" />
             {statusLabel(s)}
           </span>
         ))}
@@ -105,6 +118,16 @@ export function CalendarPage() {
                 </div>
               );
             })}
+          </div>
+          <div className="c-cal__row c-cal__row--free">
+            <div className="c-cal__label">
+              Còn trống <small>trên {activeRooms.length} phòng</small>
+            </div>
+            {free.map((n, i) => (
+              <div key={i} className={`c-cal__free c-cal__free--${freeTone(n)}`} style={{ gridColumn: i + 2 }} title={`${dayLabel(days[i])}: còn ${n} phòng`}>
+                {n === 0 ? "Hết" : n}
+              </div>
+            ))}
           </div>
           {data.meta.roomTypes.map((t) => {
             const rooms = data.meta.rooms.filter((r) => r.roomType === t.id && r.active);
@@ -134,9 +157,9 @@ export function CalendarPage() {
                       <Link
                         key={`${b.id}-${s}`}
                         href={`/quan-tri/dat-phong/sua?id=${b.id}`}
-                        className={`c-cal__bar c-status--${b.status}`}
+                        className={`c-cal__bar c-cal__bar--${b.status}`}
                         style={{ gridColumn: `${s + 2} / span ${span}` }}
-                        title={`${b.guestName} · ${statusLabel(b.status)} · ${b.code}`}
+                        title={barTitle(b)}
                       >
                         {hourly ? <em>giờ</em> : null}
                         {b.guestName}

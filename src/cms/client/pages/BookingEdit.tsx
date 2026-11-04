@@ -8,6 +8,7 @@ import { addDays, nightsBetween, todayInVietnam, toIsoDate } from "@/lib/dates";
 import type { BookingDTO, BookingItem, Meta } from "../../types";
 import { api, ApiError } from "../api";
 import { loadMeta, money, NEXT_STEPS, STAY_LABELS, statusLabel, telHref, zaloHref, type Step } from "../booking";
+import { PayBar, StatusSteps } from "../BookingBits";
 import { hasRole, useSession } from "../session";
 import { useToast } from "../ui";
 
@@ -257,8 +258,8 @@ function Editor({ initial, meta, emails }: { initial: Draft; meta: Meta; emails?
 
       {b.id ? (
         <div className="c-actionbar">
-          <span className="c-row" style={{ marginRight: "auto" }}>
-            Trạng thái: <span className={`c-status c-status--${b.status}`}>{statusLabel(b.status)}</span>
+          <span className="c-actionbar__steps">
+            <StatusSteps status={b.status} />
           </span>
           {steps.map((s) => {
             const lock = s.to === "checked_in" && missing > 0;
@@ -521,6 +522,7 @@ function Editor({ initial, meta, emails }: { initial: Draft; meta: Meta; emails?
           <p className="c-kvline">
             Còn phải thu: <b>{money(Math.max(0, total - b.paid))}</b>
           </p>
+          <PayBar b={{ total, paid: b.paid, deposit }} showTotal={false} />
         </section>
 
         <section className="c-card c-form">

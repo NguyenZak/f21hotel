@@ -29,13 +29,15 @@ export type DataTableProps<T> = {
   /** Dòng đang chọn (tô đậm) */
   activeId?: string | number | null;
   getRowId?: (row: T) => string;
+  /** Lớp CSS thêm cho từng dòng (ví dụ dải màu theo trạng thái) */
+  rowClassName?: (row: T) => string;
   /** Chữ lọc nhanh, so khớp không dấu trên giá trị các cột */
   filter?: string;
   initialSort?: SortingState;
   empty?: string;
 };
 
-export default function DataTable<T>({ data, columns, rowHref, onRowClick, activeId, getRowId, filter = "", initialSort = [], empty = "Chưa có mục nào." }: DataTableProps<T>) {
+export default function DataTable<T>({ data, columns, rowHref, onRowClick, activeId, getRowId, rowClassName, filter = "", initialSort = [], empty = "Chưa có mục nào." }: DataTableProps<T>) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>(initialSort);
   // React Compiler tự bỏ qua ghi nhớ component này vì useReactTable trả về hàm đổi theo trạng thái
@@ -89,7 +91,7 @@ export default function DataTable<T>({ data, columns, rowHref, onRowClick, activ
           rows.map((row) => (
             <tr
               key={row.id}
-              className={`c-row-link${activeId != null && String(activeId) === row.id ? " is-active" : ""}`}
+              className={`c-row-link${activeId != null && String(activeId) === row.id ? " is-active" : ""}${rowClassName ? ` ${rowClassName(row.original)}` : ""}`}
               onClick={(e) => {
                 // Liên kết và nút trong ô (gọi điện, tên khách) tự xử lý
                 if ((e.target as HTMLElement).closest("a, button")) return;

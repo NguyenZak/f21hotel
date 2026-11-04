@@ -4,9 +4,11 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
-import type { BookingDTO } from "../../types";
+import { todayInVietnam } from "@/lib/dates";
+import type { BookingDTO, Meta } from "../../types";
 import { api, ApiError } from "../api";
-import { dayLabel, money, roomsText, sourceLabel, statusLabel, telHref } from "../booking";
+import { dayLabel, loadMeta, roomsText, sourceLabel, statusLabel, telHref } from "../booking";
+import { PayBar, RoomBadges, StatusBadge, StayHint } from "../BookingBits";
 import type { ColumnDef, DataTableProps } from "../DataTable";
 
 const DataTable = dynamic(() => import("../DataTable"), { ssr: false, loading: () => <p className="c-empty">Đang tải…</p> }) as <T>(
@@ -27,8 +29,9 @@ const useWide = () => useSyncExternalStore(onWideChange, () => matchMedia(WIDE).
 
 const editHref = (b: BookingDTO) => `/quan-tri/dat-phong/sua?id=${b.id}`;
 
-// Cột bảng: giá trị (accessor) dùng để sắp xếp, ô (cell) để hiển thị
-const COLUMNS: ColumnDef<BookingDTO, unknown>[] = [
+// Cột bảng: giá trị (accessor) dùng để sắp xếp, ô (cell) để hiển thị. Cần danh sách phòng để hiện số phòng
+// compact: khung xem nhanh đang mở bên phải, cột Phòng chỉ còn số phòng
+const columnsFor = (meta: Meta | null, today: string, compact = false): ColumnDef<BookingDTO, unknown>[] => [
   {
     id: "guest",
     header: "Khách",
@@ -38,7 +41,7 @@ const COLUMNS: ColumnDef<BookingDTO, unknown>[] = [
         <Link href={editHref(b)}>
           <b>{b.guestName}</b>
         </Link>
-        <div className="c-muted" style={{ fontSize: 13 }}>
+        <div className="c-muted" style={{ fontSize: 13, whiteSpace: "nowrap" }}>
           {b.code} · <a href={telHref(b.phone)}>{b.phone}</a>
         </div>
       </>
@@ -50,36 +53,54 @@ const COLUMNS: ColumnDef<BookingDTO, unknown>[] = [
     accessorFn: (b) => b.checkIn,
     cell: ({ row: { original: b } }) => (
       <>
-        {dayLabel(b.checkIn)} → {dayLabel(b.checkOut)}
-        <div className="c-muted" style={{ fontSize: 13 }}>
-          {b.nights ? `${b.nights} đêm` : "Trong ngày"}
+        <span className="c-stay">
+          {dayLabel(b.checkIn)} → {dayLabel(b.checkOut)}
+        </span>
+        <div className="c-row c-row--tight">
+          <span className="c-muted" style={{ fontSize: 13 }}>
+            {b.nights ? `${b.nights} đêm` : "Trong ngày"}
+          </span>
+          <StayHint b={b} today={today} />
         </div>
       </>
     ),
   },
-  { id: "rooms", header: "Phòng", accessorFn: roomsText, enableSorting: false },
+  {
+    id: "rooms",
+    header: "Phòng",
+    accessorFn: roomsText,
+    enableSorting: false,
+    cell: ({ row: { original: b } }) => (
+      <>
+        <RoomBadges b={b} meta={meta} />
+        {compact ? null : (
+          <div className="c-muted" style={{ fontSize: 13 }}>
+            {roomsText(b)}
+          </div>
+        )}
+      </>
+    ),
+  },
   {
     id: "status",
     header: "Trạng thái",
     accessorFn: (b) => statusLabel(b.status),
-    cell: ({ row: { original: b } }) => <span className={`c-status c-status--${b.status}`}>{statusLabel(b.status)}</span>,
+    cell: ({ row: { original: b } }) => <StatusBadge status={b.status} />,
   },
-  { id: "total", header: "Tổng tiền", accessorFn: (b) => b.total ?? 0, cell: ({ row: { original: b } }) => money(b.total), sortDescFirst: true },
+  { id: "total", header: "Tiền", accessorFn: (b) => b.total ?? 0, cell: ({ row: { original: b } }) => <PayBar b={b} />, sortDescFirst: true },
   { id: "source", header: "Kênh", accessorFn: (b) => sourceLabel(b.source), cell: ({ getValue }) => <span className="c-muted">{String(getValue())}</span> },
 ];
 
-// Danh sách đặt phòng: lọc nhanh, tìm theo mã / tên / số điện thoại
+// Danh sách đặt phòng: lọc nhanh, tìm theo mã / tên / số điện thoại. "tone" tô màu nút khi có đơn cần xử lý
 const FILTERS = [
   { key: "all", label: "Tất cả" },
-  { key: "pending", label: "Chờ xác nhận" },
-  { key: "arrivals", label: "Đến hôm nay" },
-  { key: "departures", label: "Trả phòng hôm nay" },
+  { key: "pending", label: "Chờ xác nhận", tone: "warn" },
+  { key: "arrivals", label: "Đến hôm nay", tone: "info" },
+  { key: "departures", label: "Trả phòng hôm nay", tone: "info" },
   { key: "inhouse", label: "Đang ở" },
   { key: "upcoming", label: "Sắp đến" },
 ];
-
-// Khi chia đôi màn hình, bảng chỉ giữ các cột chính; phòng và kênh xem ở khung bên phải
-const COMPACT = COLUMNS.filter((c) => c.id !== "rooms" && c.id !== "source");
+type Counts = Record<string, number>;
 
 export function BookingsPage() {
   const params = useSearchParams();
@@ -90,17 +111,25 @@ export function BookingsPage() {
   const [rows, setRows] = useState<BookingDTO[] | null>(null);
   const [more, setMore] = useState(false);
   const [error, setError] = useState("");
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [counts, setCounts] = useState<Counts | null>(null);
   const wide = useWide();
+  const today = todayInVietnam();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const selected = rows?.find((b) => b.id === selectedId) ?? null;
 
   useEffect(() => {
+    loadMeta().then(setMeta, () => undefined);
+  }, []);
+
+  useEffect(() => {
     let alive = true;
-    api<{ bookings: BookingDTO[]; more: boolean }>(`bookings?filter=${filter}&q=${encodeURIComponent(q)}&page=${page}`)
+    api<{ bookings: BookingDTO[]; more: boolean; counts: Counts | null }>(`bookings?filter=${filter}&q=${encodeURIComponent(q)}&page=${page}`)
       .then((r) => {
         if (!alive) return;
         setRows((old) => (page > 1 && old ? [...old, ...r.bookings] : r.bookings));
         setMore(r.more);
+        if (r.counts) setCounts(r.counts);
       })
       .catch((e) => alive && setError(e instanceof ApiError ? e.message : "Không tải được danh sách."));
     return () => {
@@ -120,6 +149,11 @@ export function BookingsPage() {
     go({ q: String(new FormData(e.currentTarget).get("q") ?? "").trim() });
   };
 
+  const columns = columnsFor(meta, today);
+  // Khi chia đôi màn hình, bảng chỉ giữ các cột chính; hạng phòng và kênh xem ở khung bên phải
+  const compact = columnsFor(meta, today, true).filter((c) => c.id !== "source");
+  const stripe = (b: BookingDTO) => `c-stripe c-stripe--${b.status}`;
+
   const list = (
     <div className="c-card c-table-wrap">
       {!rows ? (
@@ -127,9 +161,9 @@ export function BookingsPage() {
       ) : !rows.length ? (
         <p className="c-empty">Không có đặt phòng nào{q ? ` khớp “${q}”` : ""}.</p>
       ) : wide ? (
-        <DataTable data={rows} columns={COMPACT} onRowClick={(b) => setSelectedId(b.id)} activeId={selectedId} getRowId={(b) => String(b.id)} />
+        <DataTable data={rows} columns={compact} onRowClick={(b) => setSelectedId(b.id)} activeId={selectedId} getRowId={(b) => String(b.id)} rowClassName={stripe} />
       ) : (
-        <DataTable data={rows} columns={COLUMNS} rowHref={editHref} getRowId={(b) => String(b.id)} />
+        <DataTable data={rows} columns={columns} rowHref={editHref} getRowId={(b) => String(b.id)} rowClassName={stripe} />
       )}
     </div>
   );
@@ -148,11 +182,16 @@ export function BookingsPage() {
 
       <div className="c-toolbar">
         <nav className="c-chips" aria-label="Lọc nhanh">
-          {FILTERS.map((f) => (
-            <button key={f.key} type="button" className={`c-chip${f.key === filter ? " is-active" : ""}`} onClick={() => go({ filter: f.key })}>
-              {f.label}
-            </button>
-          ))}
+          {FILTERS.map((f) => {
+            const n = counts?.[f.key];
+            const tone = f.tone && n ? ` c-chip--${f.tone}` : "";
+            return (
+              <button key={f.key} type="button" className={`c-chip${tone}${f.key === filter ? " is-active" : ""}`} onClick={() => go({ filter: f.key })}>
+                {f.label}
+                {n != null ? <span className="c-chip__n">{n}</span> : null}
+              </button>
+            );
+          })}
         </nav>
         <form className="c-search" onSubmit={onSearch} role="search">
           <input name="q" className="c-input" defaultValue={q} placeholder="Mã, tên khách, số điện thoại" aria-label="Tìm đặt phòng" />

@@ -3,7 +3,8 @@
 import { AnimatePresence, domAnimation, LazyMotion, m, MotionConfig } from "motion/react";
 import Link from "next/link";
 import type { BookingDTO } from "../types";
-import { dayLabel, money, sourceLabel, STAY_LABELS, statusLabel, telHref, zaloHref } from "./booking";
+import { dayLabel, money, sourceLabel, STAY_LABELS, telHref, zaloHref } from "./booking";
+import { PayBar, StatusBadge } from "./BookingBits";
 import { Icon } from "./icons";
 import { formatTime } from "./ui";
 
@@ -48,7 +49,7 @@ function PreviewBody({ b }: { b: BookingDTO | null }) {
             {b.code} · {sourceLabel(b.source)}
           </p>
         </div>
-        <span className={`c-status c-status--${b.status}`}>{statusLabel(b.status)}</span>
+        <StatusBadge status={b.status} />
       </header>
 
       <div className="c-row">
@@ -82,7 +83,7 @@ function PreviewBody({ b }: { b: BookingDTO | null }) {
         <div>
           <dt>Tiền</dt>
           <dd>
-            <b>{money(b.total)}</b>
+            <PayBar b={b} />
             <small>
               Đã trả {money(b.paid)} · Cọc {money(b.deposit)}
               {due ? ` · Còn ${money(due)}` : ""}
