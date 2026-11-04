@@ -1,7 +1,7 @@
 // Thẻ meta và dữ liệu có cấu trúc (schema.org JSON-LD) cho Google, mạng xã hội và trợ lý AI.
 // Mọi đường dẫn tuyệt đối lấy theo "Địa chỉ website" trong CMS (Cài đặt › Thông tin chung).
 import type { Metadata } from "next";
-import type { SiteData } from "./cms";
+import type { Post, SiteData } from "./cms";
 import { mapsUrl, type Room } from "./site";
 
 export const absUrl = (site: SiteData, path: string) => new URL(path, site.url).toString();
@@ -20,6 +20,16 @@ export const OG_IMAGES = {
   booking: { file: "dat-phong", alt: "Quầy lễ tân và sảnh F21 Hotel" },
   groups: { file: "doan-doanh-nghiep", alt: "Phòng hai giường cho khách đoàn tại F21 Hotel" },
 } as const;
+
+// Ảnh bìa bài viết (Cloudinary) cắt 1200×630 JPG làm ảnh xem trước; bài chưa có ảnh bìa dùng ảnh trang Vị trí
+export function postOgImages(post: Post) {
+  if (!post.cover) return ogImageMeta(OG_IMAGES.location);
+  const url = post.cover.src.replace("/image/upload/f_auto,q_auto/", "/image/upload/c_fill,g_auto,w_1200,h_630,q_auto,f_jpg/");
+  return {
+    images: [{ url, width: 1200, height: 630, alt: post.cover.alt, type: "image/jpeg" }],
+    twitter: { card: "summary_large_image" as const, images: [{ url, alt: post.cover.alt }] },
+  };
+}
 
 export type OgImage = (typeof OG_IMAGES)[keyof typeof OG_IMAGES];
 
@@ -113,6 +123,43 @@ export function breadcrumbJsonLd(site: SiteData, path: string, name: string) {
       { "@type": "ListItem", position: 1, name: "Trang chủ", item: absUrl(site, "/") },
       { "@type": "ListItem", position: 2, name, item: absUrl(site, path) },
     ],
+  };
+}
+
+// Breadcrumb nhiều cấp: [tên, đường dẫn] sau "Trang chủ"
+export function breadcrumbTrailJsonLd(site: SiteData, trail: [string, string][]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [["Trang chủ", "/"], ...trail].map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: absUrl(site, path) })),
+  };
+}
+
+// Bài viết: tác giả và đơn vị xuất bản là khách sạn (@id trong hotelJsonLd), để Google và AI biết nguồn thông tin
+export function articleJsonLd(site: SiteData, post: Post, path: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": absUrl(site, `${path}#article`),
+    headline: post.title,
+    description: post.excerpt,
+    url: absUrl(site, path),
+    mainEntityOfPage: absUrl(site, path),
+    inLanguage: "vi",
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt.slice(0, 10) > post.publishedAt ? post.updatedAt.slice(0, 10) : post.publishedAt,
+    ...(post.cover ? { image: absUrl(site, post.cover.src) } : {}),
+    author: { "@type": "Organization", "@id": hotelId(site), name: site.name, url: absUrl(site, "/") },
+    publisher: { "@id": hotelId(site) },
+    isPartOf: { "@id": websiteId(site) },
+  };
+}
+
+export function faqJsonLd(faqs: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   };
 }
 

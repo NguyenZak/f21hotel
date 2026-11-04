@@ -1,6 +1,7 @@
 // API chung cho các mục nội dung khai báo trong src/cms/schema.ts: /api/cms/c/<slug>[/<id>], /api/cms/options/<slug>.
 // Đọc/ghi D1 theo cấu trúc bảng do CMS Payload tạo trước đây (bảng chính, bảng mảng con, bảng _rels).
-import { fromDbDate, toDbDate } from "@/lib/dates";
+import { fromDbDate, todayInVietnam, toDbDate } from "@/lib/dates";
+import { UNVERIFIED_MARK } from "@/lib/markdown";
 import { num, rowId, str } from "@/lib/sql";
 import { collectionBySlug, type CollectionDef, type Field } from "../schema";
 import { audit, body, can, fail, json, type CmsContext, type CmsUser } from "./http";
@@ -79,6 +80,10 @@ async function check(d: D1Database, def: CollectionDef, input: Doc, id: number |
     if (f.type === "date" && v && !/^\d{4}-\d{2}-\d{2}$/.test(str(v))) return `“${f.label}” không hợp lệ.`;
   }
   if (def.slug === "rate-rules" && str(input.from) > str(input.to)) return "“Đến hết đêm” phải sau hoặc bằng “Từ đêm”.";
+  if (def.slug === "posts" && input.published) {
+    const mark = [str(input.title), str(input.excerpt), str(input.body), JSON.stringify(input.faqs ?? [])].join("\n").match(UNVERIFIED_MARK);
+    if (mark) return `Bài còn chỗ “${mark[0]}”. Kiểm tra lại thông tin rồi xoá dấu này trước khi đăng.`;
+  }
   return null;
 }
 
@@ -135,10 +140,11 @@ const list = async ({ ctx, user, path }: Ctx) => {
     return json({ ok: true, doc: row ? await readDoc(ctx.d, def, num(row.id)) : {} });
   }
   const cols = [...new Set(["id", def.titleField, ...(def.listColumns ?? [])])];
+  const dates = new Set(def.fields.filter((f) => f.type === "date").map((f) => (f as { column: string }).column));
   const { results } = await ctx.d.prepare(`select ${cols.map(q).join(", ")} from ${q(def.table)} order by ${def.order ?? "id desc"} limit 500`).all<Row>();
   return json({
     ok: true,
-    rows: results.map((r) => Object.fromEntries(cols.map((c) => [c, c === "from" || c === "to" ? fromDbDate(str(r[c])) : r[c]]))),
+    rows: results.map((r) => Object.fromEntries(cols.map((c) => [c, dates.has(c) ? fromDbDate(str(r[c])) : r[c]]))),
   });
 };
 
@@ -160,6 +166,8 @@ const save = async ({ ctx, user, request, path }: Ctx) => {
   if (def.global) id = num((await d.prepare(`select id from ${q(def.table)} order by id limit 1`).first<Row>())?.id) || null;
   const existing = id ? await readDoc(d, def, id) : null;
   if (id && !existing) return fail(404, "Không tìm thấy.");
+  // Bài viết bật "Đăng" mà chưa có ngày đăng: lấy hôm nay
+  if (def.slug === "posts" && input.published && !str(input.publishedAt ?? existing?.publishedAt)) input.publishedAt = todayInVietnam();
   const merged = { ...(existing ?? {}), ...input };
   const err = await check(d, def, merged, id);
   if (err) return fail(400, err);
@@ -207,7 +215,8 @@ const remove = async ({ ctx, user, path }: Ctx) => {
     if (f.type === "multi") stmts.push(d.prepare(`delete from ${q(f.table)} where parent_id = ?`).bind(id));
     if (f.type === "refs" || f.type === "media") stmts.push(d.prepare(`delete from ${q(f.relTable)} where parent_id = ?`).bind(id));
   }
-  stmts.push(d.prepare(`delete from payload_locked_documents_rels where ${q(`${def.slug.replace(/-/g, "_")}_id`)} = ?`).bind(id));
+  if (def.payloadLocks !== false)
+    stmts.push(d.prepare(`delete from payload_locked_documents_rels where ${q(`${def.slug.replace(/-/g, "_")}_id`)} = ?`).bind(id));
   stmts.push(d.prepare(`delete from ${q(def.table)} where id = ?`).bind(id));
   await d.batch(stmts);
   await audit(ctx, user, "delete", def.slug, id, titleOf(def, doc));

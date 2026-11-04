@@ -22,7 +22,9 @@ import {
   bestDiscount,
   discounted,
 } from "./booking";
+import { sendBookingEmail } from "./booking-emails";
 import { addDays, formatViDate, nightsBetween, todayInVietnam, toIsoDate } from "./dates";
+import type { MailConfig } from "./mailer";
 import { notifyFrontDesk } from "./notify";
 import { checkAvailability, deleteBooking, findBooking, insertBooking } from "./reservations";
 import { stayModes } from "./site";
@@ -34,6 +36,8 @@ export type BookingApiOptions = {
   webhookUrl?: string;
   // Chạy việc sau khi đã trả kết quả cho khách (ctx.waitUntil trên Workers, after() trong Next)
   waitUntil: (p: Promise<unknown>) => void;
+  // Gửi email "đã nhận đặt phòng" cho khách có điền email (src/lib/mailer.ts); không có thì bỏ qua
+  mail?: MailConfig;
 };
 
 type Settings = BookingSettings;
@@ -214,6 +218,7 @@ export async function createBooking(d: D1Database, input: CreateBookingInput, op
   }
 
   const code = booking.code;
+  if (g.email && opts.mail) opts.waitUntil(sendBookingEmail(d, opts.mail, booking.id, "received", { once: true }));
   // Báo lễ tân sau khi đã trả kết quả cho khách
   opts.waitUntil(
     (async () => {

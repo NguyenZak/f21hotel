@@ -30,6 +30,9 @@ export async function Footer() {
                 </li>
               ))}
               <li>
+                <Link href="/bai-viet">Cẩm nang du lịch</Link>
+              </li>
+              <li>
                 <Link href="/dieu-khoan">Điều khoản đặt phòng</Link>
               </li>
               <li>

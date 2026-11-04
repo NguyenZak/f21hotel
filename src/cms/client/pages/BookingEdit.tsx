@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { BOOKING_SOURCES, BOOKING_STATUSES } from "@/lib/booking";
+import { BOOKING_SOURCES, BOOKING_STATUSES, EMAIL_KINDS, type BookingEmailLog, type EmailKind } from "@/lib/booking";
 import { addDays, nightsBetween, todayInVietnam, toIsoDate } from "@/lib/dates";
 import type { BookingDTO, BookingItem, Meta } from "../../types";
 import { api, ApiError } from "../api";
@@ -51,7 +51,80 @@ function suggest(meta: Meta, item: BookingItem, nights: number) {
   return roundK(unit * item.quantity);
 }
 
-function Editor({ initial, meta }: { initial: Draft; meta: Meta }) {
+// Email đã gửi cho khách và nút gửi (lại) email xác nhận / nhắc lịch. Email nhắc tự gửi theo cron (worker.ts).
+function GuestEmails({ id, email, dirty, canEmail, log, onLog }: {
+  id: number;
+  email: string;
+  dirty: boolean;
+  canEmail: boolean;
+  log: BookingEmailLog[];
+  onLog: (log: BookingEmailLog[]) => void;
+}) {
+  const [sending, setSending] = useState<EmailKind | null>(null);
+  const [error, setError] = useState("");
+  const [toast, say] = useToast();
+  const send = async (kind: EmailKind) => {
+    setSending(kind);
+    setError("");
+    try {
+      const r = await api<{ emails: BookingEmailLog[] }>(`bookings/${id}/email`, { body: { kind } });
+      onLog(r.emails);
+      say(`Đã gửi “${EMAIL_KINDS[kind]}” tới ${email}.`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Không gửi được email.");
+    } finally {
+      setSending(null);
+    }
+  };
+  const when = (iso: string) =>
+    new Date(iso).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" });
+  return (
+    <section className="c-card c-form">
+      <h2>Email cho khách</h2>
+      {!canEmail ? (
+        <p className="c-alert c-alert--info">Website chưa bật gửi email (thiếu khoá RESEND_API_KEY). Liên hệ người quản trị website.</p>
+      ) : !email ? (
+        <p className="c-kvline c-muted">Nhập email của khách rồi lưu để gửi xác nhận và nhắc lịch.</p>
+      ) : (
+        <p className="c-kvline c-muted">Khách nhận email nhắc lúc 8:00 sáng, một ngày trước ngày nhận phòng. Chuyển đơn sang “Đã xác nhận” thì khách tự nhận email xác nhận (trừ đơn OTA).</p>
+      )}
+      {error ? <p className="c-alert c-alert--error" role="alert">{error}</p> : null}
+      {log.length ? (
+        <ul className="c-emails">
+          {log.map((e, i) => (
+            <li key={i}>
+              <span className={`c-badge ${e.status === "sent" ? "c-badge--ok" : "c-badge--warn"}`} title={e.error || undefined}>
+                {e.status === "sent" ? "Đã gửi" : "Lỗi"}
+              </span>
+              <span>
+                <b>{EMAIL_KINDS[e.kind] ?? e.kind}</b> · {when(e.createdAt)} · {e.recipient}
+                {e.userName ? ` · ${e.userName}` : ""}
+                {e.error ? <small className="c-emails__err">{e.error}</small> : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="c-kvline c-muted">Chưa gửi email nào.</p>
+      )}
+      {canEmail && email ? (
+        <div className="c-row">
+          {(["confirmed", "reminder"] as const).map((kind) => (
+            <button key={kind} type="button" className="c-btn c-btn--small" disabled={dirty || sending !== null} onClick={() => send(kind)}>
+              {sending === kind ? "Đang gửi…" : `Gửi “${EMAIL_KINDS[kind]}”`}
+            </button>
+          ))}
+          {dirty ? <span className="c-hint">Lưu thay đổi trước khi gửi</span> : null}
+        </div>
+      ) : null}
+      {toast}
+    </section>
+  );
+}
+
+type EmailState = { log: BookingEmailLog[]; canEmail: boolean };
+
+function Editor({ initial, meta, emails }: { initial: Draft; meta: Meta; emails?: EmailState }) {
   const router = useRouter();
   const { user } = useSession();
   const [b, setB] = useState<Draft>(initial);
@@ -63,6 +136,7 @@ function Editor({ initial, meta }: { initial: Draft; meta: Meta }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [toast, say] = useToast();
+  const [emailLog, setEmailLog] = useState(emails?.log ?? []);
 
   const nights = nightsBetween(b.checkIn, b.checkOut) ?? 0;
   // Dòng chưa sửa tay: thành tiền luôn theo giá phòng × số đêm hiện tại
@@ -124,10 +198,17 @@ function Editor({ initial, meta }: { initial: Draft; meta: Meta }) {
     setError("");
     try {
       if (b.id) {
-        await api(`bookings/${b.id}`, { method: "PATCH", body: payload(status) });
+        const r = await api<{ emailed: string }>(`bookings/${b.id}`, { method: "PATCH", body: payload(status) });
         if (status) set({ status });
         setDirty(false);
-        say(status ? `Đã chuyển sang “${statusLabel(status)}”.` : "Đã lưu.");
+        say(`${status ? `Đã chuyển sang “${statusLabel(status)}”.` : "Đã lưu."}${r.emailed ? ` Đang gửi email xác nhận tới ${r.emailed}.` : ""}`);
+        // Email gửi sau khi lưu xong: tải lại lịch sử sau vài giây
+        if (r.emailed) {
+          const id = b.id;
+          setTimeout(() => {
+            api<{ emails: BookingEmailLog[] }>(`bookings/${id}`).then((x) => setEmailLog(x.emails)).catch(() => {});
+          }, 4000);
+        }
       } else {
         const r = await api<{ id: number; code: string }>("bookings", { body: payload(status) });
         setDirty(false);
@@ -457,6 +538,10 @@ function Editor({ initial, meta }: { initial: Draft; meta: Meta }) {
             <textarea id="staffNote" className="c-textarea" value={b.staffNote} onChange={(e) => set({ staffNote: e.target.value })} placeholder="Khách không thấy ghi chú này." />
           </div>
         </section>
+
+        {b.id && emails ? (
+          <GuestEmails id={b.id} email={b.email.trim()} dirty={dirty} canEmail={emails.canEmail} log={emailLog} onLog={setEmailLog} />
+        ) : null}
       </div>
 
       <div className="c-savebar">
@@ -520,12 +605,12 @@ export function BookingNewPage() {
 export function BookingEditPage() {
   const params = useSearchParams();
   const id = Number(params.get("id"));
-  const [state, setState] = useState<{ booking: BookingDTO; meta: Meta } | null>(null);
+  const [state, setState] = useState<{ booking: BookingDTO; meta: Meta; emails: EmailState } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
     if (!id) return;
-    Promise.all([api<{ booking: BookingDTO }>(`bookings/${id}`), loadMeta()])
-      .then(([r, meta]) => setState({ booking: r.booking, meta }))
+    Promise.all([api<{ booking: BookingDTO; emails: BookingEmailLog[]; canEmail: boolean }>(`bookings/${id}`), loadMeta()])
+      .then(([r, meta]) => setState({ booking: r.booking, meta, emails: { log: r.emails, canEmail: r.canEmail } }))
       .catch((e) => setError(e instanceof ApiError ? e.message : "Không tải được đặt phòng."));
   }, [id]);
   if (!id || error) return <p className="c-alert c-alert--error">{error || "Thiếu mã đặt phòng."}</p>;
@@ -533,7 +618,7 @@ export function BookingEditPage() {
   return (
     <>
       {params.get("created") ? <p className="c-alert c-alert--ok" style={{ marginBottom: 12 }}>Đã tạo đặt phòng {state.booking.code}.</p> : null}
-      <Editor key={state.booking.id} initial={state.booking} meta={state.meta} />
+      <Editor key={state.booking.id} initial={state.booking} meta={state.meta} emails={state.emails} />
     </>
   );
 }

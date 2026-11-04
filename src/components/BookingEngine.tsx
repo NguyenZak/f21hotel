@@ -301,7 +301,7 @@ export function BookingEngine({ rooms, contact, policy, maxRooms, rating }: Prop
                 </div>
                 <div className={fieldClass("email")}>
                   <label htmlFor="g-email">
-                    Email <span className="opt">(không bắt buộc)</span>
+                    Email <span className="opt">(không bắt buộc, để nhận email xác nhận và nhắc lịch)</span>
                   </label>
                   <input id="g-email" name="email" type="email" autoComplete="email" />
                   <span className="err">{err("email")}</span>
@@ -386,8 +386,8 @@ export function BookingEngine({ rooms, contact, policy, maxRooms, rating }: Prop
                 <label className={`be-agree${err("agreeData") ? " invalid" : ""}`}>
                   <input type="checkbox" name="agreeData" value="yes" required />
                   <span>
-                    Tôi đồng ý để F21 Hotel dùng họ tên, số điện thoại, email ở trên để giữ phòng, gọi hoặc nhắn Zalo xác nhận
-                    và hướng dẫn đặt cọc, theo{" "}
+                    Tôi đồng ý để F21 Hotel dùng họ tên, số điện thoại, email ở trên để giữ phòng, gọi hoặc nhắn Zalo xác nhận,
+                    hướng dẫn đặt cọc và gửi email về đặt phòng, theo{" "}
                     <a href="/chinh-sach-bao-mat" target="_blank" rel="noopener">
                       Chính sách bảo vệ dữ liệu cá nhân
                     </a>

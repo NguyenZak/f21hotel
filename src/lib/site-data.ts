@@ -242,3 +242,43 @@ export async function readPageData(d: D1Database, slug: string): Promise<{ title
   return data?.content ? { title: str(page.title), data } : null;
 }
 
+
+// ---------- Bài viết (CMS › Bài viết) ----------
+
+export type Post = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  topic: string;
+  publishedAt: string;
+  updatedAt: string;
+  cover: Photo | null;
+  faqs: { q: string; a: string }[];
+};
+
+// Các bài đã bật "Đăng", mới nhất trước. Nội dung đầy đủ (ít bài, website dựng sẵn mọi bài lúc build)
+export async function readPosts(d: D1Database): Promise<Post[]> {
+  const [posts, faqs, covers] = await batch<[Row, Row, Row]>(d,
+    d.prepare("select * from posts where published = 1 order by published_at desc, id desc limit 200"),
+    d.prepare("select f._parent_id, f.question, f.answer from posts_faqs f join posts p on p.id = f._parent_id where p.published = 1 order by f._order"),
+    d.prepare(
+      "select r.parent_id, m.url, m.filename, m.prefix, m.alt, m.width, m.height from posts_rels r join media m on m.id = r.media_id where r.path = 'cover' order by r.\"order\"",
+    ),
+  );
+  return posts.map((p) => {
+    const c = covers.find((x) => x.parent_id === p.id);
+    const src = c ? mediaUrl(c) : "";
+    return {
+      slug: str(p.slug),
+      title: str(p.title),
+      excerpt: str(p.excerpt),
+      body: str(p.body),
+      topic: str(p.topic),
+      publishedAt: str(p.published_at).slice(0, 10) || str(p.created_at).slice(0, 10),
+      updatedAt: str(p.updated_at),
+      cover: c && src ? { src, alt: str(c.alt) || str(p.title), w: num(c.width, 1600), h: num(c.height, 1067) } : null,
+      faqs: faqs.filter((f) => f._parent_id === p.id).map((f) => ({ q: str(f.question), a: str(f.answer) })),
+    };
+  });
+}

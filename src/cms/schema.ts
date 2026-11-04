@@ -2,18 +2,21 @@
 // Mỗi trường ứng với cách Payload đã lưu trong D1: cột của bảng chính, bảng mảng con ("<bảng>_<tên>",
 // cột _order/_parent_id/id) hoặc bảng liên kết ("<bảng>_rels", cột path + "<đích>_id").
 import { CMS_TAGS } from "@/lib/cms-tags";
+import { POST_TOPICS } from "@/lib/site";
 import { fontChoices } from "@/lib/theme";
 import type { Role } from "./server/http";
 
 type Base = { name: string; label: string; help?: string; required?: boolean; half?: boolean };
 export type Field =
   | (Base & { type: "text" | "textarea" | "number" | "money" | "date" | "email"; column: string; min?: number; max?: number })
+  // Nội dung dài viết bằng Markdown (src/lib/markdown.ts), có ô xem trước
+  | (Base & { type: "markdown"; column: string })
   | (Base & { type: "bool"; column: string; default?: boolean })
   | (Base & { type: "select"; column: string; options: { value: string; label: string }[] })
   // Quan hệ một (cột <tên>_id), lựa chọn lấy từ một mục khác
   | (Base & { type: "ref"; column: string; to: string })
   // Mảng các dòng (bảng con); một cột thì hiện như danh sách chữ
-  | (Base & { type: "rows"; table: string; columns: { column: string; label: string }[] })
+  | (Base & { type: "rows"; table: string; columns: { column: string; label: string; long?: boolean }[] })
   // Quan hệ nhiều (bảng _rels): tới một mục khác, hoặc tới ảnh trong Thư viện ảnh
   | (Base & { type: "refs"; relTable: string; path: string; relColumn: string; to: string })
   | (Base & { type: "media"; relTable: string; path: string; relColumn: string })
@@ -38,6 +41,8 @@ export type CollectionDef = {
   // Nhãn bộ nhớ đệm của website cần làm mới khi lưu
   tags: string[];
   intro?: string;
+  // Bảng tạo sau khi bỏ Payload: không có cột trong payload_locked_documents_rels
+  payloadLocks?: false;
   fields: Field[];
 };
 
@@ -171,6 +176,58 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "number", name: "order", column: "order", label: "Thứ tự hiển thị", half: true },
       { type: "bool", name: "featured", column: "featured", label: "Nổi bật" },
       { type: "bool", name: "active", column: "active", label: "Đang hiển thị", default: true },
+    ],
+  },
+  {
+    slug: "posts",
+    path: "bai-viet",
+    table: "posts",
+    label: "Bài viết",
+    group: "Website",
+    titleField: "title",
+    listColumns: ["title", "topic", "published_at", "published"],
+    order: "published desc, published_at desc, id desc",
+    read: MANAGE,
+    write: MANAGE,
+    remove: MANAGE,
+    tags: [CMS_TAGS.posts],
+    payloadLocks: false,
+    intro:
+      "Bài cẩm nang trả lời câu khách hay hỏi (đi Mỹ Đình, Bảo Sơn, nghỉ giờ…), giúp F21 lên Google và được ChatGPT, Gemini nhắc tới. Viết đúng sự thật, có số liệu cụ thể. Chỗ chưa chắc thì ghi [CẦN XÁC NHẬN]: bài còn dấu này không đăng được.",
+    fields: [
+      { type: "text", name: "title", column: "title", label: "Tiêu đề", required: true, help: "Viết như câu khách gõ vào Google, khoảng 50–65 ký tự. Ví dụ: Đi xem concert ở SVĐ Mỹ Đình: ở đâu, đi lại thế nào" },
+      { type: "text", name: "slug", column: "slug", label: "Mã (dùng trong đường dẫn)", required: true, help: `${slugHelp}-concert-my-dinh. Đã đăng thì không nên đổi.`, half: true },
+      { type: "select", name: "topic", column: "topic", label: "Chủ đề", options: POST_TOPICS, half: true },
+      {
+        type: "textarea",
+        name: "excerpt",
+        column: "excerpt",
+        label: "Tóm tắt",
+        required: true,
+        help: "1–2 câu trả lời thẳng câu hỏi của bài (Google và AI hay trích đoạn này), khoảng 140–160 ký tự.",
+      },
+      { type: "media", name: "cover", relTable: "posts_rels", path: "cover", relColumn: "media_id", label: "Ảnh bìa", help: "Một ảnh ngang, dùng làm ảnh đầu bài và ảnh khi chia sẻ." },
+      {
+        type: "markdown",
+        name: "body",
+        column: "body",
+        label: "Nội dung",
+        required: true,
+        help: "## Tiêu đề mục · ### Mục nhỏ · **đậm** · *nghiêng* · - danh sách · 1. danh sách số · [chữ](đường dẫn) · > trích dẫn · bảng | Cột | Cột |. Mỗi mục nên mở đầu bằng câu trả lời ngắn gọn.",
+      },
+      {
+        type: "rows",
+        name: "faqs",
+        table: "posts_faqs",
+        label: "Hỏi đáp cuối bài",
+        columns: [
+          { column: "question", label: "Câu hỏi" },
+          { column: "answer", label: "Trả lời", long: true },
+        ],
+        help: "3–5 câu khách hay hỏi kèm câu trả lời ngắn. Website gắn dữ liệu cấu trúc FAQ cho Google và AI.",
+      },
+      { type: "date", name: "publishedAt", column: "published_at", label: "Ngày đăng", half: true, help: "Để trống thì lấy ngày bật “Đăng”." },
+      { type: "bool", name: "published", column: "published", label: "Đăng lên website", help: "Bài lên website sau khi bấm Xuất bản website." },
     ],
   },
   {

@@ -10,7 +10,7 @@ import type { Offer, Review, Room } from "./site";
 import type { FontKey } from "./theme";
 
 export { CMS_TAGS };
-export type { BookingSettings, PriceNotes, SiteData } from "./site-data";
+export type { BookingSettings, Post, PriceNotes, SiteData } from "./site-data";
 
 export async function getSite(): Promise<read.SiteData> {
   "use cache";
@@ -66,6 +66,13 @@ export async function getReviews(): Promise<Review[]> {
   cacheLife("max");
   cacheTag(CMS_TAGS.reviews);
   return read.readReviews(await db());
+}
+
+export async function getPosts(): Promise<read.Post[]> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(CMS_TAGS.posts);
+  return read.readPosts(await db());
 }
 
 // Bố cục đã xuất bản của một trang dựng bằng trình kéo thả (null nếu chưa có hoặc chưa xuất bản)

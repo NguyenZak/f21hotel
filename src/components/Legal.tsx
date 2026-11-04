@@ -1,7 +1,7 @@
 import type { SiteData } from "@/lib/cms";
 
 // Ngày cập nhật Chính sách bảo vệ dữ liệu cá nhân và Điều khoản đặt phòng. Sửa nội dung hai trang thì đổi ngày này.
-export const LEGAL_UPDATED = "02/11/2026";
+export const LEGAL_UPDATED = "03/11/2026";
 
 // Thông tin chủ website bắt buộc công bố (Luật TMĐT 122/2025 Điều 11), lấy từ CMS › Thông tin khách sạn.
 // Mục nào CMS chưa điền thì ẩn, không hiện chỗ trống.

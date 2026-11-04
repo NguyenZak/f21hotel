@@ -43,11 +43,14 @@ export function SectionHead({
 
 export function PageHero({
   crumb,
+  parent,
   eyebrow,
   title,
   children,
 }: {
   crumb: string;
+  // Trang cấp trên trong breadcrumb (ví dụ Cẩm nang › bài viết)
+  parent?: { href: string; label: string };
   eyebrow: string;
   title: ReactNode;
   children?: ReactNode;
@@ -56,7 +59,13 @@ export function PageHero({
     <section className="page-hero on-dark">
       <div className="wrap">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <Link href="/">Trang chủ</Link> / <span>{crumb}</span>
+          <Link href="/">Trang chủ</Link> /{" "}
+          {parent ? (
+            <>
+              <Link href={parent.href}>{parent.label}</Link> /{" "}
+            </>
+          ) : null}
+          <span>{crumb}</span>
         </nav>
         <span className="eyebrow">{eyebrow}</span>
         <h1>{title}</h1>

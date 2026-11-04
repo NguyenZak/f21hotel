@@ -2,7 +2,8 @@
 // Đọc/ghi thẳng D1 theo cấu trúc bảng của Payload (bookings, bookings_items, bookings_rels path "items.N.rooms")
 // (cấu trúc do CMS Payload tạo trước đây). Giữ đúng quy tắc đặt phòng của CMS cũ:
 // mã đặt phòng, số đêm, tổng tiền mặc định, phòng gán đúng hạng / không quá số lượng / không trùng thời gian.
-import { BLOCKING_STATUSES, BOOKING_SOURCES, BOOKING_STATUSES, newBookingCode } from "@/lib/booking";
+import { BLOCKING_STATUSES, BOOKING_SOURCES, BOOKING_STATUSES, EMAIL_KINDS, newBookingCode, type EmailKind } from "@/lib/booking";
+import { autoConfirmEmail, bookingEmailLog, sendBookingEmail } from "@/lib/booking-emails";
 import { addDays, fromDbDate, nightsBetween, nightsOf, todayInVietnam, toDbDate, toIsoDate } from "@/lib/dates";
 import { checkAvailability } from "@/lib/reservations";
 import { num, rowId, str } from "@/lib/sql";
@@ -167,8 +168,9 @@ const listBookings: (r: Ctx) => Promise<Response> = async ({ ctx, url }) => {
 };
 
 const getBooking: (r: Ctx) => Promise<Response> = async ({ ctx, path }) => {
-  const [b] = await loadBookings(ctx.d, "b.id = ?", [Number(path[1])], "limit 1");
-  return b ? json({ ok: true, booking: b }) : fail(404, "Không tìm thấy đặt phòng.");
+  const id = Number(path[1]);
+  const [[b], emails] = await Promise.all([loadBookings(ctx.d, "b.id = ?", [id], "limit 1"), bookingEmailLog(ctx.d, id)]);
+  return b ? json({ ok: true, booking: b, emails, canEmail: Boolean(ctx.mail) }) : fail(404, "Không tìm thấy đặt phòng.");
 };
 
 // Hạng phòng và phòng (cho form đặt phòng, lịch phòng)
@@ -209,6 +211,16 @@ const busyRooms: (r: Ctx) => Promise<Response> = async ({ ctx, url }) => {
 };
 
 // ---------- Tạo, sửa, xoá ----------
+
+// Đơn vừa chuyển sang "Đã xác nhận" (hoặc tạo mới ở trạng thái đó): tự gửi email xác nhận cho khách có email,
+// trừ đơn OTA (OTA đã gửi) và đơn đã trả phòng. Gửi sau khi trả kết quả cho CMS. Trả về email sẽ nhận, "" nếu không gửi.
+function emailOnConfirm(ctx: CmsContext, user: CmsUser, id: number | undefined, before: string | null, v: BookingDTO) {
+  const to = str(v.email).trim();
+  if (!id || !ctx.mail || !to || before === "confirmed" || v.status !== "confirmed") return "";
+  if (!autoConfirmEmail(v.source) || v.checkOut <= todayInVietnam()) return "";
+  ctx.waitUntil(sendBookingEmail(ctx.d, ctx.mail, id, "confirmed", { once: true, userId: user.id }));
+  return to;
+}
 
 type Input = Partial<Omit<BookingDTO, "items" | "id" | "code" | "createdAt" | "nights">> & { items?: BookingItem[] };
 
@@ -311,7 +323,7 @@ const createBooking: (r: Ctx) => Promise<Response> = async ({ ctx, user, request
       ]);
       const created = await ctx.d.prepare("select id from bookings where code = ?").bind(code).first<{ id: number }>();
       await audit(ctx, user, "create", "bookings", created?.id, code);
-      return json({ ok: true, id: created?.id, code });
+      return json({ ok: true, id: created?.id, code, emailed: emailOnConfirm(ctx, user, created?.id, null, v) });
     } catch (e) {
       if (!String(e).includes("UNIQUE")) throw e;
     }
@@ -334,7 +346,17 @@ const updateBooking: (r: Ctx) => Promise<Response> = async ({ ctx, user, request
     ...(input.items ? itemStatements(ctx.d, "?", id, v.items) : []),
   ]);
   await audit(ctx, user, "update", "bookings", id, current.code);
-  return json({ ok: true });
+  return json({ ok: true, emailed: emailOnConfirm(ctx, user, id, current.status, v) });
+};
+
+// Gửi (lại) một email cho khách từ CMS, chờ kết quả để báo nhân viên
+const emailBooking: (r: Ctx) => Promise<Response> = async ({ ctx, user, request, path }) => {
+  const id = Number(path[1]);
+  const kind = str((await body<{ kind?: string }>(request))?.kind) as EmailKind;
+  if (!Object.hasOwn(EMAIL_KINDS, kind)) return fail(400, "Chọn loại email.");
+  const result = await sendBookingEmail(ctx.d, ctx.mail, id, kind, { userId: user.id });
+  if (!result.ok) return fail(400, result.error);
+  return json({ ok: true, emails: await bookingEmailLog(ctx.d, id) });
 };
 
 const deleteBooking: (r: Ctx) => Promise<Response> = async ({ ctx, user, path }) => {
@@ -344,6 +366,7 @@ const deleteBooking: (r: Ctx) => Promise<Response> = async ({ ctx, user, path })
   await ctx.d.batch([
     ...itemStatements(ctx.d, "?", id, []),
     ctx.d.prepare("delete from payload_locked_documents_rels where bookings_id = ?").bind(id),
+    ctx.d.prepare("delete from booking_emails where booking_id = ?").bind(id),
     ctx.d.prepare("delete from bookings where id = ?").bind(id),
   ]);
   await audit(ctx, user, "delete", "bookings", id, row.code);
@@ -375,5 +398,6 @@ export const bookingRoutes = [
   { method: "POST", match: (p: string[]) => p[0] === "bookings" && p.length === 1, handler: createBooking },
   { method: "GET", match: (p: string[]) => p[0] === "bookings" && p.length === 2, handler: getBooking },
   { method: "PATCH", match: (p: string[]) => p[0] === "bookings" && p.length === 2, handler: updateBooking },
+  { method: "POST", match: (p: string[]) => p[0] === "bookings" && p.length === 3 && p[2] === "email", handler: emailBooking },
   { method: "DELETE", match: (p: string[]) => p[0] === "bookings" && p.length === 2, roles: ["owner", "manager"] as const, handler: deleteBooking },
 ];

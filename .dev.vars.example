@@ -8,6 +8,12 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 CLOUDINARY_FOLDER=f21-hotel
+# Email gửi khách (xác nhận, nhắc lịch) qua Resend. Trên Cloudflare: `npx wrangler secret put RESEND_API_KEY`.
+# Để trống thì không gửi email. EMAIL_FROM phải dùng tên miền đã xác minh trong Resend (mặc định datphong@f21hotel.com.vn)
+RESEND_API_KEY=
+# EMAIL_FROM=F21 Hotel <datphong@f21hotel.com.vn>
+# Nút "Xuất bản website" trong CMS: Deploy Hook của Workers Builds (docs/xuat-ban.md). Để trống thì nút bị khoá
+DEPLOY_HOOK_URL=
 
 # Chỉ dùng khi tạo tài khoản Chủ bằng npm run create-admin(:remote); xoá ADMIN_PASSWORD sau khi tạo xong
 # ADMIN_EMAIL=

@@ -1,7 +1,7 @@
 -- Cấu trúc D1 của F21 Hotel (bảng do CMS Payload tạo trước đây, CMS mới dùng lại nguyên vẹn).
 -- Dùng khi dựng D1 mới (máy dev mới): npx wrangler d1 execute D1 --local --file db/schema.sql
 -- D1 thật trên Cloudflare đã có sẵn các bảng này; đổi cấu trúc thì thêm file db/migrations/NNNN_*.sql
--- (và sửa luôn file này để D1 mới dựng từ đầu có đủ cột). Đã gồm: 0001_conversion.
+-- (và sửa luôn file này để D1 mới dựng từ đầu có đủ cột). Đã gồm: 0001_conversion, 0002_legal, 0003_booking_emails, 0004_posts.
 PRAGMA foreign_keys = OFF;
 
 CREATE TABLE IF NOT EXISTS `audit_logs` (
@@ -59,6 +59,19 @@ CREATE TABLE IF NOT EXISTS `bookings_rels` (
 	`rooms_id` integer,
 	FOREIGN KEY (`parent_id`) REFERENCES `bookings`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`rooms_id`) REFERENCES `rooms`(`id`) ON UPDATE no action ON DELETE cascade
+);
+CREATE TABLE IF NOT EXISTS `booking_emails` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`booking_id` integer NOT NULL,
+	`kind` text NOT NULL,
+	`recipient` text NOT NULL,
+	`status` text NOT NULL,
+	`message_id` text,
+	`error` text,
+	`user_id` integer,
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	FOREIGN KEY (`booking_id`) REFERENCES `bookings`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE set null
 );
 CREATE TABLE IF NOT EXISTS `faqs` (
 	`id` integer PRIMARY KEY NOT NULL,
@@ -178,6 +191,38 @@ CREATE TABLE IF NOT EXISTS `payload_preferences_rels` (
 	FOREIGN KEY (`parent_id`) REFERENCES `payload_preferences`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`users_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
+CREATE TABLE IF NOT EXISTS `posts` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`title` text NOT NULL,
+	`slug` text NOT NULL,
+	`excerpt` text NOT NULL,
+	`body` text NOT NULL,
+	`topic` text,
+	`published` integer DEFAULT false,
+	`published_at` text,
+	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS `posts_slug_idx` ON `posts` (`slug`);
+CREATE TABLE IF NOT EXISTS `posts_faqs` (
+	`_order` integer NOT NULL,
+	`_parent_id` integer NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
+	`question` text NOT NULL,
+	`answer` text NOT NULL,
+	FOREIGN KEY (`_parent_id`) REFERENCES `posts`(`id`) ON UPDATE no action ON DELETE cascade
+);
+CREATE INDEX IF NOT EXISTS `posts_faqs_parent_id_idx` ON `posts_faqs` (`_parent_id`);
+CREATE TABLE IF NOT EXISTS `posts_rels` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`order` integer,
+	`parent_id` integer NOT NULL,
+	`path` text NOT NULL,
+	`media_id` integer,
+	FOREIGN KEY (`parent_id`) REFERENCES `posts`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`media_id`) REFERENCES `media`(`id`) ON UPDATE no action ON DELETE cascade
+);
+CREATE INDEX IF NOT EXISTS `posts_rels_parent_idx` ON `posts_rels` (`parent_id`);
 CREATE TABLE IF NOT EXISTS `rate_rules` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -349,6 +394,7 @@ CREATE INDEX IF NOT EXISTS `bookings_items_order_idx` ON `bookings_items` (`_ord
 CREATE INDEX IF NOT EXISTS `bookings_items_parent_id_idx` ON `bookings_items` (`_parent_id`);
 CREATE INDEX IF NOT EXISTS `bookings_items_room_type_idx` ON `bookings_items` (`room_type_id`);
 CREATE INDEX IF NOT EXISTS `bookings_phone_idx` ON `bookings` (`phone`);
+CREATE INDEX IF NOT EXISTS `booking_emails_booking_idx` ON `booking_emails` (`booking_id`);
 CREATE INDEX IF NOT EXISTS `bookings_rels_order_idx` ON `bookings_rels` (`order`);
 CREATE INDEX IF NOT EXISTS `bookings_rels_parent_idx` ON `bookings_rels` (`parent_id`);
 CREATE INDEX IF NOT EXISTS `bookings_rels_path_idx` ON `bookings_rels` (`path`);

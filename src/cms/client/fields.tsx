@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { renderMarkdown } from "@/lib/markdown";
 import type { Field } from "../schema";
 import { api } from "./api";
 import { MediaPicker, type MediaItem } from "./media";
@@ -84,9 +85,13 @@ function Rows({ f, value, onChange }: { f: Extract<Field, { type: "rows" }>; val
         render={(r, i, handle) => (
           <>
             {handle}
-            {f.columns.map((c) => (
-              <input key={c.column} className="c-input" placeholder={c.label} aria-label={`${c.label} ${i + 1}`} value={r[c.column] ?? ""} onChange={(e) => set(i, c.column, e.target.value)} />
-            ))}
+            {f.columns.map((c) =>
+              c.long ? (
+                <textarea key={c.column} className="c-textarea c-rows__long" rows={2} placeholder={c.label} aria-label={`${c.label} ${i + 1}`} value={r[c.column] ?? ""} onChange={(e) => set(i, c.column, e.target.value)} />
+              ) : (
+                <input key={c.column} className="c-input" placeholder={c.label} aria-label={`${c.label} ${i + 1}`} value={r[c.column] ?? ""} onChange={(e) => set(i, c.column, e.target.value)} />
+              ),
+            )}
             <button type="button" className="c-btn c-btn--small c-btn--ghost c-btn--danger" onClick={() => remove(i)} aria-label={`Xoá dòng ${i + 1}`}>
               ✕
             </button>
@@ -186,10 +191,39 @@ function MediaField({ value, onChange }: { value: number[]; onChange: (v: Value)
   );
 }
 
+// Nội dung Markdown: ô soạn và ô xem trước (cùng bộ chuyển với website, src/lib/markdown.ts)
+function MarkdownField({ id, value, onChange, required }: { id: string; value: string; onChange: (v: Value) => void; required?: boolean }) {
+  const [preview, setPreview] = useState(false);
+  const html = useMemo(() => (preview ? renderMarkdown(value).html : ""), [preview, value]);
+  return (
+    <div className="c-md">
+      <div className="c-row">
+        <button type="button" className={`c-btn c-btn--small${preview ? "" : " c-btn--primary"}`} onClick={() => setPreview(false)} aria-pressed={!preview}>
+          Soạn
+        </button>
+        <button type="button" className={`c-btn c-btn--small${preview ? " c-btn--primary" : ""}`} onClick={() => setPreview(true)} aria-pressed={preview}>
+          Xem trước
+        </button>
+        <span className="c-muted" style={{ fontSize: 13 }}>
+          {value.trim() ? `${value.trim().split(/\s+/).length} chữ` : ""}
+        </span>
+      </div>
+      {preview ? (
+        <div className="c-md__preview" dangerouslySetInnerHTML={{ __html: html || "<p>Chưa có nội dung.</p>" }} />
+      ) : (
+        <textarea id={id} className="c-textarea c-md__input" value={value} onChange={(e) => onChange(e.target.value)} required={required} spellCheck />
+      )}
+    </div>
+  );
+}
+
 export function FieldInput({ f, value, onChange }: { f: Exclude<Field, { type: "section" }>; value: Value; onChange: (v: Value) => void }) {
   const id = `f-${f.name}`;
   let input: React.ReactNode;
   switch (f.type) {
+    case "markdown":
+      input = <MarkdownField id={id} value={String(value ?? "")} onChange={onChange} required={f.required} />;
+      break;
     case "textarea":
       input = <textarea id={id} className="c-textarea" value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} required={f.required} />;
       break;
@@ -263,7 +297,7 @@ export function FieldInput({ f, value, onChange }: { f: Exclude<Field, { type: "
         <input id={id} className="c-input" type={f.type === "email" ? "email" : "text"} value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} required={f.required} />
       );
   }
-  const wide = f.type === "rows" || f.type === "refs" || f.type === "media" || f.type === "multi" || f.type === "textarea" || !f.half;
+  const wide = f.type === "rows" || f.type === "refs" || f.type === "media" || f.type === "multi" || f.type === "textarea" || f.type === "markdown" || !f.half;
   return (
     <div className={`c-field${wide ? " c-field--full" : ""}`}>
       <label htmlFor={id}>

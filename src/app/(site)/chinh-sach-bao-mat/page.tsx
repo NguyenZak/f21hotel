@@ -7,7 +7,7 @@ import { LEGAL_UPDATED, LegalOwner } from "@/components/Legal";
 
 // Chính sách bảo vệ dữ liệu cá nhân theo Luật 91/2025/QH15 và NĐ 356/2025/NĐ-CP (rà soát pháp lý 02/11/2026).
 // Bản nháp cần luật sư duyệt. Nội dung phải khớp thực tế: form đặt phòng (BookingEngine, BookingForm), nơi lưu dữ liệu
-// (Cloudflare D1), bên thứ ba (VietQR, Google Maps, Zalo). Đổi luồng dữ liệu thì sửa trang này và LEGAL_UPDATED.
+// (Cloudflare D1), bên thứ ba (VietQR, Google Maps, Zalo, Resend gửi email). Đổi luồng dữ liệu thì sửa trang này và LEGAL_UPDATED.
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -58,6 +58,10 @@ export default async function PrivacyPage() {
           <h2>3. Chúng tôi dùng dữ liệu để làm gì</h2>
           <ul>
             <li>Giữ phòng, gọi hoặc nhắn Zalo xác nhận và hướng dẫn đặt cọc.</li>
+            <li>
+              Nếu bạn điền email: gửi email báo đã nhận đặt phòng, email xác nhận và email nhắc một ngày trước ngày nhận phòng. Đây
+              là email về đặt phòng của bạn, không phải quảng cáo.
+            </li>
             <li>Phục vụ bạn trong thời gian lưu trú và giải quyết yêu cầu, khiếu nại của bạn.</li>
             <li>Thực hiện nghĩa vụ kế toán, thuế và các nghĩa vụ khác theo pháp luật.</li>
             <li>
@@ -84,6 +88,10 @@ export default async function PrivacyPage() {
             </li>
             <li>
               <b>Zalo</b>: khi bạn nhắn tin cho khách sạn qua Zalo.
+            </li>
+            <li>
+              <b>Resend</b> (Hoa Kỳ): gửi email về đặt phòng nếu bạn điền email. Resend nhận email, họ tên và
+              thông tin đặt phòng trong nội dung email. Máy chủ đặt ngoài Việt Nam.
             </li>
             <li>Cơ quan nhà nước có thẩm quyền, khi pháp luật yêu cầu.</li>
           </ul>

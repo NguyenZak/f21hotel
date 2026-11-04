@@ -85,6 +85,10 @@ npm run create-admin       # tạo tài khoản Chủ cho D1 ở máy (ADMIN_* t
 npm run dev                # mở http://localhost:3000/quan-tri
 ```
 
+### Bài viết (cẩm nang SEO/GEO)
+
+CMS › Bài viết: tiêu đề, tóm tắt, ảnh bìa, nội dung Markdown (có xem trước), hỏi đáp cuối bài. Website: `/bai-viet`, `/bai-viet/<mã>` (schema BlogPosting, FAQPage, breadcrumb), sitemap và `/llms.txt` tự thêm bài. Bài còn dấu `[CẦN XÁC NHẬN]` không bật “Đăng” được. Đường dẫn bài không có bị worker.ts trả 404 trước khi tới Next.js. Code: [src/lib/markdown.ts](src/lib/markdown.ts), [src/app/(site)/bai-viet](src/app/(site)/bai-viet). Bài lên website sau khi bấm **Xuất bản website**.
+
 ### Đặt phòng trực tuyến
 
 Trang `/dat-phong`: chọn ngày và số khách → xem phòng trống và giá từng hạng phòng → chọn số phòng → điền thông tin → trang xác nhận `/dat-phong/xac-nhan/<mã>` (không cho Google lập chỉ mục). Chưa thu tiền trên website: đặt phòng ở trạng thái **Chờ xác nhận** và giữ phòng ngay, lễ tân gọi xác nhận và thu cọc.
@@ -93,8 +97,9 @@ Trang `/dat-phong`: chọn ngày và số khách → xem phòng trống và giá
 - **Giá** = bảng giá của hạng phòng, cộng/trừ theo **Giá theo ngày** (Tết, cuối tuần, sự kiện…): phần trăm, ngừng bán online, số đêm tối thiểu. Nhiều quy tắc trùng đêm thì cộng dồn phần trăm.
 - **Cài đặt › Thông tin khách sạn › Đặt phòng online**: bật/tắt, % cọc, số phòng và số đêm tối đa, tài khoản nhận cọc (điền đủ thì trang xác nhận hiện mã QR VietQR có sẵn số tiền và mã đặt phòng).
 - Mỗi đặt phòng mới báo lễ tân qua `BOOKING_WEBHOOK_URL` ([hướng dẫn](docs/google-apps-script.md)).
+- Email cho khách có điền email: đã nhận đặt phòng (đặt online), đã xác nhận (đơn chuyển sang Đã xác nhận trong CMS, trừ đơn OTA), nhắc lịch một ngày trước ngày nhận phòng (cron 8:00 và 14:00). Gửi qua Resend, cài đặt theo [docs/email-khach.md](docs/email-khach.md). Code: [src/lib/booking-emails.ts](src/lib/booking-emails.ts).
 - Code: [src/lib/reservations.ts](src/lib/reservations.ts) (phòng trống, giá, tạo đơn), [src/lib/booking-api.ts](src/lib/booking-api.ts) (API), [src/components/BookingEngine.tsx](src/components/BookingEngine.tsx) (giao diện).
 
 ### Deploy
 
-Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), có `.env.local` (cần `CLOUDINARY_CLOUD_NAME` để dựng URL ảnh), rồi `npm run build:cf` và `npx opennextjs-cloudflare deploy`. `build:cf` dùng env `build` trong wrangler.jsonc: D1 đọc thẳng database thật, nên trang dựng sẵn khớp nội dung CMS (`next dev` vẫn dùng D1 giả lập ở máy). Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).
+Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), có `.env.local` (cần `CLOUDINARY_CLOUD_NAME` để dựng URL ảnh), rồi `npm run build:cf` và `npx opennextjs-cloudflare deploy`. `build:cf` dùng env `build` trong wrangler.jsonc: D1 đọc thẳng database thật, nên trang dựng sẵn khớp nội dung CMS (`next dev` vẫn dùng D1 giả lập ở máy). Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`, `RESEND_API_KEY`, `DEPLOY_HOOK_URL`. Khi đã cài Workers Builds ([docs/xuat-ban.md](docs/xuat-ban.md)), deploy bằng cách đưa commit vào nhánh `production` (sau khi chạy migration); nội dung CMS lên website bằng nút **Xuất bản website** trong CMS. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).

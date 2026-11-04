@@ -8,6 +8,7 @@ Căn cứ: Luật Bảo vệ dữ liệu cá nhân 91/2025/QH15, Nghị định 
 | Dữ liệu | Nơi lưu | Ai xem được |
 |---|---|---|
 | Đơn đặt phòng online (họ tên, SĐT, email, ngày ở, ghi chú, thời điểm đồng ý, có nhận ưu đãi không) | Cloudflare D1 `f21-hotel-cms`, vùng APAC | Tài khoản CMS được phân quyền |
+| Email gửi khách (đã nhận, xác nhận, nhắc lịch): địa chỉ email, họ tên, chi tiết đơn | Resend (Hoa Kỳ) gửi đi; lịch sử gửi lưu ở bảng `booking_emails` trong D1, xoá cùng đơn | Tài khoản CMS được phân quyền |
 | Yêu cầu đặt phòng / báo giá đoàn từ form | Không lưu trên website. Gửi tới lễ tân qua webhook (nếu bật `BOOKING_WEBHOOK_URL`) hoặc khách tự gửi qua Zalo | Lễ tân |
 | Tin nhắn Zalo, cuộc gọi | Zalo / điện thoại của khách sạn | Lễ tân |
 

@@ -165,6 +165,15 @@ export const STAY_LABELS: Record<string, string> = {
   hourly: "Nghỉ giờ",
 };
 
+// Email gửi khách (src/lib/booking-emails.ts): đã nhận (đặt online), đã xác nhận, nhắc trước ngày nhận phòng
+export type EmailKind = "received" | "confirmed" | "reminder";
+export const EMAIL_KINDS: Record<EmailKind, string> = {
+  received: "Đã nhận đặt phòng",
+  confirmed: "Đặt phòng đã xác nhận",
+  reminder: "Nhắc ngày nhận phòng",
+};
+export type BookingEmailLog = { kind: EmailKind; recipient: string; status: "sent" | "failed"; error: string; createdAt: string; userName: string };
+
 export const statusLabel = (s: string) => BOOKING_STATUSES.find((x) => x.value === s)?.label ?? s;
 
 const vnd = (n: number) => n.toLocaleString("vi-VN") + "đ";

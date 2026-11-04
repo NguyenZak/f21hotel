@@ -30,6 +30,7 @@ function Cell({ def, col, row, refs }: { def: CollectionDef; col: string; row: R
   if (f.type === "ref") return <>{refs[Number(v)] ?? "—"}</>;
   if (f.type === "number" && f.name === "adjust") return <>{v === null ? "—" : `${Number(v) > 0 ? "+" : ""}${v}%`}</>;
   if (f.type === "date") return <>{v ? String(v).split("-").reverse().join("/") : "—"}</>;
+  if (f.type === "select") return <>{f.options.find((o) => o.value === v)?.label ?? String(v ?? "")}</>;
   return <>{String(v ?? "")}</>;
 }
 
@@ -172,7 +173,7 @@ export function CollectionEditPage({ path }: { path: string }) {
       const r = await api<{ id: number }>(def.global || !id ? `c/${def.slug}` : `c/${def.slug}/${id}`, { method: def.global || id ? "PATCH" : "POST", body: doc });
       setDirty(false);
       if (!def.global && !id) router.replace(`/quan-tri/${def.path}/sua?id=${r.id}`);
-      say("Đã lưu. Website hiện thay đổi sau lần cập nhật website tiếp theo.");
+      say("Đã lưu. Vào “Xuất bản website” để đưa thay đổi lên website.");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Không lưu được.");
       window.scrollTo({ top: 0, behavior: "smooth" });

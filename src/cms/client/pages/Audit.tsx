@@ -21,6 +21,8 @@ const TARGETS: Record<string, string> = {
   media: "Ảnh",
   "site-settings": "Thông tin khách sạn",
   "theme-settings": "Giao diện",
+  posts: "Bài viết",
+  publish: "Bản xuất bản website",
 };
 
 export function AuditPage() {

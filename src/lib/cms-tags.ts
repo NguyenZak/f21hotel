@@ -8,4 +8,5 @@ export const CMS_TAGS = {
   faqs: "cms:faqs",
   reviews: "cms:reviews",
   pages: "cms:pages",
+  posts: "cms:posts",
 } as const;

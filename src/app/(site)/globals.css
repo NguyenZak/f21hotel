@@ -1011,6 +1011,55 @@ html[data-lightbox-open] { overflow: hidden; }
 .legal-owner div { display: grid; grid-template-columns: 200px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
 .legal-owner dt { color: var(--muted); }
 .legal-owner dd { margin: 0; color: var(--ink); }
+
+/* Cẩm nang (/bai-viet): danh sách thẻ bài và trang bài viết (nội dung Markdown, src/lib/markdown.ts) */
+.post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: clamp(20px, 3vw, 32px); }
+.post-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease); }
+.post-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.post-card__link { display: grid; gap: 10px; padding-bottom: 22px; color: inherit; text-decoration: none; height: 100%; align-content: start; }
+.post-card__link > :not(img, .post-card__blank) { padding-inline: 22px; }
+.post-card img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.post-card__blank { display: block; aspect-ratio: 16 / 9; background: var(--gold-grad); opacity: 0.35; }
+.post-card__meta { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-text); }
+.post-card__link > .post-card__meta:first-child { padding-top: 22px; }
+.post-card h2, .post-card h3 { font-size: clamp(21px, 2vw, 25px); line-height: 1.3; color: var(--maroon); margin: 0; }
+.post-card p { color: var(--muted); line-height: 1.6; margin: 0; }
+.post-empty { color: var(--muted); font-size: 18px; }
+.post-related__title { margin-bottom: 28px; }
+
+.post-layout { display: grid; grid-template-columns: minmax(0, 760px) minmax(200px, 280px); grid-template-areas: "post toc"; gap: clamp(32px, 5vw, 72px); align-items: start; }
+.post { grid-area: post; display: grid; gap: 22px; min-width: 0; }
+.post-toc { grid-area: toc; position: sticky; top: calc(var(--header-h) + 24px); display: grid; gap: 10px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--cream); font-size: 15px; }
+.post-toc ol { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.post-toc a { color: var(--ink); text-decoration: none; }
+.post-toc a:hover { color: var(--maroon); text-decoration: underline; }
+.post-meta { margin: 0; color: var(--muted); font-size: 15px; }
+.post-cover { margin: 0; }
+.post-cover img { width: 100%; height: auto; border-radius: var(--radius); }
+.post-body { display: grid; gap: 16px; font-size: 18px; line-height: 1.75; color: var(--ink); }
+.post-body > * { margin: 0; }
+.post-body h2 { font-size: clamp(25px, 2.8vw, 32px); margin-top: 18px; scroll-margin-top: calc(var(--header-h) + 20px); }
+.post-body h3 { font-size: clamp(20px, 2.2vw, 24px); color: var(--maroon-ink); margin-top: 8px; scroll-margin-top: calc(var(--header-h) + 20px); }
+.post-body ul, .post-body ol { padding-left: 1.3em; display: grid; gap: 8px; }
+.post-body a, .post-contact a { color: var(--maroon); text-decoration: underline; text-underline-offset: 3px; }
+.post-body blockquote { padding: 14px 20px; border-left: 3px solid var(--gold); background: var(--cream); border-radius: 0 var(--radius) var(--radius) 0; }
+.post-body blockquote p { margin: 0; }
+.post-body hr { border: 0; border-top: 1px solid var(--line); }
+.post-table { overflow-x: auto; }
+.post-table table { width: 100%; border-collapse: collapse; font-size: 16px; line-height: 1.5; }
+.post-table th, .post-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.post-table th { background: var(--cream); color: var(--maroon-ink); }
+.post-faq { display: grid; gap: 10px; margin-top: 12px; }
+.post-faq h2 { font-size: clamp(25px, 2.8vw, 32px); margin-bottom: 6px; }
+.post-faq details { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.post-faq summary { cursor: pointer; padding: 14px 18px; font-weight: 600; font-size: 17px; }
+.post-faq details p { margin: 0; padding: 0 18px 16px; color: var(--ink); line-height: 1.7; }
+.post-contact { padding: 18px 20px; border-radius: var(--radius); background: var(--gold-pale); line-height: 1.7; }
+@media (max-width: 900px) {
+  .post-layout { grid-template-columns: 1fr; grid-template-areas: "toc" "post"; }
+  .post-toc { position: static; }
+  .post-body { font-size: 17px; }
+}
 @media (max-width: 560px) { .legal-owner div { grid-template-columns: 1fr; gap: 2px; } }
 .legal-basis { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted) !important; font-style: italic; }
 

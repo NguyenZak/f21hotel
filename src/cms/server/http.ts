@@ -1,4 +1,5 @@
 // Phần dùng chung của API CMS: kiểu dữ liệu, trả JSON, phân quyền, nhật ký thao tác.
+import type { MailConfig } from "@/lib/mailer";
 import { str } from "@/lib/sql";
 
 export const ROLES = ["owner", "manager", "staff"] as const;
@@ -15,6 +16,12 @@ export type CmsContext = {
   waitUntil: (p: Promise<unknown>) => void;
   // Thư viện ảnh (Cloudinary); không có thì không tải ảnh lên được
   cloudinary?: { cloudName: string; apiKey: string; apiSecret: string; folder: string };
+  // Gửi email cho khách (src/lib/mailer.ts); không có thì CMS không gửi email
+  mail?: MailConfig;
+  // Deploy Hook của Workers Builds (secret DEPLOY_HOOK_URL): nút "Xuất bản website" (src/cms/server/publish.ts)
+  deployHook?: string;
+  // Bản worker đang chạy (binding version_metadata); không có khi chạy next dev
+  version?: { id: string; tag: string; timestamp: string };
 };
 
 // ---------- Tiện ích ----------

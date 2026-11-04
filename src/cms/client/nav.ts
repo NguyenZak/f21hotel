@@ -30,7 +30,9 @@ export const NAV: NavGroup[] = [
     title: "Website",
     roles: MANAGE,
     items: [
+      { href: "/quan-tri/xuat-ban", label: "Xuất bản website", icon: "publish", keywords: ["deploy", "đăng", "cập nhật website", "build"] },
       { href: "/quan-tri/trang", label: "Trang", icon: "pages", keywords: ["trình dựng", "trang chủ"] },
+      { href: "/quan-tri/bai-viet", label: "Bài viết", icon: "posts", keywords: ["blog", "cẩm nang", "seo", "tin tức"] },
       { href: "/quan-tri/uu-dai", label: "Ưu đãi", icon: "offers", keywords: ["khuyến mãi", "mã"] },
       { href: "/quan-tri/thu-vien-anh", label: "Thư viện ảnh", icon: "media", keywords: ["ảnh", "hình"] },
       { href: "/quan-tri/danh-gia", label: "Đánh giá của khách", icon: "reviews", keywords: ["review"] },

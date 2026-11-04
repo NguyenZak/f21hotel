@@ -1,10 +1,10 @@
-import { getOffers, getPriceNotes, getRooms, getSite } from "@/lib/cms";
+import { getOffers, getPosts, getPriceNotes, getRooms, getSite } from "@/lib/cms";
 import { distances, formatVnd, nav, nearby } from "@/lib/site";
 
 // /llms.txt: tóm tắt khách sạn bằng văn bản thuần cho ChatGPT, Perplexity và các trợ lý AI.
 // Lấy cùng dữ liệu với website nên tự cập nhật khi sửa trong CMS.
 export async function GET() {
-  const [site, rooms, offers, notes] = await Promise.all([getSite(), getRooms(), getOffers(), getPriceNotes()]);
+  const [site, rooms, offers, notes, posts] = await Promise.all([getSite(), getRooms(), getOffers(), getPriceNotes(), getPosts()]);
   const abs = (path: string) => new URL(path, site.url).toString();
   const lines = [
     `# ${site.name}`,
@@ -40,7 +40,10 @@ export async function GET() {
     "",
     `- [Trang chủ](${abs("/")})`,
     ...nav.map((n) => `- [${n.label}](${abs(n.href)})`),
+    `- [Cẩm nang](${abs("/bai-viet")})`,
     "",
+    // Bài cẩm nang (CMS › Bài viết): AI đọc tóm tắt rồi mở bài khi cần chi tiết
+    ...(posts.length ? ["## Cẩm nang", "", ...posts.map((p) => `- [${p.title}](${abs(`/bai-viet/${p.slug}`)}): ${p.excerpt}`), ""] : []),
   ];
   return new Response(lines.join("\n"), { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }

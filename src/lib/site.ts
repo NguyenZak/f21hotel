@@ -89,6 +89,15 @@ export type StayModeKey = (typeof stayModes)[number]["key"];
 // w, h: kích thước thật của file ảnh, để hiển thị đúng tỉ lệ
 export type Photo = { src: string; alt: string; w: number; h: number };
 
+// Chủ đề của Bài viết (CMS › Bài viết, trang /bai-viet)
+export const POST_TOPICS = [
+  { value: "su-kien", label: "Sự kiện Mỹ Đình" },
+  { value: "diem-den", label: "Điểm đến quanh F21" },
+  { value: "huong-dan", label: "Hướng dẫn lưu trú" },
+  { value: "doan", label: "Khách đoàn, công tác" },
+];
+export const postTopicLabel = (v: string) => POST_TOPICS.find((t) => t.value === v)?.label ?? "";
+
 export type Room = {
   slug: string;
   name: string;
