@@ -126,7 +126,9 @@ export type Place = {
   body: string;
   href: string;
   embed: string;
+  // Ảnh đầu tiên (ô trong lưới ảnh, ảnh chia sẻ) và cả album cho trang chi tiết
   photo: Photo | null;
+  photos: Photo[];
   // Ảnh giấy phép mở: "tác giả, giấy phép" và link trang gốc; ảnh tự chụp thì trống
   credit: string;
   creditUrl: string;

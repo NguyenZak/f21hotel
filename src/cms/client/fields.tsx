@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { renderMarkdown } from "@/lib/markdown";
+import { useEffect, useState, type ReactNode } from "react";
+import { markdownText } from "@/lib/markdown";
 import type { Field } from "../schema";
 import { api } from "./api";
 import { MediaPicker, type MediaItem } from "./media";
@@ -11,6 +11,8 @@ import type { SortableProps } from "./Sortable";
 // Kéo thả sắp xếp (dnd-kit): tải riêng trong trình duyệt. Viết import() ngay trong dynamic() để Next.js nhận ra
 // ssr: false và không đưa dnd-kit vào gói chạy trên server (gói worker giới hạn 3 MB)
 const Sortable = dynamic(() => import("./Sortable"), { ssr: false }) as <T>(p: SortableProps<T>) => ReactNode;
+// Trình soạn thảo (TipTap) cũng tải riêng trong trình duyệt, cùng lý do
+const RichText = dynamic(() => import("./RichText"), { ssr: false, loading: () => <div className="c-rte c-rte--loading">Đang mở trình soạn thảo…</div> });
 
 let keySeq = 0;
 const newKey = () => `k${++keySeq}`;
@@ -191,27 +193,27 @@ function MediaField({ value, onChange }: { value: number[]; onChange: (v: Value)
   );
 }
 
-// Nội dung Markdown: ô soạn và ô xem trước (cùng bộ chuyển với website, src/lib/markdown.ts)
+// Nội dung bài: trình soạn thảo trực quan (RichText.tsx), hoặc sửa thẳng mã Markdown. Cả hai cùng lưu một chuỗi Markdown,
+// website dựng bằng src/lib/markdown.ts
 function MarkdownField({ id, value, onChange, required }: { id: string; value: string; onChange: (v: Value) => void; required?: boolean }) {
-  const [preview, setPreview] = useState(false);
-  const html = useMemo(() => (preview ? renderMarkdown(value).html : ""), [preview, value]);
+  const [source, setSource] = useState(false);
   return (
     <div className="c-md">
       <div className="c-row">
-        <button type="button" className={`c-btn c-btn--small${preview ? "" : " c-btn--primary"}`} onClick={() => setPreview(false)} aria-pressed={!preview}>
-          Soạn
+        <button type="button" className={`c-btn c-btn--small${source ? "" : " c-btn--primary"}`} onClick={() => setSource(false)} aria-pressed={!source}>
+          Soạn thảo
         </button>
-        <button type="button" className={`c-btn c-btn--small${preview ? " c-btn--primary" : ""}`} onClick={() => setPreview(true)} aria-pressed={preview}>
-          Xem trước
+        <button type="button" className={`c-btn c-btn--small${source ? " c-btn--primary" : ""}`} onClick={() => setSource(true)} aria-pressed={source}>
+          Mã Markdown
         </button>
         <span className="c-muted" style={{ fontSize: 13 }}>
-          {value.trim() ? `${value.trim().split(/\s+/).length} chữ` : ""}
+          {value.trim() ? `${markdownText(value).split(/\s+/).length} chữ` : ""}
         </span>
       </div>
-      {preview ? (
-        <div className="c-md__preview" dangerouslySetInnerHTML={{ __html: html || "<p>Chưa có nội dung.</p>" }} />
-      ) : (
+      {source ? (
         <textarea id={id} className="c-textarea c-md__input" value={value} onChange={(e) => onChange(e.target.value)} required={required} spellCheck />
+      ) : (
+        <RichText id={id} value={value} onChange={onChange} />
       )}
     </div>
   );

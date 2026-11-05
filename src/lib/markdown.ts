@@ -1,9 +1,12 @@
 // Markdown rút gọn cho nội dung Bài viết (CMS › Bài viết): đủ cho bài cẩm nang, không cần thư viện.
 // Hỗ trợ: ## / ### tiêu đề, đoạn văn, - danh sách, 1. danh sách số, > trích dẫn, bảng | a | b |, ---,
-// **đậm**, *nghiêng*, [chữ](đường dẫn). Mọi chữ đều được escape, chỉ sinh ra các thẻ cố định ở đây nên
+// ![mô tả](ảnh) trên một dòng riêng, **đậm**, *nghiêng*, ~~gạch~~, [chữ](đường dẫn). CMS soạn bằng trình soạn thảo trực quan
+// (src/cms/client/RichText.tsx) rồi lưu lại thành đúng cú pháp này. Mọi chữ đều được escape, chỉ sinh ra các thẻ cố định ở đây nên
 // HTML lưu trong CMS không chèn được script. Không dùng DOM: chạy được trên server, lúc build và trong ô xem trước của CMS.
 
 const SAFE_HREF = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i;
+const SAFE_SRC = /^(https:\/\/|\/(?!\/))/i;
+const IMAGE_LINE = /^!\[([^\]]*)\]\(([^)\s]+)\)$/;
 
 // Đánh dấu chỗ người viết chưa chắc thông tin; CMS không cho đăng bài còn đánh dấu này
 export const UNVERIFIED_MARK = /\[CẦN XÁC NHẬN[^\]]*\]/i;
@@ -31,6 +34,7 @@ function inline(raw: string) {
   });
   s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   s = s.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+  s = s.replace(/~~([^~]+)~~/g, "<s>$1</s>");
   return s;
 }
 
@@ -65,6 +69,13 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
       used.add(id);
       headings.push({ id, text, level });
       out.push(`<h${level} id="${id}">${inline(text)}</h${level}>`);
+      i++;
+      continue;
+    }
+    const img = IMAGE_LINE.exec(t);
+    if (img) {
+      const src = img[2].replace(/&amp;/g, "&");
+      if (SAFE_SRC.test(src)) out.push(`<figure class="post-figure"><img src="${escape(src)}" alt="${escape(img[1])}" loading="lazy" decoding="async"></figure>`);
       i++;
       continue;
     }
@@ -110,7 +121,7 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
     const para: string[] = [];
     while (i < lines.length) {
       const x = lines[i].trim();
-      if (!x || /^(#{2,3}\s|>|\||([-*]|\d+[.)])\s|-{3,}$)/.test(x)) break;
+      if (!x || /^(#{2,3}\s|>|\||([-*]|\d+[.)])\s|-{3,}$)/.test(x) || IMAGE_LINE.test(x)) break;
       para.push(x);
       i++;
     }
@@ -122,8 +133,9 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
 // Chữ thuần (bỏ ký hiệu Markdown) để đếm chữ, làm mô tả, llms.txt
 export const markdownText = (md: string) =>
   md
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-    .replace(/[#>*|`]/g, " ")
+    .replace(/[#>*|`~]/g, " ")
     .replace(/^-{3,}$/gm, " ")
     .replace(/\s+/g, " ")
     .trim();

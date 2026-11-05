@@ -257,7 +257,7 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "text", name: "mapQuery", column: "map_query", label: "Tìm trên Google Maps", help: "Từ khoá tìm (ví dụ: Thiên đường Bảo Sơn, An Khánh) hoặc dán link Google Maps của địa điểm. Để trống thì tìm theo tên." },
       { type: "number", name: "lat", column: "lat", label: "Vĩ độ", half: true, help: "Không bắt buộc. Để bản đồ ở trang chi tiết ghim đúng chỗ, ví dụ 21.0003" },
       { type: "number", name: "lng", column: "lng", label: "Kinh độ", half: true, help: "Ví dụ 105.7285. Lấy trên Google Maps: bấm giữ vào điểm, chép hai số đầu." },
-      { type: "media", name: "photo", relTable: "places_rels", path: "photo", relColumn: "media_id", label: "Ảnh", help: "Một ảnh tự chụp hoặc được phép dùng. Chưa có ảnh thì website hiện ô chữ." },
+      { type: "media", name: "photo", relTable: "places_rels", path: "photo", relColumn: "media_id", label: "Ảnh", help: "Một hoặc nhiều ảnh tự chụp hoặc được phép dùng, kéo để đổi thứ tự. Ảnh đầu tiên hiện ở lưới ảnh; trang chi tiết hiện cả album. Chưa có ảnh thì website hiện ô chữ." },
       { type: "text", name: "photoCredit", column: "photo_credit", label: "Ghi công ảnh", half: true, help: "Bắt buộc với ảnh lấy từ Wikimedia, Flickr…: tác giả và giấy phép, ví dụ kitmasterbloke, CC BY 2.0. Ảnh tự chụp thì để trống." },
       { type: "text", name: "photoSource", column: "photo_source", label: "Link trang gốc của ảnh", half: true, help: "Trang Wikimedia/Flickr của ảnh. Website gắn link vào dòng ghi công." },
       {
@@ -265,7 +265,7 @@ export const COLLECTIONS: CollectionDef[] = [
         name: "body",
         column: "body",
         label: "Giới thiệu chi tiết",
-        help: "Không bắt buộc. Có gì, giá tầm bao nhiêu, giờ mở cửa, đi từ F21 thế nào. Trang có giới thiệu (từ 300 ký tự) mới được Google lập chỉ mục.",
+        help: "Không bắt buộc. Có gì, giá tầm bao nhiêu, giờ mở cửa, đi từ F21 thế nào. Chèn được ảnh, bảng, liên kết bằng thanh công cụ. Trang có giới thiệu (từ 300 ký tự) mới được Google lập chỉ mục.",
       },
       { type: "bool", name: "published", column: "published", label: "Hiện trên website", default: true },
     ],

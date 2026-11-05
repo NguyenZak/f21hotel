@@ -296,8 +296,11 @@ export async function readPlaces(d: D1Database): Promise<Place[]> {
     ),
   );
   return places.map((p) => {
-    const m = photos.find((x) => x.parent_id === p.id);
-    const src = m ? mediaUrl(m) : "";
+    const album = photos
+      .filter((x) => x.parent_id === p.id)
+      .map((m) => ({ src: mediaUrl(m), alt: str(m.alt) || str(p.name), w: num(m.width, 1600), h: num(m.height, 1067) }))
+      .filter((x) => x.src);
+    const has = album.length > 0;
     const query = str(p.map_query).trim() || str(p.name);
     const link = /^https?:\/\//.test(query);
     const lat = num(p.lat);
@@ -313,9 +316,10 @@ export async function readPlaces(d: D1Database): Promise<Place[]> {
       href: link ? query : mapsUrl(query),
       // Bản đồ nhúng không đọc được link rút gọn của Google Maps: dùng toạ độ, không có thì tên kèm địa chỉ
       embed: lat && lng ? `${lat},${lng}` : link ? [str(p.name), str(p.address)].filter(Boolean).join(", ") : query,
-      photo: m && src ? { src, alt: str(m.alt) || str(p.name), w: num(m.width, 1600), h: num(m.height, 1067) } : null,
-      credit: m && src ? str(p.photo_credit).trim() : "",
-      creditUrl: m && src ? str(p.photo_source).trim() : "",
+      photo: album[0] ?? null,
+      photos: album,
+      credit: has ? str(p.photo_credit).trim() : "",
+      creditUrl: has ? str(p.photo_source).trim() : "",
     };
   });
 }

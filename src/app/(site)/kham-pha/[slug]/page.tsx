@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaBand } from "@/components/CtaBand";
+import { Gallery } from "@/components/Gallery";
 import { IconClock, IconPin } from "@/components/Icons";
 import { PhotoCredit, PlaceMosaic } from "@/components/PlaceMosaic";
 import { PageHero } from "@/components/ui";
@@ -60,9 +60,15 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
       <section className="section tight">
         <div className="wrap place-detail">
           <div className="place-detail__main">
-            {place.photo ? (
+            {place.photos.length ? (
               <figure className="place-detail__photo">
-                <Image src={place.photo.src} alt={place.photo.alt} width={place.photo.w} height={place.photo.h} sizes="(max-width: 900px) 100vw, 55vw" priority />
+                {/* Album: ảnh đầu lớn, các ảnh sau xếp lưới; bấm ảnh nào cũng mở xem toàn màn hình và lướt cả album */}
+                <Gallery
+                  photos={place.photos}
+                  className={`place-gallery place-gallery--${Math.min(place.photos.length, 4)}`}
+                  leadSizes="(max-width: 900px) 100vw, 55vw"
+                  sizes="(max-width: 900px) 33vw, 18vw"
+                />
                 {place.credit ? (
                   <figcaption>
                     Ảnh: <PhotoCredit place={place} />
