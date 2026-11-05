@@ -17,7 +17,8 @@ export async function Footer() {
       <div className="wrap">
         <div className="footer-grid">
           <div className="footer-brand">
-            <Image src="/img/logo-dung-trang.png" alt={site.name} width={507} height={367} />
+            {/* Bản logo vàng toàn phần của cẩm nang thương hiệu: chữ đỏ mận của logo gốc chìm trên nền đỏ */}
+            <Image className="footer-logo" src="/img/logo-dung-vang.png" alt={site.name} width={507} height={364} />
             <p>{site.tagline}. Nghỉ yên tĩnh trong khu biệt thự Hoa Phượng, phía Tây Hà Nội.</p>
           </div>
 

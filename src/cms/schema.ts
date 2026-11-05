@@ -248,7 +248,7 @@ export const COLLECTIONS: CollectionDef[] = [
       "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Xung quanh F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi; đổi xong bấm Xuất bản website.",
     fields: [
       { type: "text", name: "name", column: "name", label: "Tên địa điểm", required: true, half: true, help: "Ví dụ: Thiên đường Bảo Sơn" },
-      { type: "text", name: "slug", column: "slug", label: "Mã (dùng trong đường dẫn)", required: true, half: true, help: `${slugHelp}-thien-duong-bao-son. Trang chi tiết: /xung-quanh/<mã>.` },
+      { type: "text", name: "slug", column: "slug", label: "Mã (dùng trong đường dẫn)", required: true, half: true, help: `${slugHelp}-thien-duong-bao-son. Trang chi tiết: /kham-pha/<mã>.` },
       { type: "select", name: "category", column: "category", label: "Nhóm", options: PLACE_CATEGORIES, required: true, half: true },
       { type: "text", name: "time", column: "time", label: "Đi từ F21 mất bao lâu", half: true, help: "Ví dụ: ~5 phút. Để trống thì ẩn." },
       { type: "number", name: "order", column: "order", label: "Thứ tự trong nhóm", half: true, help: "Số nhỏ đứng trước. Địa điểm đầu tiên có ảnh được hiện ô lớn." },

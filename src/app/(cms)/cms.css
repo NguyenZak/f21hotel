@@ -4,19 +4,22 @@
   --c-maroon-deep: #6e1316;
   --c-maroon-soft: #f6e9e7;
   --c-gold: #c9a23f;
-  --c-gold-ink: #8a6a17;
+  --c-gold-ink: #000;
   --c-cream: #faf6ef;
   --c-bg: #f6f3ee;
   --c-card: #ffffff;
   --c-line: #e7e0d5;
   --c-line-strong: #d6cdbf;
-  --c-text: #2a2622;
-  --c-muted: #786f64;
+  --c-text: #000;
+  --c-muted: #000;
   --c-ok: #1f7a43;
+  --c-ok-ink: #000;
   --c-ok-soft: #e3f3e8;
   --c-warn: #8a5a00;
+  --c-warn-ink: #000;
   --c-warn-soft: #fdf0d5;
   --c-info: #234a8f;
+  --c-info-ink: #000;
   --c-info-soft: #e3ecfb;
   --c-danger: #b42318;
   --c-danger-soft: #fdecea;
@@ -27,7 +30,7 @@
   --font: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --nav-w: 248px;
   --c-neutral: #efeae2;
-  --c-neutral-ink: #5b544b;
+  --c-neutral-ink: #000;
   --c-raised: #fdfcfa;
   --c-inverse: #2a2622;
   --c-inverse-ink: #fff;
@@ -51,10 +54,13 @@
   --c-text: #ece6de;
   --c-muted: #a69c90;
   --c-ok: #74d39b;
+  --c-ok-ink: var(--c-ok);
   --c-ok-soft: #17321f;
   --c-warn: #e8b85a;
+  --c-warn-ink: var(--c-warn);
   --c-warn-soft: #3a2c12;
   --c-info: #93b6f2;
+  --c-info-ink: var(--c-info);
   --c-info-soft: #1b2a45;
   --c-danger: #f28b82;
   --c-danger-soft: #3d1c19;
@@ -167,14 +173,14 @@ body.cms {
 
 .c-alert { padding: 10px 12px; border-radius: var(--r-s); font-size: 14px; }
 .c-alert--error { background: var(--c-danger-soft); color: var(--c-danger); }
-.c-alert--ok { background: var(--c-ok-soft); color: var(--c-ok); }
-.c-alert--info { background: var(--c-info-soft); color: var(--c-info); }
+.c-alert--ok { background: var(--c-ok-soft); color: var(--c-ok-ink); }
+.c-alert--info { background: var(--c-info-soft); color: var(--c-info-ink); }
 
 .c-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--c-neutral); color: var(--c-neutral-ink); }
 .c-badge--owner { background: var(--c-maroon-soft); color: var(--c-maroon); }
-.c-badge--manager { background: var(--c-info-soft); color: var(--c-info); }
-.c-badge--ok { background: var(--c-ok-soft); color: var(--c-ok); }
-.c-badge--warn { background: var(--c-warn-soft); color: var(--c-warn); }
+.c-badge--manager { background: var(--c-info-soft); color: var(--c-info-ink); }
+.c-badge--ok { background: var(--c-ok-soft); color: var(--c-ok-ink); }
+.c-badge--warn { background: var(--c-warn-soft); color: var(--c-warn-ink); }
 .c-badge--off { background: var(--c-neutral); color: var(--c-muted); }
 
 .c-table-wrap { overflow-x: auto; }
@@ -232,9 +238,9 @@ body.cms {
 .c-line__main span { font-size: 13px; color: var(--c-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .c-status { display: inline-flex; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--c-neutral); color: var(--c-neutral-ink); }
-.c-status--pending { background: var(--c-warn-soft); color: var(--c-warn); }
-.c-status--confirmed { background: var(--c-ok-soft); color: var(--c-ok); }
-.c-status--checked_in { background: var(--c-info-soft); color: var(--c-info); }
+.c-status--pending { background: var(--c-warn-soft); color: var(--c-warn-ink); }
+.c-status--confirmed { background: var(--c-ok-soft); color: var(--c-ok-ink); }
+.c-status--checked_in { background: var(--c-info-soft); color: var(--c-info-ink); }
 .c-status--checked_out, .c-status--cancelled, .c-status--no_show { background: var(--c-neutral); color: var(--c-muted); }
 
 
@@ -250,7 +256,7 @@ body.cms {
 .c-table td a { text-decoration: none; }
 
 .c-actionbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--c-line); border-radius: var(--r-l); background: var(--c-cream); }
-.c-hint { font-size: 13px; color: var(--c-warn); }
+.c-hint { font-size: 13px; color: var(--c-warn-ink); }
 .c-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .c-form-grid__wide { grid-column: 1 / -1; }
 .c-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
@@ -294,8 +300,8 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-cal__bar { grid-row: 1; z-index: 1; align-self: center; margin: 0 3px; padding: 5px 8px; border-radius: var(--r-s); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; box-shadow: inset 3px 0 0 currentColor; }
 .c-cal__bar em { font-style: normal; font-size: 11px; margin-right: 4px; opacity: 0.8; }
 .c-cal__bar.c-status--checked_out { opacity: 0.6; }
-.c-cal__row--unassigned .c-cal__label { color: var(--c-warn); font-weight: 600; }
-.c-cal__count { min-width: 26px; padding: 2px 6px; border-radius: 999px; background: var(--c-warn-soft); color: var(--c-warn); font-size: 13px; font-weight: 700; text-align: center; }
+.c-cal__row--unassigned .c-cal__label { color: var(--c-warn-ink); font-weight: 600; }
+.c-cal__count { min-width: 26px; padding: 2px 6px; border-radius: 999px; background: var(--c-warn-soft); color: var(--c-warn-ink); font-size: 13px; font-weight: 700; text-align: center; }
 
 @media (max-width: 900px) {
   .c-form-grid { grid-template-columns: 1fr; }
@@ -645,7 +651,7 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 
 .c-roomtags { display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .c-roomtag { white-space: nowrap; min-width: 38px; padding: 2px 6px; border-radius: var(--r-s); border: 1px solid var(--c-line-strong); background: var(--c-raised); font-weight: 700; font-size: 13px; text-align: center; font-variant-numeric: tabular-nums; }
-.c-roomtag--missing { border-style: dashed; border-color: var(--st-pending); background: var(--c-warn-soft); color: var(--c-warn); font-weight: 600; }
+.c-roomtag--missing { border-style: dashed; border-color: var(--st-pending); background: var(--c-warn-soft); color: var(--c-warn-ink); font-weight: 600; }
 
 .c-pay { display: inline-grid; gap: 4px; min-width: 104px; }
 .c-pay b { font-variant-numeric: tabular-nums; }
@@ -653,7 +659,7 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-pay__track span { display: block; height: 100%; border-radius: inherit; background: var(--st-pending); }
 .c-pay--full .c-pay__track span { background: var(--c-ok); }
 .c-pay small { font-size: 12px; color: var(--c-muted); }
-.c-pay--full small { color: var(--c-ok); font-weight: 600; }
+.c-pay--full small { color: var(--c-ok-ink); font-weight: 600; }
 .c-card > .c-pay { width: 100%; max-width: 360px; }
 
 /* Các bước của đơn: Chờ xác nhận → Đã xác nhận → Đã nhận phòng → Đã trả phòng */
@@ -673,7 +679,7 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 
 /* Lịch phòng: thanh màu đặc theo trạng thái; chờ xác nhận viền đứt để biết chưa chắc */
 .c-cal .c-cal__bar { box-shadow: none; color: var(--c-card); }
-.c-cal .c-cal__bar--pending { background: var(--c-warn-soft); color: var(--c-warn); border: 1.5px dashed var(--st-pending); }
+.c-cal .c-cal__bar--pending { background: var(--c-warn-soft); color: var(--c-warn-ink); border: 1.5px dashed var(--st-pending); }
 .c-cal .c-cal__bar--confirmed { background: var(--st-confirmed); }
 .c-cal .c-cal__bar--checked_in { background: var(--st-checked_in); }
 .c-cal .c-cal__bar--checked_out { background: var(--c-neutral); color: var(--c-muted); }
@@ -689,8 +695,8 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-cal__row--free { min-height: 38px; background: var(--c-raised); }
 .c-cal__row--free .c-cal__label { font-weight: 600; white-space: nowrap; }
 .c-cal__free { grid-row: 1; display: grid; place-items: center; border-left: 1px solid var(--c-line); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.c-cal__free--ok { color: var(--c-ok); }
-.c-cal__free--low { background: var(--c-warn-soft); color: var(--c-warn); }
+.c-cal__free--ok { color: var(--c-ok-ink); }
+.c-cal__free--low { background: var(--c-warn-soft); color: var(--c-warn-ink); }
 .c-cal__free--full { background: var(--c-danger-soft); color: var(--c-danger); }
 
 @media (max-width: 900px) {

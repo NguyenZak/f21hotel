@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { nav, type Contact } from "@/lib/site";
+import { headerNav, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
 import { IconPhone, IconZalo } from "./Icons";
 
@@ -33,12 +33,12 @@ export function Header({ contact }: { contact: Contact }) {
     <header className={`site-header${open ? " menu-open" : ""}`} style={{ viewTransitionName: "site-header" }}>
       <div className="wrap">
         <Link href="/" className="brand" aria-label={`${name} – Trang chủ`}>
-          <Image src="/img/logo-ngang.png" alt="" width={673} height={221} priority />
+          <Image src="/img/logo-dung.png" alt="" width={507} height={367} priority />
         </Link>
 
         <nav className="nav" id="site-nav" aria-label="Điều hướng chính">
           <ul>
-            {nav.map((item) => (
+            {headerNav.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>
                   {item.label}

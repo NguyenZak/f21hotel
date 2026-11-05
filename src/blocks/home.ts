@@ -138,7 +138,7 @@ export const nearbyDefaults: B.NearbyProps = {
   category: "vui-choi",
   limit: 5,
   linkLabel: "Xem tất cả tiện ích xung quanh",
-  linkHref: "/xung-quanh",
+  linkHref: "/kham-pha",
 };
 
 export const nearbyFoodDefaults: B.NearbyProps = { ...nearbyDefaults, background: "", title: "Ăn uống quanh F21", category: "an-uong" };

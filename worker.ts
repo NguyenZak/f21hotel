@@ -29,7 +29,7 @@ const placeNotFound = () =>
     `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Không tìm thấy địa điểm | F21 Hotel</title></head>
 <body style="font-family:Georgia,serif;background:#fffdf8;color:#2b1d1b;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center">
 <main><h1 style="color:#8d191d">Không tìm thấy địa điểm</h1><p>Địa điểm này không có hoặc đã được gỡ.</p>
-<p><a href="/xung-quanh" style="color:#8d191d">Xem tiện ích xung quanh</a> · <a href="/" style="color:#8d191d">Trang chủ</a></p></main></body></html>`,
+<p><a href="/kham-pha" style="color:#8d191d">Xem tiện ích xung quanh</a> · <a href="/" style="color:#8d191d">Trang chủ</a></p></main></body></html>`,
     { status: 404, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } },
   );
 
@@ -87,7 +87,7 @@ export default {
       if (!found) return postNotFound();
     }
     // Trang chi tiết Tiện ích xung quanh: cũng chỉ có bản dựng sẵn, mã không có thì 404 ngay
-    const place = /^\/xung-quanh\/([^/]+)\/?$/.exec(pathname);
+    const place = /^\/kham-pha\/([^/]+)\/?$/.exec(pathname);
     if (place) {
       let slug = "";
       try {

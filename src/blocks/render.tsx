@@ -370,7 +370,7 @@ export function NearbyBlock(p: P<NearbyProps>) {
         <PlaceMosaic places={places} />
         {p.linkLabel ? (
           <div className="places-more">
-            <Link className="link-arrow" href={p.linkHref || "/xung-quanh"}>
+            <Link className="link-arrow" href={p.linkHref || "/kham-pha"}>
               {p.linkLabel}
             </Link>
           </div>

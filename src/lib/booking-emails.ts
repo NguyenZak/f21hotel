@@ -29,7 +29,7 @@ const loadHotel = async (d: D1Database): Promise<Hotel> => {
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 const longDate = (iso: string) => `${shortDate(iso)}/${iso.slice(0, 4)}`;
 const plusDays = (iso: string, n: number) => toIsoDate(addDays(new Date(`${iso}T00:00:00`), n));
-const C = { maroon: "#8d191d", gold: "#c9a23f", goldText: "#86651a", cream: "#f8f2e7", paper: "#fffdf8", ink: "#2b1d1b", muted: "#6f625c", line: "#e6dbc8" };
+const C = { maroon: "#8d191d", gold: "#c9a23f", goldText: "#000", cream: "#f8f2e7", paper: "#fffdf8", ink: "#000", muted: "#000", line: "#e6dbc8" };
 
 export function renderBookingEmail(kind: EmailKind, b: BookingView, { site, settings, refund }: Hotel, today = todayInVietnam()) {
   const base = site.url.replace(/\/+$/, "");

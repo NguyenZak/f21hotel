@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/admin", destination: "/quan-tri", permanent: true },
       { source: "/admin/:path*", destination: "/quan-tri", permanent: true },
+      // Trang Tiện ích xung quanh đổi đường dẫn thành /kham-pha (khớp mục "Khám phá" trên menu)
+      { source: "/xung-quanh", destination: "/kham-pha", permanent: true },
+      { source: "/xung-quanh/:slug", destination: "/kham-pha/:slug", permanent: true },
     ];
   },
 };

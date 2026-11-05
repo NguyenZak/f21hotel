@@ -66,6 +66,15 @@ export const nav = [
   { href: "/dat-phong", label: "Liên hệ" },
 ] as const;
 
+// Menu trên thanh header (logo ở giữa nên chỉ 4 mục); các trang còn lại nằm ở footer qua `nav`.
+// Chưa có trang Giới thiệu riêng: dẫn về khối Tổng quan (Intro, anchor "tong-quan") của trang chủ.
+export const headerNav = [
+  { href: "/#tong-quan", label: "Giới thiệu" },
+  { href: "/phong", label: "Phòng nghỉ" },
+  { href: "/kham-pha", label: "Khám phá" },
+  { href: "/bai-viet", label: "Cẩm nang" },
+] as const;
+
 // Link Google Maps theo tên + địa chỉ (CMS: "Từ khoá bản đồ", cũng là ghim của bản đồ nhúng).
 // Không dùng link share.google trong CMS cho việc chỉ đường: link đó mở trang tìm kiếm Google, không mở Maps.
 // directionsUrl mở thẳng chỉ đường từ vị trí của khách (trên điện thoại mở ứng dụng Google Maps).
