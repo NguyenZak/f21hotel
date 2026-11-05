@@ -19,6 +19,7 @@ const TARGETS: Record<string, string> = {
   faqs: "Hỏi đáp",
   pages: "Trang",
   media: "Ảnh",
+  "media-folders": "Thư mục ảnh",
   "site-settings": "Thông tin khách sạn",
   "theme-settings": "Giao diện",
   posts: "Bài viết",

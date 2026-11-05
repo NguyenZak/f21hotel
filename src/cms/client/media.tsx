@@ -2,9 +2,28 @@
 
 import { type DragEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "./api";
+import { Finder } from "./Finder";
 
 // Thư viện ảnh: tải ảnh thẳng từ trình duyệt lên Cloudinary (chữ ký do API cấp), chọn ảnh cho hạng phòng / trang
-export type MediaItem = { id: number; alt: string; filename: string; url: string; width: number | null; height: number | null; createdAt: string };
+export type MediaItem = {
+  id: number;
+  alt: string;
+  filename: string;
+  url: string;
+  width: number | null;
+  height: number | null;
+  filesize?: number | null;
+  mimeType?: string | null;
+  folderId?: number | null;
+  createdAt: string;
+};
+export type MediaFolder = { id: number; name: string; parentId: number | null; createdAt: string };
+// Nơi đang dùng ảnh (trang Thư viện ảnh hỏi kèm ?usage=1)
+export type MediaUse = { title: string; label: string; href: string };
+export type MediaLibrary = { media: MediaItem[]; folders: MediaFolder[]; usage?: Record<number, MediaUse[]> };
+
+// Kéo ảnh / thư mục bên trong thư viện (khác kéo file từ máy tính vào)
+export const DRAG_TYPE = "application/x-f21-media";
 
 export const thumb = (url: string, w = 320, h = 220) => url.replace("/upload/", `/upload/w_${w},h_${h},c_fill/`);
 
@@ -14,7 +33,7 @@ const altFromName = (name: string) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export async function uploadImage(file: File, alt?: string): Promise<MediaItem> {
+export async function uploadImage(file: File, alt?: string, folderId?: number | null): Promise<MediaItem> {
   const size = await createImageBitmap(file)
     .then((b) => ({ width: b.width, height: b.height }))
     .catch(() => ({ width: 0, height: 0 }));
@@ -25,7 +44,7 @@ export async function uploadImage(file: File, alt?: string): Promise<MediaItem> 
   const res = await fetch(signed.upload.url, { method: "POST", body: form });
   if (!res.ok) throw new ApiError("Cloudinary không nhận ảnh này. Thử ảnh khác hoặc ảnh nhỏ hơn.", res.status);
   const r = await api<{ media: MediaItem }>("media", {
-    body: { filename: signed.filename, alt: alt || altFromName(file.name), ...size, mimeType: file.type, filesize: file.size },
+    body: { filename: signed.filename, alt: alt || altFromName(file.name), ...size, mimeType: file.type, filesize: file.size, folderId: folderId ?? null },
   });
   return r.media;
 }
@@ -36,11 +55,16 @@ const PARALLEL = 3;
 
 export type Uploads = { busy: string; errors: string[]; start: (files: File[]) => void };
 
-// Hàng đợi tải ảnh dùng chung cho nút chọn file và vùng kéo thả. Ảnh trả về theo đúng thứ tự đã chọn
-export function useUploads(onDone: (items: MediaItem[]) => void): Uploads {
+// Hàng đợi tải ảnh dùng chung cho nút chọn file và vùng kéo thả. Ảnh trả về theo đúng thứ tự đã chọn,
+// và vào thư mục đang mở (folderId) lúc bắt đầu tải
+export function useUploads(onDone: (items: MediaItem[]) => void, folderId: number | null = null): Uploads {
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const running = useRef(false);
+  const folder = useRef(folderId);
+  useEffect(() => {
+    folder.current = folderId;
+  }, [folderId]);
   const start = async (all: File[]) => {
     const files = all.filter((f) => ACCEPT.includes(f.type));
     const skipped = all.filter((f) => !ACCEPT.includes(f.type)).map((f) => `${f.name}: không phải ảnh JPG, PNG, WebP, AVIF hoặc GIF.`);
@@ -51,12 +75,13 @@ export function useUploads(onDone: (items: MediaItem[]) => void): Uploads {
     const failed: string[] = [];
     let next = 0;
     let finished = 0;
+    const into = folder.current;
     setProgress({ done: 0, total: files.length });
     const worker = async () => {
       while (next < files.length) {
         const i = next++;
         try {
-          results[i] = await uploadImage(files[i]);
+          results[i] = await uploadImage(files[i], undefined, into);
         } catch (err) {
           failed.push(`${files[i].name}: ${err instanceof ApiError ? err.message : "không tải được."}`);
         }
@@ -115,7 +140,8 @@ export function DropZone({ uploads, children, className = "" }: { uploads: Uploa
   const [over, setOver] = useState(false);
   // dragenter/dragleave bắn cả khi đi qua phần tử con: đếm để biết khi nào thật sự rời vùng
   const depth = useRef(0);
-  const hasFiles = (e: DragEvent) => e.dataTransfer.types.includes("Files");
+  // Kéo ảnh trong thư viện sang thư mục khác không phải tải lên (trình duyệt có thể gắn kèm "Files" khi kéo ảnh)
+  const hasFiles = (e: DragEvent) => e.dataTransfer.types.includes("Files") && !e.dataTransfer.types.includes(DRAG_TYPE);
   return (
     <div
       className={`c-drop${over ? " is-over" : ""} ${className}`}
@@ -158,7 +184,7 @@ export function DropZone({ uploads, children, className = "" }: { uploads: Uploa
   );
 }
 
-// Hộp chọn ảnh từ thư viện (có tải ảnh mới ngay trong hộp)
+// Hộp chọn ảnh từ thư viện: cùng giao diện Finder với trang Thư viện ảnh (có thư mục, tìm, tải ảnh mới ngay trong hộp)
 export function MediaPicker({
   multiple,
   selected = [],
@@ -171,64 +197,12 @@ export function MediaPicker({
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [items, setItems] = useState<MediaItem[] | null>(null);
-  const [q, setQ] = useState("");
-  const [picked, setPicked] = useState<number[]>([]);
-  const uploads = useUploads((added) => {
-    setItems((l) => [...added, ...(l ?? [])]);
-    if (multiple) setPicked((p) => [...p, ...added.map((m) => m.id)]);
-  });
   useEffect(() => {
     dialog.current?.showModal();
-    api<{ media: MediaItem[] }>("media")
-      .then((r) => setItems(r.media))
-      .catch(() => setItems([]));
   }, []);
-  const shown = (items ?? []).filter((m) => !q || m.alt.toLowerCase().includes(q.toLowerCase()) || m.filename.includes(q.toLowerCase()));
-  const toggle = (m: MediaItem) => {
-    if (!multiple) return onPick([m]);
-    setPicked((p) => (p.includes(m.id) ? p.filter((x) => x !== m.id) : [...p, m.id]));
-  };
   return (
-    <dialog ref={dialog} className="c-dialog c-dialog--wide" onClose={onClose}>
-      <div className="c-dialog__head">
-        <h2>Chọn ảnh</h2>
-        <button type="button" className="c-btn c-btn--ghost c-btn--small" onClick={onClose} aria-label="Đóng">
-          ✕
-        </button>
-      </div>
-      <DropZone uploads={uploads} className="c-dialog__body">
-        <div className="c-row">
-          <input className="c-input" style={{ flex: 1 }} placeholder="Tìm theo mô tả ảnh" value={q} onChange={(e) => setQ(e.target.value)} />
-          <UploadButton uploads={uploads} />
-        </div>
-        <UploadErrors uploads={uploads} />
-        {!items ? <p className="c-empty">Đang tải…</p> : null}
-        {items && !items.length ? <p className="c-empty">Thư viện chưa có ảnh. Bấm “Tải ảnh lên” hoặc kéo thả ảnh vào đây.</p> : null}
-        <div className="c-gallery">
-          {shown.map((m) => {
-            const on = picked.includes(m.id);
-            const already = selected.includes(m.id);
-            return (
-              <button key={m.id} type="button" className={`c-gallery__item${on ? " is-on" : ""}`} disabled={already} onClick={() => toggle(m)} title={m.alt}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- ảnh thu nhỏ từ Cloudinary */}
-                <img src={thumb(m.url)} alt={m.alt} loading="lazy" />
-                <span>{already ? "Đã chọn" : m.alt}</span>
-              </button>
-            );
-          })}
-        </div>
-      </DropZone>
-      {multiple ? (
-        <div className="c-dialog__foot">
-          <button type="button" className="c-btn" onClick={onClose}>
-            Huỷ
-          </button>
-          <button type="button" className="c-btn c-btn--primary" disabled={!picked.length} onClick={() => onPick((items ?? []).filter((m) => picked.includes(m.id)))}>
-            Thêm {picked.length || ""} ảnh
-          </button>
-        </div>
-      ) : null}
+    <dialog ref={dialog} className="c-dialog c-dialog--finder" aria-label="Chọn ảnh" onClose={onClose}>
+      <Finder pick={{ multiple, disabled: selected, onPick, onCancel: onClose }} />
     </dialog>
   );
 }
