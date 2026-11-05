@@ -131,7 +131,7 @@ export const locationDefaults: B.LocationProps = {
 export const nearbyDefaults: B.NearbyProps = {
   anchor: "",
   background: "cream",
-  eyebrow: "Xung quanh F21",
+  eyebrow: "Tiện ích F21",
   title: "Vui chơi, giải trí quanh F21",
   intro: "",
   center: false,

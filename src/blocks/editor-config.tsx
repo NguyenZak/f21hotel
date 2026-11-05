@@ -190,7 +190,7 @@ const components = {
     defaultProps: D.locationDefaults,
   },
   Nearby: {
-    label: "Xung quanh F21 (lưới ảnh từ mục Tiện ích xung quanh)",
+    label: "Tiện ích F21 (lưới ảnh từ mục Tiện ích xung quanh)",
     fields: {
       category: { type: "select", label: "Nhóm địa điểm", options: PLACE_CATEGORIES.map((c) => ({ label: c.label, value: c.value })) },
       ...headFields,

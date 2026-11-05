@@ -245,7 +245,7 @@ export const COLLECTIONS: CollectionDef[] = [
     tags: [CMS_TAGS.places],
     payloadLocks: false,
     intro:
-      "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Xung quanh F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi; đổi xong bấm Xuất bản website.",
+      "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Tiện ích F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi; đổi xong bấm Xuất bản website.",
     fields: [
       { type: "text", name: "name", column: "name", label: "Tên địa điểm", required: true, half: true, help: "Ví dụ: Thiên đường Bảo Sơn" },
       { type: "text", name: "slug", column: "slug", label: "Mã (dùng trong đường dẫn)", required: true, half: true, help: `${slugHelp}-thien-duong-bao-son. Trang chi tiết: /kham-pha/<mã>.` },

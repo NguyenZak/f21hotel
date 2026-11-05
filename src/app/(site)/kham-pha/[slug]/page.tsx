@@ -52,8 +52,8 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
 
   return (
     <>
-      <JsonLd data={breadcrumbTrailJsonLd(site, [["Xung quanh F21", "/kham-pha"], [place.name, path]])} />
-      <PageHero crumb={place.name} parent={{ href: "/kham-pha", label: "Xung quanh F21" }} eyebrow={cat?.label ?? "Xung quanh F21"} title={place.name}>
+      <JsonLd data={breadcrumbTrailJsonLd(site, [["Tiện ích F21", "/kham-pha"], [place.name, path]])} />
+      <PageHero crumb={place.name} parent={{ href: "/kham-pha", label: "Tiện ích F21" }} eyebrow={cat?.label ?? "Tiện ích F21"} title={place.name}>
         {place.note || undefined}
       </PageHero>
 

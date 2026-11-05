@@ -25,8 +25,8 @@ export default async function NearbyPage() {
   const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value) })).filter((g) => g.places.length);
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd(site, "/kham-pha", "Xung quanh F21")} />
-      <PageHero crumb="Xung quanh F21" eyebrow="Xung quanh F21" title="Ăn uống, vui chơi, thể thao quanh F21">
+      <JsonLd data={breadcrumbJsonLd(site, "/kham-pha", "Tiện ích F21")} />
+      <PageHero crumb="Tiện ích F21" eyebrow="Tiện ích F21" title="Ăn uống, vui chơi, thể thao quanh F21">
         Những chỗ gần khu biệt thự Hoa Phượng, An Khánh. Bấm vào từng địa điểm để xem địa chỉ, bản đồ và đường đi.
       </PageHero>
 

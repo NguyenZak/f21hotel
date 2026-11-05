@@ -5,7 +5,7 @@ import { IconBag, IconClock, IconFood, IconSport, IconTicket } from "./Icons";
 
 // Lưới ảnh Tiện ích xung quanh (CMS › Tiện ích xung quanh): địa điểm đầu tiên ô lớn, các ô sau nhỏ hơn.
 // Bấm ô mở trang chi tiết /kham-pha/<mã> (ghi công ảnh giấy phép mở ở đó, dưới ảnh lớn). Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
-// Dùng ở trang Vị trí và khối "Xung quanh F21" của trình dựng trang (chạy cả trên trình duyệt), nên không đọc dữ liệu ở đây.
+// Dùng ở trang Vị trí và khối "Tiện ích F21" của trình dựng trang (chạy cả trên trình duyệt), nên không đọc dữ liệu ở đây.
 const ICON = {
   "vui-choi": IconTicket,
   "an-uong": IconFood,

@@ -362,7 +362,7 @@ export type NearbyProps = Section & Head & { category: string; limit: number; li
 export function NearbyBlock(p: P<NearbyProps>) {
   const places = (meta(p.puck).places ?? []).filter((x) => x.category === p.category).slice(0, p.limit || 5);
   if (!places.length)
-    return <EditorNote puck={p.puck}>Xung quanh F21: nhóm này chưa có địa điểm nào được hiện trong CMS › Tiện ích xung quanh.</EditorNote>;
+    return <EditorNote puck={p.puck}>Tiện ích F21: nhóm này chưa có địa điểm nào được hiện trong CMS › Tiện ích xung quanh.</EditorNote>;
   return (
     <section {...sectionProps(p)}>
       <div className="wrap">
