@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api, ApiError } from "../api";
-import { thumb, UploadButton, type MediaItem } from "../media";
+import { DropZone, thumb, UploadButton, UploadErrors, useUploads, type MediaItem } from "../media";
 import { useToast } from "../ui";
 
 // Thư viện ảnh: tải ảnh lên Cloudinary, sửa mô tả, xoá ảnh không còn dùng
@@ -11,6 +11,10 @@ export function MediaPage() {
   const [q, setQ] = useState("");
   const [error, setError] = useState("");
   const [toast, say] = useToast();
+  const uploads = useUploads((added) => {
+    setItems((l) => [...added, ...(l ?? [])]);
+    say(`Đã tải lên ${added.length} ảnh.`);
+  });
   useEffect(() => {
     api<{ media: MediaItem[] }>("media")
       .then((r) => setItems(r.media))
@@ -40,19 +44,16 @@ export function MediaPage() {
 
   const shown = (items ?? []).filter((m) => !q || m.alt.toLowerCase().includes(q.toLowerCase()) || m.filename.includes(q.toLowerCase()));
   return (
-    <>
+    <DropZone uploads={uploads}>
       <div className="c-page__head">
         <div>
           <h1>Thư viện ảnh</h1>
           <p>Ảnh lưu trên Cloudinary, tự nén và đổi định dạng cho nhẹ. Mô tả ảnh giúp Google và người khiếm thị hiểu nội dung ảnh.</p>
+          <p className="c-muted">Chọn nhiều ảnh một lúc, hoặc kéo thả ảnh từ máy tính vào trang này.</p>
         </div>
-        <UploadButton
-          onDone={(added) => {
-            setItems((l) => [...added, ...(l ?? [])]);
-            say(`Đã tải lên ${added.length} ảnh.`);
-          }}
-        />
+        <UploadButton uploads={uploads} />
       </div>
+      <UploadErrors uploads={uploads} />
       {error ? <p className="c-alert c-alert--error">{error}</p> : null}
       <input className="c-input" style={{ maxWidth: 360, marginBottom: 16 }} placeholder="Tìm theo mô tả hoặc tên file" value={q} onChange={(e) => setQ(e.target.value)} />
       {!items ? <p className="c-empty">Đang tải…</p> : null}
@@ -79,6 +80,6 @@ export function MediaPage() {
         ))}
       </div>
       {toast}
-    </>
+    </DropZone>
   );
 }

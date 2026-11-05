@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type DragEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "./api";
 
 // Thư viện ảnh: tải ảnh thẳng từ trình duyệt lên Cloudinary (chữ ký do API cấp), chọn ảnh cho hạng phòng / trang
@@ -30,41 +30,131 @@ export async function uploadImage(file: File, alt?: string): Promise<MediaItem> 
   return r.media;
 }
 
-// Nút tải ảnh (chọn nhiều file)
-export function UploadButton({ onDone, label = "Tải ảnh lên" }: { onDone: (items: MediaItem[]) => void; label?: string }) {
+const ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+// Số ảnh tải lên Cloudinary cùng lúc: nhanh hơn tải lần lượt mà không nghẽn mạng điện thoại
+const PARALLEL = 3;
+
+export type Uploads = { busy: string; errors: string[]; start: (files: File[]) => void };
+
+// Hàng đợi tải ảnh dùng chung cho nút chọn file và vùng kéo thả. Ảnh trả về theo đúng thứ tự đã chọn
+export function useUploads(onDone: (items: MediaItem[]) => void): Uploads {
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+  const running = useRef(false);
+  const start = async (all: File[]) => {
+    const files = all.filter((f) => ACCEPT.includes(f.type));
+    const skipped = all.filter((f) => !ACCEPT.includes(f.type)).map((f) => `${f.name}: không phải ảnh JPG, PNG, WebP, AVIF hoặc GIF.`);
+    setErrors(skipped);
+    if (!files.length || running.current) return;
+    running.current = true;
+    const results: (MediaItem | null)[] = new Array(files.length).fill(null);
+    const failed: string[] = [];
+    let next = 0;
+    let finished = 0;
+    setProgress({ done: 0, total: files.length });
+    const worker = async () => {
+      while (next < files.length) {
+        const i = next++;
+        try {
+          results[i] = await uploadImage(files[i]);
+        } catch (err) {
+          failed.push(`${files[i].name}: ${err instanceof ApiError ? err.message : "không tải được."}`);
+        }
+        setProgress({ done: ++finished, total: files.length });
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(PARALLEL, files.length) }, worker));
+    running.current = false;
+    setProgress(null);
+    setErrors([...skipped, ...failed]);
+    const done = results.filter((m): m is MediaItem => m !== null);
+    if (done.length) onDone(done);
+  };
+  return { busy: progress ? `Đang tải ${progress.done}/${progress.total} ảnh…` : "", errors, start };
+}
+
+// Nút tải ảnh (chọn nhiều file một lúc)
+export function UploadButton({ uploads, label = "Tải ảnh lên" }: { uploads: Uploads; label?: string }) {
   const ref = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState("");
-  const [error, setError] = useState("");
   return (
-    <span className="c-row">
+    <>
       <input
         ref={ref}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+        accept={ACCEPT.join(",")}
         multiple
         hidden
-        onChange={async (e) => {
+        onChange={(e) => {
           const files = [...(e.target.files ?? [])];
           e.target.value = "";
-          setError("");
-          const done: MediaItem[] = [];
-          for (const [i, f] of files.entries()) {
-            setBusy(`Đang tải ${i + 1}/${files.length}…`);
-            try {
-              done.push(await uploadImage(f));
-            } catch (err) {
-              setError(`${f.name}: ${err instanceof ApiError ? err.message : "không tải được."}`);
-            }
-          }
-          setBusy("");
-          if (done.length) onDone(done);
+          uploads.start(files);
         }}
       />
-      <button type="button" className="c-btn c-btn--primary" disabled={Boolean(busy)} onClick={() => ref.current?.click()}>
-        {busy || label}
+      <button type="button" className="c-btn c-btn--primary" disabled={Boolean(uploads.busy)} onClick={() => ref.current?.click()}>
+        {uploads.busy || label}
       </button>
-      {error ? <span className="c-hint">{error}</span> : null}
-    </span>
+    </>
+  );
+}
+
+// Lỗi của lần tải gần nhất, mỗi file một dòng
+export function UploadErrors({ uploads }: { uploads: Uploads }) {
+  if (!uploads.errors.length) return null;
+  return (
+    <div className="c-alert c-alert--error" role="alert">
+      {uploads.errors.length > 1 ? `${uploads.errors.length} file không tải được:` : null}
+      {uploads.errors.map((e) => (
+        <div key={e}>{e}</div>
+      ))}
+    </div>
+  );
+}
+
+// Vùng nhận ảnh kéo thả từ máy tính: kéo file vào là hiện lớp phủ, thả ra là tải lên
+export function DropZone({ uploads, children, className = "" }: { uploads: Uploads; children: ReactNode; className?: string }) {
+  const [over, setOver] = useState(false);
+  // dragenter/dragleave bắn cả khi đi qua phần tử con: đếm để biết khi nào thật sự rời vùng
+  const depth = useRef(0);
+  const hasFiles = (e: DragEvent) => e.dataTransfer.types.includes("Files");
+  return (
+    <div
+      className={`c-drop${over ? " is-over" : ""} ${className}`}
+      onDragEnter={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        depth.current++;
+        setOver(true);
+      }}
+      onDragOver={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = uploads.busy ? "none" : "copy";
+      }}
+      onDragLeave={(e) => {
+        if (!hasFiles(e)) return;
+        if (--depth.current <= 0) {
+          depth.current = 0;
+          setOver(false);
+        }
+      }}
+      onDrop={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        depth.current = 0;
+        setOver(false);
+        if (!uploads.busy) uploads.start([...e.dataTransfer.files]);
+      }}
+    >
+      {children}
+      {over ? (
+        <div className="c-drop__overlay" aria-hidden="true">
+          <div className="c-drop__msg">
+            <strong>{uploads.busy ? "Đang tải ảnh, đợi xong rồi thả tiếp" : "Thả ảnh vào đây để tải lên"}</strong>
+            <span>JPG, PNG, WebP, AVIF, GIF · chọn được nhiều ảnh một lúc</span>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -84,6 +174,10 @@ export function MediaPicker({
   const [items, setItems] = useState<MediaItem[] | null>(null);
   const [q, setQ] = useState("");
   const [picked, setPicked] = useState<number[]>([]);
+  const uploads = useUploads((added) => {
+    setItems((l) => [...added, ...(l ?? [])]);
+    if (multiple) setPicked((p) => [...p, ...added.map((m) => m.id)]);
+  });
   useEffect(() => {
     dialog.current?.showModal();
     api<{ media: MediaItem[] }>("media")
@@ -103,18 +197,14 @@ export function MediaPicker({
           ✕
         </button>
       </div>
-      <div className="c-dialog__body">
+      <DropZone uploads={uploads} className="c-dialog__body">
         <div className="c-row">
           <input className="c-input" style={{ flex: 1 }} placeholder="Tìm theo mô tả ảnh" value={q} onChange={(e) => setQ(e.target.value)} />
-          <UploadButton
-            onDone={(added) => {
-              setItems((l) => [...added, ...(l ?? [])]);
-              if (multiple) setPicked((p) => [...p, ...added.map((m) => m.id)]);
-            }}
-          />
+          <UploadButton uploads={uploads} />
         </div>
+        <UploadErrors uploads={uploads} />
         {!items ? <p className="c-empty">Đang tải…</p> : null}
-        {items && !items.length ? <p className="c-empty">Thư viện chưa có ảnh. Bấm “Tải ảnh lên”.</p> : null}
+        {items && !items.length ? <p className="c-empty">Thư viện chưa có ảnh. Bấm “Tải ảnh lên” hoặc kéo thả ảnh vào đây.</p> : null}
         <div className="c-gallery">
           {shown.map((m) => {
             const on = picked.includes(m.id);
@@ -128,7 +218,7 @@ export function MediaPicker({
             );
           })}
         </div>
-      </div>
+      </DropZone>
       {multiple ? (
         <div className="c-dialog__foot">
           <button type="button" className="c-btn" onClick={onClose}>

@@ -478,6 +478,17 @@ button.c-cal__cell:hover { background: var(--c-cream); }
 .c-library__item { margin: 0; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
 .c-library__item img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
 .c-library__item figcaption { padding: 10px; display: grid; gap: 6px; }
+/* Kéo thả ảnh: lớp phủ phủ kín vùng nhận khi đang kéo file vào */
+.c-drop { position: relative; }
+.c-drop.is-over > :not(.c-drop__overlay) { pointer-events: none; }
+.c-drop__overlay {
+  position: absolute; inset: 0; z-index: 20; min-height: 160px; border: 2px dashed var(--c-maroon); border-radius: var(--r-m);
+  background: color-mix(in srgb, var(--c-card) 88%, transparent); color: var(--c-text); pointer-events: none;
+}
+/* Thư viện dài hơn màn hình: chữ bám giữa màn hình thay vì giữa cả trang */
+.c-drop__msg { position: sticky; top: 38vh; display: grid; gap: 6px; padding: 48px 16px; text-align: center; }
+.c-drop__overlay strong { font-size: 18px; color: var(--c-maroon); }
+.c-drop__overlay span { font-size: 13px; color: var(--c-muted); }
 @media (max-width: 900px) {
   .c-fields { grid-template-columns: 1fr; }
 }
