@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Place } from "@/lib/site";
-import { IconBag, IconClock, IconFood, IconSport, IconTicket } from "./Icons";
+import { IconBag, IconFood, IconSport, IconTicket } from "./Icons";
 
 // Lưới ảnh Tiện ích xung quanh (CMS › Tiện ích xung quanh): địa điểm đầu tiên ô lớn, các ô sau nhỏ hơn.
 // Bấm ô mở trang chi tiết /kham-pha/<mã> (ghi công ảnh giấy phép mở ở đó, dưới ảnh lớn). Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
@@ -48,11 +48,6 @@ export function PlaceMosaic({ places }: { places: Place[] }) {
                 <span className="place-body">
                   <b>{p.name}</b>
                   {p.note ? <small>{p.note}</small> : null}
-                  {p.time ? (
-                    <span className="place-time">
-                      <IconClock /> {p.time}
-                    </span>
-                  ) : null}
                 </span>
               </Link>
             </li>
