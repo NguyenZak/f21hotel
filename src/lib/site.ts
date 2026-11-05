@@ -106,7 +106,23 @@ export const PLACE_CATEGORIES = [
   { value: "dich-vu", label: "Mua sắm, dịch vụ", title: "Mua sắm, dịch vụ tiện ích" },
 ];
 
-export type Place = { name: string; category: string; time: string; note: string; href: string; photo: Photo | null };
+// href: Google Maps (chỉ đường); embed: từ khoá hoặc "vĩ độ,kinh độ" cho bản đồ nhúng ở trang chi tiết
+export type Place = {
+  slug: string;
+  name: string;
+  category: string;
+  time: string;
+  note: string;
+  address: string;
+  body: string;
+  href: string;
+  embed: string;
+  photo: Photo | null;
+};
+
+export const placeCategory = (v: string) => PLACE_CATEGORIES.find((c) => c.value === v);
+// Trang chi tiết chỉ cho Google lập chỉ mục khi có giới thiệu đủ dài; vài dòng mô tả thì là trang mỏng
+export const placeIndexable = (p: Place) => p.body.trim().length >= 300;
 
 export type Room = {
   slug: string;

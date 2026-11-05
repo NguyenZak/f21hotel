@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import { LocationMap3D } from "@/components/LocationMap3D";
 import { MapEmbed } from "@/components/MapEmbed";
@@ -22,7 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LocationPage() {
   const [site, places] = await Promise.all([getSite(), getPlaces()]);
-  const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value) })).filter((g) => g.places.length);
+  // Mỗi nhóm 5 địa điểm đầu (vừa lưới); đủ danh sách ở /xung-quanh
+  const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value).slice(0, 5) })).filter((g) => g.places.length);
   return (
     <>
       <JsonLd data={breadcrumbJsonLd(site, "/vi-tri", "Vị trí")} />
@@ -104,7 +106,7 @@ export default async function LocationPage() {
       <section className="section cream" id="xung-quanh">
         <div className="wrap">
           <SectionHead eyebrow="Xung quanh" title="Ăn uống, vui chơi, thể thao quanh F21">
-            {groups.length ? "Bấm vào từng địa điểm để mở Google Maps. Cần gợi ý thêm, nhắn lễ tân qua Zalo." : undefined}
+            {groups.length ? "Bấm vào từng địa điểm để xem địa chỉ, bản đồ và đường đi. Cần gợi ý thêm, nhắn lễ tân qua Zalo." : undefined}
           </SectionHead>
           {groups.length ? (
             groups.map((g) => (
@@ -113,6 +115,13 @@ export default async function LocationPage() {
                 <PlaceMosaic places={g.places} />
               </div>
             ))
+          ) : null}
+          {groups.length ? (
+            <div className="places-more">
+              <Link className="link-arrow" href="/xung-quanh">
+                Xem tất cả tiện ích xung quanh
+              </Link>
+            </div>
           ) : (
             <div className="nearby reveal-stagger">
               {nearby.map((n) => (

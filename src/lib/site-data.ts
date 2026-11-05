@@ -290,7 +290,7 @@ export async function readPosts(d: D1Database): Promise<Post[]> {
 // Địa điểm đang hiện, theo thứ tự. Ô "Tìm trên Google Maps" là từ khoá hoặc link Google Maps dán sẵn
 export async function readPlaces(d: D1Database): Promise<Place[]> {
   const [places, photos] = await batch<[Row, Row]>(d,
-    d.prepare('select * from places where published = 1 order by "order", id limit 100'),
+    d.prepare('select * from places where published = 1 and slug is not null order by "order", id limit 200'),
     d.prepare(
       "select r.parent_id, m.url, m.filename, m.prefix, m.alt, m.width, m.height from places_rels r join media m on m.id = r.media_id where r.path = 'photo' order by r.\"order\"",
     ),
@@ -299,12 +299,20 @@ export async function readPlaces(d: D1Database): Promise<Place[]> {
     const m = photos.find((x) => x.parent_id === p.id);
     const src = m ? mediaUrl(m) : "";
     const query = str(p.map_query).trim() || str(p.name);
+    const link = /^https?:\/\//.test(query);
+    const lat = num(p.lat);
+    const lng = num(p.lng);
     return {
+      slug: str(p.slug),
       name: str(p.name),
       category: str(p.category),
       time: str(p.time),
       note: str(p.note),
-      href: /^https?:\/\//.test(query) ? query : mapsUrl(query),
+      address: str(p.address),
+      body: str(p.body),
+      href: link ? query : mapsUrl(query),
+      // Bản đồ nhúng không đọc được link rút gọn của Google Maps: dùng toạ độ, không có thì tên kèm địa chỉ
+      embed: lat && lng ? `${lat},${lng}` : link ? [str(p.name), str(p.address)].filter(Boolean).join(", ") : query,
       photo: m && src ? { src, alt: str(m.alt) || str(p.name), w: num(m.width, 1600), h: num(m.height, 1067) } : null,
     };
   });

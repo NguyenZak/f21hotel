@@ -1014,8 +1014,25 @@ html[data-lightbox-open] { overflow: hidden; }
   .place-body small { font-size: 13.5px; }
 }
 .places-group + .places-group { margin-top: clamp(48px, 6vw, 72px); }
-.places-group > h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-size: clamp(22px, 2.4vw, 28px); color: var(--maroon); }
+.places-group > h3, .places-group__title { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-size: clamp(22px, 2.4vw, 28px); color: var(--maroon); }
 .places-more { margin-top: 24px; }
+/* Trang chi tiết một địa điểm: nội dung bên trái, bản đồ bên phải */
+.place-detail { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
+.place-detail__main { display: grid; gap: 22px; align-content: start; }
+.place-detail__photo { margin: 0; border-radius: calc(var(--radius) * 2.5); overflow: hidden; }
+.place-detail__photo img { width: 100%; height: auto; display: block; }
+.place-detail__map { position: sticky; top: 100px; }
+.place-detail__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.place-facts { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.place-facts > div { display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.place-facts dt { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--maroon); }
+.place-facts dt svg { width: 18px; height: 18px; color: var(--gold); }
+.place-facts dd { margin: 0; font-size: 18px; color: var(--ink); }
+@media (max-width: 900px) {
+  .place-detail { grid-template-columns: 1fr; }
+  .place-detail__map { position: static; }
+  .place-facts > div { grid-template-columns: 1fr; gap: 4px; }
+}
 
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
 @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
