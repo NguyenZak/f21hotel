@@ -7,7 +7,13 @@ const nextConfig: NextConfig = {
   // Ảnh đã được nén sẵn đúng kích thước trong /public/img
   images: { unoptimized: true },
   // Trang 404 chung cho đường dẫn không khớp trang nào (src/app/global-not-found.tsx): app có nhiều root layout
-  experimental: { globalNotFound: true },
+  experimental: {
+    globalNotFound: true,
+    // Build dựng trang từ D1 thật qua mạng, D1 thỉnh thoảng trả "internal error" khi nhiều trang hỏi cùng lúc:
+    // thử lại trang lỗi và bớt số trang dựng song song thay vì hỏng cả bản build
+    staticGenerationRetryCount: 3,
+    staticGenerationMaxConcurrency: 4,
+  },
   // Cho phép mở `next dev` từ điện thoại cùng mạng Wi-Fi (http://192.168.x.x:3000).
   // Thiếu dòng này Next chặn file JS của bản dev, trang không chạy JS nên menu và các nút không bấm được.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
