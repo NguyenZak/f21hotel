@@ -1,7 +1,7 @@
 // Trình dựng trang (Puck) của CMS mới: /api/cms/pages, /api/cms/block-meta.
 // Bố cục lưu trong bảng pages như CMS cũ: "draft" là bản đang sửa, "data" là bản đang hiện trên website.
 import { CMS_TAGS } from "@/lib/cms-tags";
-import { readFaqs, readOffers, readReviews, readRooms, readSite, readThemeFonts } from "@/lib/site-data";
+import { readFaqs, readOffers, readPlaces, readReviews, readRooms, readSite, readThemeFonts } from "@/lib/site-data";
 import { isHtml, sanitizeRichText } from "@/lib/richtext";
 import { num, str } from "@/lib/sql";
 import { audit, body, fail, json, type CmsContext, type CmsUser } from "./http";
@@ -55,8 +55,10 @@ const save = async ({ ctx, user, request, path }: Ctx) => {
 // Dữ liệu website để xem trước các khối (phòng, ưu đãi, hỏi đáp…) và font đang dùng
 const blockMeta = async ({ ctx }: Ctx) => {
   const d = ctx.d;
-  const [site, rooms, offers, faqs, reviews, fonts] = await Promise.all([readSite(d), readRooms(d), readOffers(d), readFaqs(d), readReviews(d), readThemeFonts(d)]);
-  return json({ ok: true, meta: { site, rooms, offers, faqs, reviews }, fonts });
+  const [site, rooms, offers, faqs, reviews, places, fonts] = await Promise.all([
+    readSite(d), readRooms(d), readOffers(d), readFaqs(d), readReviews(d), readPlaces(d), readThemeFonts(d),
+  ]);
+  return json({ ok: true, meta: { site, rooms, offers, faqs, reviews, places }, fonts });
 };
 
 export const pageRoutes = [

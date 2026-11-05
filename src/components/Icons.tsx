@@ -127,6 +127,25 @@ export const IconHeart = (p: P) => (
   </Svg>
 );
 
+export const IconFood = (p: P) => (
+  <Svg {...p}>
+    <path d="M4 3v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3M7 3v18M20 15V3a4 4 0 0 0-4 4v6a2 2 0 0 0 2 2h2zm0 0v6" />
+  </Svg>
+);
+
+export const IconSport = (p: P) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 3.5a12 12 0 0 1 0 17M12 3.5a12 12 0 0 0 0 17M3.5 12h17" />
+  </Svg>
+);
+
+export const IconBag = (p: P) => (
+  <Svg {...p}>
+    <path d="M6 3 4 7v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-2-4zM4 7h16M15.5 10.5a3.5 3.5 0 0 1-7 0" />
+  </Svg>
+);
+
 // Logo Zalo nhiều màu (public/img/logo-zalo.svg), cho nút và liên kết nhắn Zalo
 export const IconZalo = (p: P) => (
   <svg viewBox="0 0 50 50" fill="none" aria-hidden="true" {...p}>

@@ -9,6 +9,7 @@ import { Gallery } from "@/components/Gallery";
 import { HeroSearch } from "@/components/HeroSearch";
 import { HeroSlider } from "@/components/HeroSlider";
 import { LocationMap3D } from "@/components/LocationMap3D";
+import { PlaceMosaic } from "@/components/PlaceMosaic";
 import { CtaBandView, Faq, RatingBadge, RoomCard, SectionHead } from "@/components/ui";
 import { isHtml, plainToHtml, sanitizeRichText } from "@/lib/richtext";
 import { mapsUrl, type Photo } from "@/lib/site";
@@ -350,6 +351,30 @@ export function LocationBlock(p: P<LocationProps>) {
             </LocationMap3D>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
+
+export type NearbyProps = Section & Head & { category: string; limit: number; linkLabel: string; linkHref: string };
+
+// Lưới ảnh một nhóm Tiện ích xung quanh (CMS › Tiện ích xung quanh). Nhóm chưa có địa điểm thì khối tự ẩn
+export function NearbyBlock(p: P<NearbyProps>) {
+  const places = (meta(p.puck).places ?? []).filter((x) => x.category === p.category).slice(0, p.limit || 5);
+  if (!places.length)
+    return <EditorNote puck={p.puck}>Xung quanh F21: nhóm này chưa có địa điểm nào được hiện trong CMS › Tiện ích xung quanh.</EditorNote>;
+  return (
+    <section {...sectionProps(p)}>
+      <div className="wrap">
+        <Head {...p} />
+        <PlaceMosaic places={places} />
+        {p.linkLabel ? (
+          <div className="places-more">
+            <Link className="link-arrow" href={p.linkHref || "/vi-tri#xung-quanh"}>
+              {p.linkLabel}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

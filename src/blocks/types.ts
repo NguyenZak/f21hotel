@@ -1,5 +1,5 @@
 import type { SiteData } from "@/lib/cms";
-import type { Offer, Photo, Review, Room } from "@/lib/site";
+import type { Offer, Photo, Place, Review, Room } from "@/lib/site";
 
 // Dữ liệu CMS đưa vào mọi khối qua `puck.metadata` (khi xem trang và khi đang chỉnh sửa)
 export type BlockMeta = {
@@ -8,6 +8,7 @@ export type BlockMeta = {
   offers: Offer[];
   faqs: { q: string; a: string }[];
   reviews: Review[];
+  places: Place[];
 };
 
 // Mục chọn ảnh trong mảng: Puck lưu mỗi phần tử là một object

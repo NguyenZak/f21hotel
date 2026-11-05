@@ -5,8 +5,9 @@ import { MapEmbed } from "@/components/MapEmbed";
 import { Gallery } from "@/components/Gallery";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
-import { getSite } from "@/lib/cms";
-import { directionsUrl, distances, locationPhotos, nearby } from "@/lib/site";
+import { PlaceMosaic } from "@/components/PlaceMosaic";
+import { getPlaces, getSite } from "@/lib/cms";
+import { directionsUrl, distances, locationPhotos, nearby, PLACE_CATEGORIES } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -20,7 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LocationPage() {
-  const site = await getSite();
+  const [site, places] = await Promise.all([getSite(), getPlaces()]);
+  const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value) })).filter((g) => g.places.length);
   return (
     <>
       <JsonLd data={breadcrumbJsonLd(site, "/vi-tri", "Vị trí")} />
@@ -98,21 +100,33 @@ export default async function LocationPage() {
         </div>
       </section>
 
-      <section className="section cream">
+      {/* Tiện ích xung quanh: lưới ảnh theo nhóm từ CMS. CMS chưa có địa điểm nào thì hiện danh sách chữ mặc định */}
+      <section className="section cream" id="xung-quanh">
         <div className="wrap">
-          <SectionHead eyebrow="Xung quanh" title="Gần khách sạn có gì" />
-          <div className="nearby reveal-stagger">
-            {nearby.map((n) => (
-              <div key={n.title}>
-                <h3>{n.title}</h3>
-                <ul>
-                  {n.items.map((i) => (
-                    <li key={i}>{i}</li>
-                  ))}
-                </ul>
+          <SectionHead eyebrow="Xung quanh" title="Ăn uống, vui chơi, thể thao quanh F21">
+            {groups.length ? "Bấm vào từng địa điểm để mở Google Maps. Cần gợi ý thêm, nhắn lễ tân qua Zalo." : undefined}
+          </SectionHead>
+          {groups.length ? (
+            groups.map((g) => (
+              <div className="places-group" key={g.value}>
+                <h3>{g.label}</h3>
+                <PlaceMosaic places={g.places} />
               </div>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="nearby reveal-stagger">
+              {nearby.map((n) => (
+                <div key={n.title}>
+                  <h3>{n.title}</h3>
+                  <ul>
+                    {n.items.map((i) => (
+                      <li key={i}>{i}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

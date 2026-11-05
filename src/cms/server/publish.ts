@@ -10,7 +10,7 @@ type Ctx = { ctx: CmsContext; user: CmsUser };
 type Row = Record<string, unknown>;
 
 // Mục có hiện trên website (đặt phòng, giá theo ngày, tài khoản chạy trực tiếp qua API, không cần xuất bản)
-const PAGE_TARGETS = ["site-settings", "theme-settings", "room-types", "rooms", "offers", "reviews", "faqs", "posts", "pages", "media"];
+const PAGE_TARGETS = ["site-settings", "theme-settings", "room-types", "rooms", "offers", "reviews", "faqs", "posts", "places", "pages", "media"];
 const targetLabel = (t: string) => collectionBySlug(t)?.label ?? ({ pages: "Trang", media: "Thư viện ảnh" } as Record<string, string>)[t] ?? t;
 const marks = (n: number) => Array(n).fill("?").join(", ");
 

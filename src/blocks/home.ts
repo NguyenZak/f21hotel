@@ -128,6 +128,21 @@ export const locationDefaults: B.LocationProps = {
   map: "3d",
 };
 
+export const nearbyDefaults: B.NearbyProps = {
+  anchor: "",
+  background: "cream",
+  eyebrow: "Xung quanh F21",
+  title: "Vui chơi, giải trí quanh F21",
+  intro: "",
+  center: false,
+  category: "vui-choi",
+  limit: 5,
+  linkLabel: "Xem tất cả tiện ích xung quanh",
+  linkHref: "/vi-tri#xung-quanh",
+};
+
+export const nearbyFoodDefaults: B.NearbyProps = { ...nearbyDefaults, background: "", title: "Ăn uống quanh F21", category: "an-uong" };
+
 export const offersDefaults: B.OffersProps = {
   anchor: "uu-dai",
   background: "cream",
@@ -175,6 +190,8 @@ export const defaultHome: Data = {
     block("Intro", 1, introDefaults),
     block("Gallery", 1, galleryDefaults),
     block("Guests", 1, guestsDefaults),
+    block("Nearby", 1, nearbyDefaults),
+    block("Nearby", 2, nearbyFoodDefaults),
     block("Reviews", 1, reviewsDefaults),
     block("Perks", 1, perksDefaults),
     block("Offers", 1, offersDefaults),

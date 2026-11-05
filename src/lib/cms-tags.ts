@@ -9,4 +9,5 @@ export const CMS_TAGS = {
   reviews: "cms:reviews",
   pages: "cms:pages",
   posts: "cms:posts",
+  places: "cms:places",
 } as const;

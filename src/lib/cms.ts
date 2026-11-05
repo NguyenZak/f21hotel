@@ -6,7 +6,7 @@ import type { BlockMeta } from "@/blocks/types";
 import { CMS_TAGS } from "./cms-tags";
 import { db } from "./db";
 import * as read from "./site-data";
-import type { Offer, Review, Room } from "./site";
+import type { Offer, Place, Review, Room } from "./site";
 import type { FontKey } from "./theme";
 
 export { CMS_TAGS };
@@ -75,6 +75,13 @@ export async function getPosts(): Promise<read.Post[]> {
   return read.readPosts(await db());
 }
 
+export async function getPlaces(): Promise<Place[]> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(CMS_TAGS.places);
+  return read.readPlaces(await db());
+}
+
 // Bố cục đã xuất bản của một trang dựng bằng trình kéo thả (null nếu chưa có hoặc chưa xuất bản)
 export async function getPageData(slug: string): Promise<{ title: string; data: Data } | null> {
   "use cache";
@@ -97,6 +104,6 @@ export const toFormContact = (s: read.SiteData) => ({
 
 // Dữ liệu CMS mà các khối của trình dựng trang cần (src/blocks/types.ts)
 export async function getBlockMeta(): Promise<BlockMeta> {
-  const [site, rooms, offers, faqs, reviews] = await Promise.all([getSite(), getRooms(), getOffers(), getFaqs(), getReviews()]);
-  return { site, rooms, offers, faqs, reviews };
+  const [site, rooms, offers, faqs, reviews, places] = await Promise.all([getSite(), getRooms(), getOffers(), getFaqs(), getReviews(), getPlaces()]);
+  return { site, rooms, offers, faqs, reviews, places };
 }

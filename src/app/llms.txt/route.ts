@@ -1,10 +1,10 @@
-import { getOffers, getPosts, getPriceNotes, getRooms, getSite } from "@/lib/cms";
-import { distances, formatVnd, nav, nearby } from "@/lib/site";
+import { getOffers, getPlaces, getPosts, getPriceNotes, getRooms, getSite } from "@/lib/cms";
+import { distances, formatVnd, nav, nearby, PLACE_CATEGORIES } from "@/lib/site";
 
 // /llms.txt: tóm tắt khách sạn bằng văn bản thuần cho ChatGPT, Perplexity và các trợ lý AI.
 // Lấy cùng dữ liệu với website nên tự cập nhật khi sửa trong CMS.
 export async function GET() {
-  const [site, rooms, offers, notes, posts] = await Promise.all([getSite(), getRooms(), getOffers(), getPriceNotes(), getPosts()]);
+  const [site, rooms, offers, notes, posts, places] = await Promise.all([getSite(), getRooms(), getOffers(), getPriceNotes(), getPosts(), getPlaces()]);
   const abs = (path: string) => new URL(path, site.url).toString();
   const lines = [
     `# ${site.name}`,
@@ -30,7 +30,13 @@ export async function GET() {
     "",
     "## Xung quanh khách sạn",
     "",
-    ...nearby.map((n) => `- ${n.title}: ${n.items.join("; ")}`),
+    // Tiện ích xung quanh từ CMS; chưa có thì dùng danh sách mặc định
+    ...(places.length
+      ? PLACE_CATEGORIES.flatMap((c) => {
+          const list = places.filter((p) => p.category === c.value);
+          return list.length ? [`- ${c.label}: ${list.map((p) => [p.name, p.time, p.note.replace(/\.\s*$/, "")].filter(Boolean).join(", ")).join("; ")}`] : [];
+        })
+      : nearby.map((n) => `- ${n.title}: ${n.items.join("; ")}`)),
     "",
     "## Ưu đãi",
     "",

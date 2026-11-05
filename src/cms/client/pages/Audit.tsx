@@ -22,6 +22,7 @@ const TARGETS: Record<string, string> = {
   "site-settings": "Thông tin khách sạn",
   "theme-settings": "Giao diện",
   posts: "Bài viết",
+  places: "Tiện ích xung quanh",
   publish: "Bản xuất bản website",
 };
 

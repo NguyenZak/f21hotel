@@ -10,8 +10,10 @@ import {
   priceNotes as defaultPriceNotes,
   rooms as defaultRooms,
   site as defaultSite,
+  mapsUrl,
   type Offer,
   type Photo,
+  type Place,
   type Review,
   type Room,
 } from "./site";
@@ -279,6 +281,31 @@ export async function readPosts(d: D1Database): Promise<Post[]> {
       updatedAt: str(p.updated_at),
       cover: c && src ? { src, alt: str(c.alt) || str(p.title), w: num(c.width, 1600), h: num(c.height, 1067) } : null,
       faqs: faqs.filter((f) => f._parent_id === p.id).map((f) => ({ q: str(f.question), a: str(f.answer) })),
+    };
+  });
+}
+
+// ---------- Tiện ích xung quanh (CMS › Tiện ích xung quanh) ----------
+
+// Địa điểm đang hiện, theo thứ tự. Ô "Tìm trên Google Maps" là từ khoá hoặc link Google Maps dán sẵn
+export async function readPlaces(d: D1Database): Promise<Place[]> {
+  const [places, photos] = await batch<[Row, Row]>(d,
+    d.prepare('select * from places where published = 1 order by "order", id limit 100'),
+    d.prepare(
+      "select r.parent_id, m.url, m.filename, m.prefix, m.alt, m.width, m.height from places_rels r join media m on m.id = r.media_id where r.path = 'photo' order by r.\"order\"",
+    ),
+  );
+  return places.map((p) => {
+    const m = photos.find((x) => x.parent_id === p.id);
+    const src = m ? mediaUrl(m) : "";
+    const query = str(p.map_query).trim() || str(p.name);
+    return {
+      name: str(p.name),
+      category: str(p.category),
+      time: str(p.time),
+      note: str(p.note),
+      href: /^https?:\/\//.test(query) ? query : mapsUrl(query),
+      photo: m && src ? { src, alt: str(m.alt) || str(p.name), w: num(m.width, 1600), h: num(m.height, 1067) } : null,
     };
   });
 }

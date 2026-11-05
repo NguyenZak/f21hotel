@@ -2,7 +2,7 @@
 // Mỗi trường ứng với cách Payload đã lưu trong D1: cột của bảng chính, bảng mảng con ("<bảng>_<tên>",
 // cột _order/_parent_id/id) hoặc bảng liên kết ("<bảng>_rels", cột path + "<đích>_id").
 import { CMS_TAGS } from "@/lib/cms-tags";
-import { POST_TOPICS } from "@/lib/site";
+import { PLACE_CATEGORIES, POST_TOPICS } from "@/lib/site";
 import { fontChoices } from "@/lib/theme";
 import type { Role } from "./server/http";
 
@@ -228,6 +228,33 @@ export const COLLECTIONS: CollectionDef[] = [
       },
       { type: "date", name: "publishedAt", column: "published_at", label: "Ngày đăng", half: true, help: "Để trống thì lấy ngày bật “Đăng”." },
       { type: "bool", name: "published", column: "published", label: "Đăng lên website", help: "Bài lên website sau khi bấm Xuất bản website." },
+    ],
+  },
+  {
+    slug: "places",
+    path: "tien-ich",
+    table: "places",
+    label: "Tiện ích xung quanh",
+    group: "Website",
+    titleField: "name",
+    listColumns: ["name", "category", "time", "published"],
+    order: 'category, "order", id',
+    read: MANAGE,
+    write: MANAGE,
+    remove: MANAGE,
+    tags: [CMS_TAGS.places],
+    payloadLocks: false,
+    intro:
+      "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Xung quanh F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi; đổi xong bấm Xuất bản website.",
+    fields: [
+      { type: "text", name: "name", column: "name", label: "Tên địa điểm", required: true, half: true, help: "Ví dụ: Thiên đường Bảo Sơn" },
+      { type: "select", name: "category", column: "category", label: "Nhóm", options: PLACE_CATEGORIES, required: true, half: true },
+      { type: "text", name: "time", column: "time", label: "Đi từ F21 mất bao lâu", half: true, help: "Ví dụ: ~5 phút. Để trống thì ẩn." },
+      { type: "number", name: "order", column: "order", label: "Thứ tự trong nhóm", half: true, help: "Số nhỏ đứng trước. Địa điểm đầu tiên có ảnh được hiện ô lớn." },
+      { type: "textarea", name: "note", column: "note", label: "Mô tả ngắn", help: "Một câu: có gì, hợp với ai. Ví dụ: Công viên trò chơi, công viên nước, hợp gia đình có trẻ nhỏ." },
+      { type: "text", name: "mapQuery", column: "map_query", label: "Tìm trên Google Maps", help: "Từ khoá tìm (ví dụ: Thiên đường Bảo Sơn, An Khánh) hoặc dán link Google Maps của địa điểm. Để trống thì tìm theo tên." },
+      { type: "media", name: "photo", relTable: "places_rels", path: "photo", relColumn: "media_id", label: "Ảnh", help: "Một ảnh tự chụp hoặc được phép dùng. Chưa có ảnh thì website hiện ô chữ." },
+      { type: "bool", name: "published", column: "published", label: "Hiện trên website", default: true },
     ],
   },
   {

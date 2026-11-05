@@ -11,6 +11,7 @@ export const blockRenders = {
   Gallery: B.GalleryBlock,
   Guests: B.GuestsBlock,
   Location: B.LocationBlock,
+  Nearby: B.NearbyBlock,
   Offers: B.OffersBlock,
   Reviews: B.ReviewsBlock,
   Faq: B.FaqBlock,

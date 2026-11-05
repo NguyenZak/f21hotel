@@ -2,7 +2,7 @@
 
 // Cấu hình đầy đủ cho trình dựng trang: giao diện khối (render.tsx) + trường chỉnh sửa + giá trị mặc định.
 import { RichTextMenu, type ComponentConfig, type Config, type Field } from "@puckeditor/core";
-import type { Photo } from "@/lib/site";
+import { PLACE_CATEGORIES, type Photo } from "@/lib/site";
 import { blockRenders, type BlockName } from "./config";
 import { backgroundField, headFields, iconField, imageField, text, textarea } from "./fields";
 import * as D from "./home";
@@ -189,6 +189,19 @@ const components = {
     },
     defaultProps: D.locationDefaults,
   },
+  Nearby: {
+    label: "Xung quanh F21 (lưới ảnh từ mục Tiện ích xung quanh)",
+    fields: {
+      category: { type: "select", label: "Nhóm địa điểm", options: PLACE_CATEGORIES.map((c) => ({ label: c.label, value: c.value })) },
+      ...headFields,
+      center: centerField,
+      limit: { type: "number", label: "Số địa điểm hiện (5 là vừa lưới)", min: 1, max: 12 },
+      linkLabel: text("Liên kết: chữ (trống là ẩn)"),
+      linkHref: text("Liên kết: đường dẫn"),
+      ...sectionFields,
+    },
+    defaultProps: D.nearbyDefaults,
+  },
   Offers: {
     label: "Ưu đãi (lấy từ mục Ưu đãi)",
     fields: { ...headFields, center: centerField, limit: { type: "number", label: "Số ưu đãi hiện", min: 1, max: 12 }, ...sectionFields },
@@ -344,7 +357,7 @@ export const editorConfig = {
   categories: {
     sections: {
       title: "Mục của trang",
-      components: ["Hero", "Intro", "Rooms", "Perks", "Gallery", "Guests", "Location", "Offers", "Reviews", "Faq", "Cta"],
+      components: ["Hero", "Intro", "Rooms", "Perks", "Gallery", "Guests", "Location", "Nearby", "Offers", "Reviews", "Faq", "Cta"],
     },
     layout: { title: "Bố cục", components: ["Section", "Columns", "Spacer"] },
     basic: { title: "Cơ bản", components: ["Heading", "Text", "Image", "Button"] },

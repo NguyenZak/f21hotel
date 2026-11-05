@@ -98,6 +98,16 @@ export const POST_TOPICS = [
 ];
 export const postTopicLabel = (v: string) => POST_TOPICS.find((t) => t.value === v)?.label ?? "";
 
+// Nhóm của Tiện ích xung quanh (CMS › Tiện ích xung quanh, trang Vị trí, khối "Xung quanh F21")
+export const PLACE_CATEGORIES = [
+  { value: "vui-choi", label: "Vui chơi, giải trí", title: "Vui chơi, giải trí quanh F21" },
+  { value: "an-uong", label: "Ăn uống", title: "Ăn uống quanh F21" },
+  { value: "the-thao", label: "Thể thao", title: "Thể thao quanh F21" },
+  { value: "dich-vu", label: "Mua sắm, dịch vụ", title: "Mua sắm, dịch vụ tiện ích" },
+];
+
+export type Place = { name: string; category: string; time: string; note: string; href: string; photo: Photo | null };
+
 export type Room = {
   slug: string;
   name: string;
