@@ -4,7 +4,7 @@ import type { Place } from "@/lib/site";
 import { IconBag, IconClock, IconFood, IconSport, IconTicket } from "./Icons";
 
 // Lưới ảnh Tiện ích xung quanh (CMS › Tiện ích xung quanh): địa điểm đầu tiên ô lớn, các ô sau nhỏ hơn.
-// Bấm ô mở trang chi tiết /kham-pha/<mã>. Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
+// Bấm ô mở trang chi tiết /kham-pha/<mã> (ghi công ảnh giấy phép mở ở đó, dưới ảnh lớn). Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
 // Dùng ở trang Vị trí và khối "Xung quanh F21" của trình dựng trang (chạy cả trên trình duyệt), nên không đọc dữ liệu ở đây.
 const ICON = {
   "vui-choi": IconTicket,
@@ -18,7 +18,6 @@ export function PlaceMosaic({ places }: { places: Place[] }) {
   const list = [...places].sort(
     (a, b) => Number(Boolean(b.photo)) - Number(Boolean(a.photo)),
   );
-  const credits = list.filter((p) => p.credit);
   return (
     <>
       <ul
@@ -60,18 +59,6 @@ export function PlaceMosaic({ places }: { places: Place[] }) {
           );
         })}
       </ul>
-      {/* Ảnh giấy phép mở (CC BY, CC BY-SA) phải ghi tác giả và giấy phép */}
-      {credits.length ? (
-        <p className="places-credits">
-          Ảnh:{" "}
-          {credits.map((p, i) => (
-            <span key={p.slug}>
-              {i ? "; " : ""}
-              {p.name}: <PhotoCredit place={p} />
-            </span>
-          ))}
-        </p>
-      ) : null}
     </>
   );
 }
