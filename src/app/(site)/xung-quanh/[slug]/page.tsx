@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaBand } from "@/components/CtaBand";
 import { IconClock, IconPin } from "@/components/Icons";
-import { PlaceMosaic } from "@/components/PlaceMosaic";
+import { PhotoCredit, PlaceMosaic } from "@/components/PlaceMosaic";
 import { PageHero } from "@/components/ui";
 import { getPlaces, getSite } from "@/lib/cms";
 import { renderMarkdown } from "@/lib/markdown";
@@ -63,6 +63,11 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
             {place.photo ? (
               <figure className="place-detail__photo">
                 <Image src={place.photo.src} alt={place.photo.alt} width={place.photo.w} height={place.photo.h} sizes="(max-width: 900px) 100vw, 55vw" priority />
+                {place.credit ? (
+                  <figcaption>
+                    Ảnh: <PhotoCredit place={place} />
+                  </figcaption>
+                ) : null}
               </figure>
             ) : null}
             <dl className="place-facts">

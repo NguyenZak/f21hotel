@@ -314,6 +314,8 @@ export async function readPlaces(d: D1Database): Promise<Place[]> {
       // Bản đồ nhúng không đọc được link rút gọn của Google Maps: dùng toạ độ, không có thì tên kèm địa chỉ
       embed: lat && lng ? `${lat},${lng}` : link ? [str(p.name), str(p.address)].filter(Boolean).join(", ") : query,
       photo: m && src ? { src, alt: str(m.alt) || str(p.name), w: num(m.width, 1600), h: num(m.height, 1067) } : null,
+      credit: m && src ? str(p.photo_credit).trim() : "",
+      creditUrl: m && src ? str(p.photo_source).trim() : "",
     };
   });
 }

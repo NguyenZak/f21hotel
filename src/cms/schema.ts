@@ -258,6 +258,8 @@ export const COLLECTIONS: CollectionDef[] = [
       { type: "number", name: "lat", column: "lat", label: "Vĩ độ", half: true, help: "Không bắt buộc. Để bản đồ ở trang chi tiết ghim đúng chỗ, ví dụ 21.0003" },
       { type: "number", name: "lng", column: "lng", label: "Kinh độ", half: true, help: "Ví dụ 105.7285. Lấy trên Google Maps: bấm giữ vào điểm, chép hai số đầu." },
       { type: "media", name: "photo", relTable: "places_rels", path: "photo", relColumn: "media_id", label: "Ảnh", help: "Một ảnh tự chụp hoặc được phép dùng. Chưa có ảnh thì website hiện ô chữ." },
+      { type: "text", name: "photoCredit", column: "photo_credit", label: "Ghi công ảnh", half: true, help: "Bắt buộc với ảnh lấy từ Wikimedia, Flickr…: tác giả và giấy phép, ví dụ kitmasterbloke, CC BY 2.0. Ảnh tự chụp thì để trống." },
+      { type: "text", name: "photoSource", column: "photo_source", label: "Link trang gốc của ảnh", half: true, help: "Trang Wikimedia/Flickr của ảnh. Website gắn link vào dòng ghi công." },
       {
         type: "markdown",
         name: "body",

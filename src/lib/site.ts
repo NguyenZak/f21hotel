@@ -118,6 +118,9 @@ export type Place = {
   href: string;
   embed: string;
   photo: Photo | null;
+  // Ảnh giấy phép mở: "tác giả, giấy phép" và link trang gốc; ảnh tự chụp thì trống
+  credit: string;
+  creditUrl: string;
 };
 
 export const placeCategory = (v: string) => PLACE_CATEGORIES.find((c) => c.value === v);

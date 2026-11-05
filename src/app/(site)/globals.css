@@ -1021,6 +1021,10 @@ html[data-lightbox-open] { overflow: hidden; }
 .place-detail__main { display: grid; gap: 22px; align-content: start; }
 .place-detail__photo { margin: 0; border-radius: calc(var(--radius) * 2.5); overflow: hidden; }
 .place-detail__photo img { width: 100%; height: auto; display: block; }
+.place-detail__photo figcaption, .places-credits { font-size: 13px; color: var(--muted); }
+.place-detail__photo figcaption { padding-top: 8px; }
+.places-credits { margin-top: 12px; }
+.place-detail__photo figcaption a, .places-credits a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .place-detail__map { position: sticky; top: 100px; }
 .place-detail__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .place-facts { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
