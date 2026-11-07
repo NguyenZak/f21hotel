@@ -66,10 +66,10 @@ export const nav = [
   { href: "/dat-phong", label: "Liên hệ" },
 ] as const;
 
-// Menu trên thanh header (logo ở giữa nên chỉ 4 mục); các trang còn lại nằm ở footer qua `nav`.
-// Chưa có trang Giới thiệu riêng: dẫn về khối Tổng quan (Intro, anchor "tong-quan") của trang chủ.
+// Menu trên thanh header (logo ở giữa nên chỉ 5 mục, vừa khít nửa trái từ 1181px); các trang còn lại nằm ở footer qua `nav`.
 export const headerNav = [
-  { href: "/#tong-quan", label: "Giới thiệu" },
+  { href: "/", label: "Trang chủ" },
+  { href: "/gioi-thieu", label: "Giới thiệu" },
   { href: "/phong", label: "Phòng nghỉ" },
   { href: "/kham-pha", label: "Khám phá" },
   { href: "/bai-viet", label: "Cẩm nang" },

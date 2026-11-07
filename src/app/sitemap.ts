@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/phong": rooms.flatMap((r) => r.photos.map((p) => p.src)),
     "/vi-tri": locationPhotos.map((p) => p.src),
   };
-  const pages = [{ href: "/" }, ...nav, { href: "/bai-viet" }, { href: "/kham-pha" }, { href: "/dieu-khoan" }, { href: "/chinh-sach-bao-mat" }].map(({ href }) => ({
+  const pages = [{ href: "/" }, { href: "/gioi-thieu" }, ...nav, { href: "/bai-viet" }, { href: "/kham-pha" }, { href: "/dieu-khoan" }, { href: "/chinh-sach-bao-mat" }].map(({ href }) => ({
     url: abs(href),
     ...(images[href]?.length ? { images: [...new Set(images[href])].map(abs) } : {}),
   }));

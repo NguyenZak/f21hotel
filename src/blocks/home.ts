@@ -200,3 +200,22 @@ export const defaultHome: Data = {
   ],
   zones: {},
 };
+
+// Trang Giới thiệu (/gioi-thieu): dùng khi CMS › Trang › "gioi-thieu" chưa xuất bản lần nào.
+// Cùng các khối với trang chủ nhưng bỏ phần bán phòng (hero tìm phòng, giá, ưu đãi), tập trung vào F21 là nơi thế nào.
+export const defaultAbout: Data = {
+  root: { props: { title: "Giới thiệu" } },
+  content: [
+    block("Intro", 1, { ...introDefaults, anchor: "tong-quan" }),
+    block("Gallery", 1, galleryDefaults),
+    block("Guests", 1, guestsDefaults),
+    block("Location", 1, { ...locationDefaults, anchor: "vi-tri", background: "cream" }),
+    block("Reviews", 1, { ...reviewsDefaults, background: "" }),
+    block("Perks", 1, perksDefaults),
+    block("Cta", 1, ctaDefaults),
+  ],
+  zones: {},
+};
+
+// Bố cục mặc định theo slug trang trong CMS (trang khác bắt đầu trống)
+export const defaultPages: Record<string, Data> = { home: defaultHome, "gioi-thieu": defaultAbout };

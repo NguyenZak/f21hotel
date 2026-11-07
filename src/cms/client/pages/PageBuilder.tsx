@@ -3,7 +3,7 @@
 import type { Data } from "@puckeditor/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { defaultHome } from "@/blocks/home";
+import { defaultPages } from "@/blocks/home";
 import type { BlockMeta } from "@/blocks/types";
 import { api, ApiError } from "../api";
 import { Editor, type SaveResult } from "../PuckEditor";
@@ -42,7 +42,7 @@ export function PageBuilder() {
       id={page.id}
       title={page.title}
       path={page.slug === "home" ? "/" : `/${page.slug}`}
-      data={page.draft ?? page.data ?? (page.slug === "home" ? defaultHome : empty)}
+      data={page.draft ?? page.data ?? defaultPages[page.slug] ?? empty}
       metadata={meta}
       fontRoles={Object.fromEntries(Object.entries(fonts).map(([role, key]) => [`--font-role-${role}`, `var(--font-${key})`]))}
       hasDraft={Boolean(page.draft)}

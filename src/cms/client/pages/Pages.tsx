@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api, ApiError } from "../api";
 import { formatTime } from "../ui";
 
-// Danh sách trang dựng bằng trình kéo thả. Hiện website dùng trang "home" (trang chủ).
+// Danh sách trang dựng bằng trình kéo thả: "home" (trang chủ) và "gioi-thieu" (/gioi-thieu).
 type PageRow = { id: number; title: string; slug: string; publishedAt: string; hasDraft: boolean; updatedAt: string };
 
 export function PagesPage() {

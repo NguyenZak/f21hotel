@@ -8,6 +8,9 @@ import { headerNav, type Contact } from "@/lib/site";
 import { track } from "@/lib/track";
 import { IconPhone, IconZalo } from "./Icons";
 
+// "/" chỉ sáng ở đúng trang chủ (mọi đường dẫn đều bắt đầu bằng "/")
+const isCurrent = (pathname: string, href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
 export function Header({ contact }: { contact: Contact }) {
   const { name, phoneDisplay, telLink, zaloLink } = contact;
   const pathname = usePathname();
@@ -40,7 +43,7 @@ export function Header({ contact }: { contact: Contact }) {
           <ul>
             {headerNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>
+                <Link href={item.href} aria-current={isCurrent(pathname, item.href) ? "page" : undefined}>
                   {item.label}
                 </Link>
               </li>
