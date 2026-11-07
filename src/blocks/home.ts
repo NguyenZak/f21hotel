@@ -94,7 +94,7 @@ export const guestsDefaults: B.GuestsProps = {
       icon: "rings",
       title: "Người thân dự cưới",
       text: "Họ hàng từ quê lên dự cưới, giỗ, tân gia của gia đình ở Vinhomes Thăng Long, Nam An Khánh.",
-      quote: "Nhà chật, khách quê lên ăn cưới cứ để F21 lo chỗ ngủ.",
+      quote: "Nhà chật, khách đi ăn cưới cứ để F21 lo chỗ ngủ.",
     },
     {
       icon: "ticket",

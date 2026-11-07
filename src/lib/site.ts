@@ -367,7 +367,7 @@ export const offers: Offer[] = [
   {
     slug: "mua-cuoi",
     tag: "Mùa cưới",
-    title: "Khách quê lên ăn cưới, để F21 lo chỗ ngủ",
+    title: "Khách đi ăn cưới, để F21 lo chỗ ngủ",
     summary: "Ngay trong khu biệt thự Hoa Phượng, sáng sang nhà người thân ở Vinhomes Thăng Long, Nam An Khánh chỉ vài phút.",
     when: "Đến hết 31/1/2027",
     details: [
