@@ -1099,7 +1099,7 @@ html[data-lightbox-open] { overflow: hidden; }
 .post-card__blank { display: block; aspect-ratio: 16 / 9; background: var(--gold-grad); opacity: 0.35; }
 .post-card__meta { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-text); }
 .post-card__link > .post-card__meta:first-child { padding-top: 22px; }
-.post-card h2, .post-card h3 { font-size: clamp(21px, 2vw, 25px); line-height: 1.3; color: var(--maroon); margin: 0; }
+.post-card h2, .post-card h3 { font-size: clamp(17px, 1.5vw, 19px); line-height: 1.4; letter-spacing: 0.01em; color: var(--maroon); margin: 0; }
 .post-card p { color: var(--muted); line-height: 1.6; margin: 0; }
 .post-empty { color: var(--muted); font-size: 18px; }
 .post-related__title { margin-bottom: 28px; }
