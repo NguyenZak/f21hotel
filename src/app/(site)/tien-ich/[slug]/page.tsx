@@ -12,7 +12,7 @@ import { breadcrumbTrailJsonLd, JsonLd, OG_IMAGES, ogImageMeta } from "@/lib/seo
 import { placeCategory, placeIndexable } from "@/lib/site";
 
 // Trang chi tiết một địa điểm xung quanh. Dựng sẵn lúc build như bài viết; mã không có thì worker.ts trả 404 trước khi tới đây.
-// Trang chưa có giới thiệu chi tiết chỉ có vài dòng nên không cho Google lập chỉ mục (tránh trang mỏng); trang /kham-pha vẫn lập chỉ mục.
+// Trang chưa có giới thiệu chi tiết chỉ có vài dòng nên không cho Google lập chỉ mục (tránh trang mỏng); trang /tien-ich vẫn lập chỉ mục.
 const NO_PLACES = "chua-co-dia-diem";
 
 export async function generateStaticParams() {
@@ -28,7 +28,7 @@ const findPlace = async (params: Promise<{ slug: string }>) => {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const [place, site] = await Promise.all([findPlace(params), getSite()]);
   if (!place) return { title: "Không tìm thấy địa điểm", robots: { index: false } };
-  const path = `/kham-pha/${place.slug}`;
+  const path = `/tien-ich/${place.slug}`;
   const title = `${place.name}${place.time ? `: cách F21 ${place.time}` : ""}`;
   const description = [place.note, place.address, `Gần ${site.name}, khu biệt thự Hoa Phượng, An Khánh.`].filter(Boolean).join(". ").replace(/\.\./g, ".");
   const og = place.photo ? { images: [{ url: place.photo.src, width: place.photo.w, height: place.photo.h, alt: place.photo.alt }] } : ogImageMeta(OG_IMAGES.location);
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {
   const [place, site, places] = await Promise.all([findPlace(params), getSite(), getPlaces()]);
   if (!place) notFound();
-  const path = `/kham-pha/${place.slug}`;
+  const path = `/tien-ich/${place.slug}`;
   const cat = placeCategory(place.category);
   const body = place.body.trim() ? renderMarkdown(place.body).html : "";
   const others = places.filter((p) => p.category === place.category && p.slug !== place.slug).slice(0, 5);
@@ -52,8 +52,8 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
 
   return (
     <>
-      <JsonLd data={breadcrumbTrailJsonLd(site, [["Tiện ích F21", "/kham-pha"], [place.name, path]])} />
-      <PageHero crumb={place.name} parent={{ href: "/kham-pha", label: "Tiện ích F21" }} eyebrow={cat?.label ?? "Tiện ích F21"} title={place.name}>
+      <JsonLd data={breadcrumbTrailJsonLd(site, [["Tiện ích F21", "/tien-ich"], [place.name, path]])} />
+      <PageHero crumb={place.name} parent={{ href: "/tien-ich", label: "Tiện ích F21" }} eyebrow={cat?.label ?? "Tiện ích F21"} title={place.name}>
         {place.note || undefined}
       </PageHero>
 
@@ -123,7 +123,7 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
             <h2 className="places-group__title">{cat ? `${cat.label} khác quanh F21` : "Địa điểm khác quanh F21"}</h2>
             <PlaceMosaic places={others} />
             <div className="places-more">
-              <Link className="link-arrow" href="/kham-pha">
+              <Link className="link-arrow" href="/tien-ich">
                 Xem tất cả tiện ích xung quanh
               </Link>
             </div>

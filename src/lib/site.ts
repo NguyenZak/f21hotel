@@ -71,7 +71,7 @@ export const headerNav = [
   { href: "/", label: "Trang chủ" },
   { href: "/gioi-thieu", label: "Giới thiệu" },
   { href: "/phong", label: "Phòng nghỉ" },
-  { href: "/kham-pha", label: "Khám phá" },
+  { href: "/tien-ich", label: "Tiện ích" },
   { href: "/bai-viet", label: "Cẩm nang" },
 ] as const;
 

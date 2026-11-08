@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LocationPage() {
   const [site, places] = await Promise.all([getSite(), getPlaces()]);
-  // Mỗi nhóm 5 địa điểm đầu (vừa lưới); đủ danh sách ở /kham-pha
+  // Mỗi nhóm 5 địa điểm đầu (vừa lưới); đủ danh sách ở /tien-ich
   const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value).slice(0, 5) })).filter((g) => g.places.length);
   return (
     <>
@@ -118,7 +118,7 @@ export default async function LocationPage() {
           ) : null}
           {groups.length ? (
             <div className="places-more">
-              <Link className="link-arrow" href="/kham-pha">
+              <Link className="link-arrow" href="/tien-ich">
                 Xem tất cả tiện ích xung quanh
               </Link>
             </div>

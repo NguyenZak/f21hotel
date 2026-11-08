@@ -4,7 +4,7 @@ import type { Place } from "@/lib/site";
 import { IconBag, IconFood, IconSport, IconTicket } from "./Icons";
 
 // Lưới ảnh Tiện ích xung quanh (CMS › Tiện ích xung quanh): địa điểm đầu tiên ô lớn, các ô sau nhỏ hơn.
-// Bấm ô mở trang chi tiết /kham-pha/<mã> (ghi công ảnh giấy phép mở ở đó, dưới ảnh lớn). Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
+// Bấm ô mở trang chi tiết /tien-ich/<mã> (ghi công ảnh giấy phép mở ở đó, dưới ảnh lớn). Địa điểm chưa có ảnh hiện ô màu theo nhóm kèm biểu tượng.
 // Dùng ở trang Vị trí và khối "Tiện ích F21" của trình dựng trang (chạy cả trên trình duyệt), nên không đọc dữ liệu ở đây.
 const ICON = {
   "vui-choi": IconTicket,
@@ -30,7 +30,7 @@ export function PlaceMosaic({ places }: { places: Place[] }) {
               key={`${p.name}-${i}`}
               className={`place place--${p.category}${p.photo ? "" : " place--text"}`}
             >
-              <Link href={`/kham-pha/${p.slug}`}>
+              <Link href={`/tien-ich/${p.slug}`}>
                 {p.photo ? (
                   <Image
                     src={p.photo.src}

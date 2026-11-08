@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
   return pageMeta(
     site,
-    "/kham-pha",
+    "/tien-ich",
     "Ăn uống, vui chơi, thể thao quanh F21 An Khánh",
     `Quán ăn, cà phê, Thiên đường Bảo Sơn, sân pickleball, siêu thị, bệnh viện gần ${site.name} ở khu biệt thự Hoa Phượng, An Khánh. Có thời gian đi từ khách sạn.`,
     OG_IMAGES.location,
@@ -25,7 +25,7 @@ export default async function NearbyPage() {
   const groups = PLACE_CATEGORIES.map((c) => ({ ...c, places: places.filter((p) => p.category === c.value) })).filter((g) => g.places.length);
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd(site, "/kham-pha", "Tiện ích F21")} />
+      <JsonLd data={breadcrumbJsonLd(site, "/tien-ich", "Tiện ích F21")} />
       <PageHero crumb="Tiện ích F21" eyebrow="Tiện ích F21" title="Ăn uống, vui chơi, thể thao quanh F21">
         Những chỗ gần khu biệt thự Hoa Phượng, An Khánh. Bấm vào từng địa điểm để xem địa chỉ, bản đồ và đường đi.
       </PageHero>
