@@ -66,7 +66,7 @@ export const nav = [
   { href: "/dat-phong", label: "Liên hệ" },
 ] as const;
 
-// Menu trên thanh header (logo ở giữa nên chỉ 5 mục, vừa khít nửa trái từ 1181px); các trang còn lại nằm ở footer qua `nav`.
+// Menu trên thanh header (5 mục, logo bên trái); các trang còn lại nằm ở footer qua `nav`.
 export const headerNav = [
   { href: "/", label: "Trang chủ" },
   { href: "/gioi-thieu", label: "Giới thiệu" },
