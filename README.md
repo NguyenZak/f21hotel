@@ -71,7 +71,7 @@ Chi tiết:
 - **Vận hành:** Hôm nay, Đặt phòng (tạo/sửa, gán phòng, Xác nhận → Nhận phòng → Trả phòng), Lịch phòng ([src/cms/server/bookings.ts](src/cms/server/bookings.ts)).
 - **Nội dung:** hạng phòng, phòng, giá theo ngày, ưu đãi, đánh giá, hỏi đáp, thông tin khách sạn, giao diện, khai báo ở [src/cms/schema.ts](src/cms/schema.ts); form và API sinh từ khai báo này. Thêm trường: thêm cột vào D1 (file `db/migrations/NNNN_*.sql`, chạy `npx wrangler d1 execute D1 --remote --file …`) rồi khai báo trong schema.ts.
 - **Ảnh:** Cloudinary. Trình duyệt tải thẳng lên Cloudinary bằng chữ ký do API cấp ([src/cms/server/media.ts](src/cms/server/media.ts)).
-- **Trình dựng trang:** CMS › Website › Trang › Mở trình dựng (`/quan-tri/dung-trang?id=`), dựng bằng [Puck](https://puckeditor.com). Lưu nháp không đổi website; Xuất bản mới đưa lên. Các khối ở [src/blocks](src/blocks): `render.tsx` (giao diện), `editor-config.tsx` (trường chỉnh sửa), `config.ts` (bản chỉ hiển thị).
+- **Trình dựng trang:** CMS › Website › Trang › Mở trình dựng (`/quan-tri/dung-trang?id=`), dựng bằng [Puck](https://puckeditor.com). Lưu nháp không đổi website; Xuất bản thì website tự cập nhật sau khoảng 10 phút. Các khối ở [src/blocks](src/blocks): `render.tsx` (giao diện), `editor-config.tsx` (trường chỉnh sửa), `config.ts` (bản chỉ hiển thị).
 
 ### Chạy ở máy
 
@@ -87,7 +87,7 @@ npm run dev                # mở http://localhost:3000/quan-tri
 
 ### Bài viết (cẩm nang SEO/GEO)
 
-CMS › Bài viết: tiêu đề, tóm tắt, ảnh bìa, nội dung Markdown (có xem trước), hỏi đáp cuối bài. Website: `/bai-viet`, `/bai-viet/<mã>` (schema BlogPosting, FAQPage, breadcrumb), sitemap và `/llms.txt` tự thêm bài. Bài còn dấu `[CẦN XÁC NHẬN]` không bật “Đăng” được. Đường dẫn bài không có bị worker.ts trả 404 trước khi tới Next.js. Code: [src/lib/markdown.ts](src/lib/markdown.ts), [src/app/(site)/bai-viet](src/app/(site)/bai-viet). Bài lên website sau khi bấm **Xuất bản website**.
+CMS › Bài viết: tiêu đề, tóm tắt, ảnh bìa, nội dung Markdown (có xem trước), hỏi đáp cuối bài. Website: `/bai-viet`, `/bai-viet/<mã>` (schema BlogPosting, FAQPage, breadcrumb), sitemap và `/llms.txt` tự thêm bài. Bài còn dấu `[CẦN XÁC NHẬN]` không bật “Đăng” được. Đường dẫn bài không có bị worker.ts trả 404 trước khi tới Next.js. Code: [src/lib/markdown.ts](src/lib/markdown.ts), [src/app/(site)/bai-viet](src/app/(site)/bai-viet). Bật “Đăng” và lưu: bài lên website sau khoảng 10 phút (tự build lại, [docs/xuat-ban.md](docs/xuat-ban.md)).
 
 ### Đặt phòng trực tuyến
 
@@ -102,4 +102,4 @@ Trang `/dat-phong`: chọn ngày và số khách → xem phòng trống và giá
 
 ### Deploy
 
-Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), có `.env.local` (cần `CLOUDINARY_CLOUD_NAME` để dựng URL ảnh), rồi `npm run build:cf` và `npx opennextjs-cloudflare deploy`. `build:cf` dùng env `build` trong wrangler.jsonc: D1 đọc thẳng database thật, nên trang dựng sẵn khớp nội dung CMS (`next dev` vẫn dùng D1 giả lập ở máy). Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`, `RESEND_API_KEY`, `DEPLOY_HOOK_URL`. Khi đã cài Workers Builds ([docs/xuat-ban.md](docs/xuat-ban.md)), deploy bằng cách đưa commit vào nhánh `production` (sau khi chạy migration); nội dung CMS lên website bằng nút **Xuất bản website** trong CMS. Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).
+Build từ một bản checkout sạch của commit cần deploy (không lẫn thay đổi chưa commit), có `.env.local` (cần `CLOUDINARY_CLOUD_NAME` để dựng URL ảnh), rồi `npm run build:cf` và `npx opennextjs-cloudflare deploy`. `build:cf` dùng env `build` trong wrangler.jsonc: D1 đọc thẳng database thật, nên trang dựng sẵn khớp nội dung CMS (`next dev` vẫn dùng D1 giả lập ở máy). Secret trên Cloudflare: `PAYLOAD_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `BOOKING_WEBHOOK_URL`, `RESEND_API_KEY`, `DEPLOY_HOOK_URL`. Khi đã cài Workers Builds ([docs/xuat-ban.md](docs/xuat-ban.md)), deploy bằng cách đưa commit vào nhánh `production` (sau khi chạy migration); nội dung CMS tự lên website khoảng 10 phút sau khi lưu (cron gọi Deploy Hook, [src/cms/server/publish.ts](src/cms/server/publish.ts)). Đo CPU: `npx wrangler tail f21hotel --format json` (trường `cpuTime`).

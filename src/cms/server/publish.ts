@@ -1,57 +1,36 @@
-// Xuất bản website: trang website chỉ dựng lúc build (sửa CMS không dựng lại trang trên Workers Free, xem worker.ts),
-// nên nút "Xuất bản website" gọi Deploy Hook của Workers Builds để Cloudflare build lại từ D1 thật và deploy.
-// Cài đặt: docs/xuat-ban.md. Mỗi lần bấm ghi audit_logs (target "publish"); thay đổi nội dung kể từ lần đó
-// đọc từ audit_logs. Bản đang chạy lấy từ binding version_metadata (wrangler.jsonc).
+// Tự cập nhật website sau khi lưu trong CMS (thay cho nút "Xuất bản website", bỏ 08/11/2026).
+// Trang website chỉ dựng lúc build (Workers Free không đủ CPU để dựng lại trang khi lưu, xem worker.ts), nên cron
+// mỗi 2 phút (wrangler.jsonc "triggers") gọi Deploy Hook của Workers Builds khi có nội dung mới đã lưu và đã
+// ngừng sửa AUTO_QUIET_MS: sửa nhiều thứ liên tiếp chỉ build một lần. Mỗi lần gọi ghi audit_logs (target "publish",
+// không có người dùng); thay đổi sau mốc đó sẽ được build ở lần sau. Cài Deploy Hook: docs/xuat-ban.md.
 import { str } from "@/lib/sql";
-import { collectionBySlug } from "../schema";
-import { audit, fail, json, type CmsContext, type CmsUser } from "./http";
 
-type Ctx = { ctx: CmsContext; user: CmsUser };
-type Row = Record<string, unknown>;
+export const AUTO_PUBLISH_CRON = "*/2 * * * *";
+const AUTO_QUIET_MS = 2 * 60_000;
 
-// Mục có hiện trên website (đặt phòng, giá theo ngày, tài khoản chạy trực tiếp qua API, không cần xuất bản)
+// Mục có hiện trên website (đặt phòng, giá theo ngày, tài khoản chạy trực tiếp qua API, không cần build).
+// Lưu nháp trang kéo thả ghi action "draft", không tính.
 const PAGE_TARGETS = ["site-settings", "theme-settings", "room-types", "rooms", "offers", "reviews", "faqs", "posts", "places", "pages", "media"];
-const targetLabel = (t: string) => collectionBySlug(t)?.label ?? ({ pages: "Trang", media: "Thư viện ảnh" } as Record<string, string>)[t] ?? t;
 const marks = (n: number) => Array(n).fill("?").join(", ");
 
-const status = async ({ ctx }: Ctx) => {
-  const last = await ctx.d
-    .prepare("select a.created_at, a.doc_id, u.name from audit_logs a left join users u on u.id = a.user_id where a.target = 'publish' order by a.id desc limit 1")
-    .first<Row>();
-  const since = str(last?.created_at) || "1970-01-01";
-  const { results } = await ctx.d
-    .prepare(`select target, count(*) n, max(created_at) at from audit_logs where target in (${marks(PAGE_TARGETS.length)}) and created_at > ? group by target order by at desc`)
+export async function autoPublish(d: D1Database, deployHook: string | undefined): Promise<string> {
+  if (!deployHook) return "";
+  const last = await d.prepare("select max(created_at) at from audit_logs where target = 'publish'").first<{ at: string | null }>();
+  const since = str(last?.at) || "1970-01-01";
+  const change = await d
+    .prepare(`select max(created_at) at from audit_logs where target in (${marks(PAGE_TARGETS.length)}) and action != 'draft' and created_at > ?`)
     .bind(...PAGE_TARGETS, since)
-    .all<Row>();
-  return json({
-    ok: true,
-    configured: Boolean(ctx.deployHook),
-    live: ctx.version ?? null,
-    last: last ? { at: str(last.created_at), by: str(last.name), build: str(last.doc_id) } : null,
-    pending: results.map((r) => ({ label: targetLabel(str(r.target)), count: Number(r.n), at: str(r.at) })),
-  });
-};
+    .first<{ at: string | null }>();
+  const at = str(change?.at);
+  if (!at || Date.now() - Date.parse(at) < AUTO_QUIET_MS) return "";
 
-const publish = async ({ ctx, user }: Ctx) => {
-  if (!ctx.deployHook) return fail(400, "Chưa cài nút xuất bản (thiếu DEPLOY_HOOK_URL). Xem docs/xuat-ban.md.");
-  const recent = await ctx.d
-    .prepare("select 1 from audit_logs where target = 'publish' and created_at > ? limit 1")
-    .bind(new Date(Date.now() - 60_000).toISOString())
-    .first();
-  if (recent) return fail(429, "Vừa bấm xuất bản dưới một phút trước. Website đang được dựng lại, chờ vài phút.");
-  let data: { success?: boolean; result?: { build_uuid?: string; already_exists?: boolean }; errors?: { message?: string }[] };
-  try {
-    const res = await fetch(ctx.deployHook, { method: "POST", signal: AbortSignal.timeout(15_000) });
-    data = (await res.json().catch(() => ({}))) as typeof data;
-    if (!res.ok || !data.success) return fail(502, `Cloudflare không nhận yêu cầu (${res.status}${data.errors?.[0]?.message ? `: ${data.errors[0].message}` : ""}).`);
-  } catch {
-    return fail(502, "Không kết nối được Cloudflare, thử lại sau.");
-  }
-  await audit(ctx, user, "create", "publish", data.result?.build_uuid ?? "", "Xuất bản website");
-  return json({ ok: true, alreadyRunning: Boolean(data.result?.already_exists) });
-};
-
-export const publishRoutes = [
-  { method: "GET", match: (p: string[]) => p[0] === "publish" && p.length === 1, roles: ["owner", "manager"] as const, handler: status },
-  { method: "POST", match: (p: string[]) => p[0] === "publish" && p.length === 1, roles: ["owner", "manager"] as const, handler: publish },
-];
+  const res = await fetch(deployHook, { method: "POST", signal: AbortSignal.timeout(15_000) });
+  const data = (await res.json().catch(() => ({}))) as { success?: boolean; result?: { build_uuid?: string }; errors?: { message?: string }[] };
+  // Lỗi thì không ghi mốc: lần cron sau thử lại
+  if (!res.ok || !data.success) return `lỗi ${res.status}${data.errors?.[0]?.message ? `: ${data.errors[0].message}` : ""}`;
+  await d
+    .prepare("insert into audit_logs (user_id, action, target, doc_id, title) values (null, 'create', 'publish', ?, ?)")
+    .bind(data.result?.build_uuid ?? "", "Tự cập nhật website")
+    .run();
+  return `build ${data.result?.build_uuid ?? ""} (nội dung lưu lúc ${at})`;
+}

@@ -173,7 +173,7 @@ export function CollectionEditPage({ path }: { path: string }) {
       const r = await api<{ id: number }>(def.global || !id ? `c/${def.slug}` : `c/${def.slug}/${id}`, { method: def.global || id ? "PATCH" : "POST", body: doc });
       setDirty(false);
       if (!def.global && !id) router.replace(`/quan-tri/${def.path}/sua?id=${r.id}`);
-      say("Đã lưu. Vào “Xuất bản website” để đưa thay đổi lên website.");
+      say("Đã lưu. Website tự cập nhật sau khoảng 10 phút.");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Không lưu được.");
       window.scrollTo({ top: 0, behavior: "smooth" });

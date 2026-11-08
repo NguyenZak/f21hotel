@@ -8,7 +8,7 @@ import { formatViDate } from "@/lib/dates";
 import { breadcrumbJsonLd, JsonLd, OG_IMAGES, pageMeta } from "@/lib/seo";
 import { postTopicLabel } from "@/lib/site";
 
-// Cẩm nang: các bài viết đã đăng trong CMS › Bài viết. Dựng sẵn lúc build (bài mới lên sau khi bấm Xuất bản website).
+// Cẩm nang: các bài viết đã đăng trong CMS › Bài viết. Dựng sẵn lúc build (bài mới lên khi cron tự build lại sau lúc lưu, src/cms/server/publish.ts).
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();

@@ -20,7 +20,7 @@ export function PagesPage() {
       <div className="c-page__head">
         <div>
           <h1>Trang</h1>
-          <p>Kéo thả các khối (hero, phòng, ưu đãi, hỏi đáp…) để sắp xếp nội dung trang. Lưu nháp không đổi website; bấm Xuất bản mới đưa lên.</p>
+          <p>Kéo thả các khối (hero, phòng, ưu đãi, hỏi đáp…) để sắp xếp nội dung trang. Lưu nháp không đổi website; bấm Xuất bản thì website tự cập nhật sau khoảng 10 phút.</p>
         </div>
       </div>
       {error ? <p className="c-alert c-alert--error">{error}</p> : null}

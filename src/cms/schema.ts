@@ -227,7 +227,7 @@ export const COLLECTIONS: CollectionDef[] = [
         help: "3–5 câu khách hay hỏi kèm câu trả lời ngắn. Website gắn dữ liệu cấu trúc FAQ cho Google và AI.",
       },
       { type: "date", name: "publishedAt", column: "published_at", label: "Ngày đăng", half: true, help: "Để trống thì lấy ngày bật “Đăng”." },
-      { type: "bool", name: "published", column: "published", label: "Đăng lên website", help: "Bài lên website sau khi bấm Xuất bản website." },
+      { type: "bool", name: "published", column: "published", label: "Đăng lên website", help: "Bật và lưu: bài lên website sau khoảng 10 phút." },
     ],
   },
   {
@@ -245,7 +245,7 @@ export const COLLECTIONS: CollectionDef[] = [
     tags: [CMS_TAGS.places],
     payloadLocks: false,
     intro:
-      "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Tiện ích F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi; đổi xong bấm Xuất bản website.",
+      "Quán ăn, chỗ vui chơi, sân thể thao, siêu thị… quanh F21. Hiện thành lưới ảnh ở trang Vị trí và khối “Tiện ích F21” trên trang chủ. Chỉ ghi chỗ lễ tân đã biết hoặc đã đi. Lưu xong, website tự cập nhật sau khoảng 10 phút.",
     fields: [
       { type: "text", name: "name", column: "name", label: "Tên địa điểm", required: true, half: true, help: "Ví dụ: Thiên đường Bảo Sơn" },
       { type: "text", name: "slug", column: "slug", label: "Mã (dùng trong đường dẫn)", required: true, half: true, help: `${slugHelp}-thien-duong-bao-son. Trang chi tiết: /tien-ich/<mã>.` },

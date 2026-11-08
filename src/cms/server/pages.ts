@@ -47,7 +47,8 @@ const save = async ({ ctx, user, request, path }: Ctx) => {
   const data = JSON.stringify(cleanBlocks(b.data));
   if (b.publish) await ctx.d.prepare("update pages set data = ?, draft = null, published_at = ?, updated_at = ? where id = ?").bind(data, now, now, id).run();
   else await ctx.d.prepare("update pages set draft = ?, updated_at = ? where id = ?").bind(data, now, id).run();
-  await audit(ctx, user, "update", "pages", id, str(page.title));
+  // Lưu nháp ghi "draft" để không kích hoạt tự build lại website (publish.ts)
+  await audit(ctx, user, b.publish ? "update" : "draft", "pages", id, str(page.title));
   if (b.publish) await ctx.revalidate([CMS_TAGS.pages]);
   return json({ ok: true, publishedAt: b.publish ? now : undefined });
 };

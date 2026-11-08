@@ -4,6 +4,7 @@
 // File này không nằm trong tsconfig (wrangler đóng gói riêng).
 import { handleCmsApi } from "./src/cms/server/api";
 import { cloudinaryFrom, mediaUrlOf } from "./src/cms/server/media";
+import { AUTO_PUBLISH_CRON, autoPublish } from "./src/cms/server/publish";
 import { handleBookingApi } from "./src/lib/booking-api";
 import { sendReminders } from "./src/lib/booking-emails";
 import { mailConfigFrom } from "./src/lib/mailer";
@@ -47,8 +48,6 @@ export default {
         waitUntil: (p) => ctx.waitUntil(p),
         cloudinary: cloudinaryFrom(env as unknown as Record<string, unknown>),
         mail: mailConfigFrom(env as unknown as Record<string, unknown>),
-        deployHook: (env as unknown as { DEPLOY_HOOK_URL?: string }).DEPLOY_HOOK_URL,
-        version: (env as unknown as { CF_VERSION_METADATA?: { id: string; tag: string; timestamp: string } }).CF_VERSION_METADATA,
       });
       if (res) return res;
     }
@@ -112,8 +111,18 @@ export default {
     return nextWorker.fetch(request, env, ctx);
   },
 
-  // Cron (wrangler.jsonc "triggers"): email nhắc khách trước ngày nhận phòng. Lần chạy buổi chiều gửi lại đơn bị lỗi buổi sáng.
-  async scheduled(_controller: ScheduledController, env: CloudflareEnv, ctx: ExecutionContext) {
+  // Cron (wrangler.jsonc "triggers"): mỗi 2 phút tự build lại website khi CMS có nội dung mới (src/cms/server/publish.ts);
+  // 01:00 và 07:00 UTC gửi email nhắc khách trước ngày nhận phòng (lần buổi chiều gửi lại đơn bị lỗi buổi sáng).
+  async scheduled(controller: ScheduledController, env: CloudflareEnv, ctx: ExecutionContext) {
+    if (controller.cron === AUTO_PUBLISH_CRON) {
+      const hook = (env as unknown as { DEPLOY_HOOK_URL?: string }).DEPLOY_HOOK_URL;
+      ctx.waitUntil(
+        autoPublish(env.D1, hook)
+          .then((r) => r && console.log(`[publish] ${r}`))
+          .catch((e) => console.log(`[publish] lỗi: ${e}`)),
+      );
+      return;
+    }
     ctx.waitUntil(
       sendReminders(env.D1, mailConfigFrom(env as unknown as Record<string, unknown>)).then((r) => {
         if (r.sent || r.failed) console.log(`[email] nhắc lịch: gửi ${r.sent}, lỗi ${r.failed}`);

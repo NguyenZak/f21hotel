@@ -1,11 +1,13 @@
-# Xuất bản website (Workers Builds)
+# Tự cập nhật website (Workers Builds)
 
 Trang website chỉ dựng lúc build: Workers Free không đủ CPU để dựng lại trang mỗi khi lưu CMS (sự cố 02/11/2026).
-Vì vậy CMS có trang **Xuất bản website** (`/quan-tri/xuat-ban`, Chủ và Quản lý). Bấm nút là gọi **Deploy Hook** của
+Từ 08/11/2026 CMS không còn nút "Xuất bản website": lưu là đủ. Cron mỗi 2 phút (`src/cms/server/publish.ts`,
+`wrangler.jsonc` "triggers") thấy nội dung mới đã lưu và đã 2 phút không ai sửa thêm thì gọi **Deploy Hook** của
 Cloudflare Workers Builds. Cloudflare lấy code ở nhánh `production` trên GitHub, build lại (đọc D1 thật) rồi deploy.
-Khoảng 5–10 phút sau, website có nội dung mới. Trang Xuất bản tự báo khi bản mới đã lên.
+Khoảng 10 phút sau khi lưu, website có nội dung mới. Lưu nháp trang kéo thả không kích hoạt build.
+Mỗi lần gọi build ghi vào CMS › Nhật ký ("Bản cập nhật website"). Log: `npx wrangler tail f21hotel` (dòng `[publish]`).
 
-Không cần xuất bản với: đặt phòng, phòng trống, giá theo ngày, email khách. Các mục này chạy qua API, luôn cập nhật ngay.
+Không cần build với: đặt phòng, phòng trống, giá theo ngày, email khách. Các mục này chạy qua API, luôn cập nhật ngay.
 Gói Free có 3.000 phút build mỗi tháng, mỗi lần chỉ chạy một build, mỗi build tối đa 20 phút.
 
 ## Cài đặt (làm một lần, trên dashboard Cloudflare)
@@ -30,10 +32,10 @@ Khi vừa nối GitHub, Cloudflare build ngay một lần, nên D1 thật phải
      `CLOUDINARY_CLOUD_NAME` (bắt buộc: trang dựng sẵn cần nó để tạo đường dẫn ảnh),
      `CLOUDFLARE_ACCOUNT_ID` = `a53fd282b8369dffc65cf51b9e234e2a`,
      `CLOUDFLARE_API_TOKEN` (secret) = token ở bước 2, để wrangler đọc D1 thật trong bước build.
-4. Settings › Builds › **Deploy Hooks** › Create: đặt tên `CMS xuất bản`, chọn nhánh `production`. Chép URL.
+4. Settings › Builds › **Deploy Hooks** › Create: đặt tên `CMS tự cập nhật`, chọn nhánh `production`. Chép URL.
    Ai có URL này đều build được (không cần đăng nhập), nên giữ kín như mật khẩu.
 5. Đặt URL làm secret cho worker: `npx wrangler secret put DEPLOY_HOOK_URL`, rồi dán URL.
-6. Thử: CMS › Xuất bản website › bấm nút, rồi xem tiến độ ở Workers & Pages › `f21hotel` › Deployments / Builds.
+6. Thử: sửa một mục trong CMS, lưu, chờ 2–4 phút rồi xem tiến độ ở Workers & Pages › `f21hotel` › Deployments / Builds.
    Build lỗi thì website cũ vẫn chạy bình thường. Mở log build để xem lý do.
 
 ## Deploy code (cho người làm website)

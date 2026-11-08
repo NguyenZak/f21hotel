@@ -16,7 +16,6 @@ async function handle(request: Request) {
     waitUntil: (p) => after(p),
     cloudinary: cloudinaryFrom(process.env),
     mail: mailConfigFrom(process.env),
-    deployHook: process.env.DEPLOY_HOOK_URL,
   });
   return res ?? new Response("Not found", { status: 404 });
 }

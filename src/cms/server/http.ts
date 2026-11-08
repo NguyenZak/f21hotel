@@ -18,10 +18,6 @@ export type CmsContext = {
   cloudinary?: { cloudName: string; apiKey: string; apiSecret: string; folder: string };
   // Gửi email cho khách (src/lib/mailer.ts); không có thì CMS không gửi email
   mail?: MailConfig;
-  // Deploy Hook của Workers Builds (secret DEPLOY_HOOK_URL): nút "Xuất bản website" (src/cms/server/publish.ts)
-  deployHook?: string;
-  // Bản worker đang chạy (binding version_metadata); không có khi chạy next dev
-  version?: { id: string; tag: string; timestamp: string };
 };
 
 // ---------- Tiện ích ----------
@@ -53,7 +49,7 @@ export const toUser = (r: Record<string, unknown>): CmsUser => ({
 export const can = (user: CmsUser, ...roles: Role[]) => roles.includes(user.role);
 
 // Ghi nhật ký thao tác (cùng bảng với CMS cũ)
-export async function audit(ctx: CmsContext, user: CmsUser, action: "create" | "update" | "delete", target: string, docId: unknown, title?: string) {
+export async function audit(ctx: CmsContext, user: CmsUser, action: "create" | "update" | "delete" | "draft", target: string, docId: unknown, title?: string) {
   await ctx.d
     .prepare("insert into audit_logs (user_id, action, target, doc_id, title) values (?, ?, ?, ?, ?)")
     .bind(user.id, action, target, docId === undefined ? null : String(docId), title ?? null)

@@ -33,11 +33,10 @@
 		{ "binding": "NEXT_TAG_CACHE_KV", "id": "df3ae53b3e8342e4a6430b63e4e5f695" }
 	],
 	"observability": { "enabled": true },
-	// Bản worker đang chạy (id, thời điểm tải lên): trang CMS › Xuất bản website biết bản build mới đã lên chưa
-	"version_metadata": { "binding": "CF_VERSION_METADATA" },
+	// Mỗi 2 phút: tự build lại website khi CMS có nội dung mới đã lưu (src/cms/server/publish.ts).
 	// Email nhắc khách trước ngày nhận phòng (worker.ts scheduled): 8:00 và 14:00 giờ Việt Nam (giờ UTC + 7).
 	// Lần 14:00 chỉ gửi đơn chưa nhắc được (lỗi, hoặc khách đặt sau 8:00). Gửi email cần secret RESEND_API_KEY.
-	"triggers": { "crons": ["0 1 * * *", "0 7 * * *"] },
+	"triggers": { "crons": ["*/2 * * * *", "0 1 * * *", "0 7 * * *"] },
 	// Chỉ dùng lúc build (package.json "deploy": NEXT_DEV_WRANGLER_ENV=build). Trang website được dựng sẵn lúc build
 	// và không dựng lại trên Workers (worker.ts), nên phải đọc D1 thật ("remote": true), không phải D1 giả lập ở máy.
 	// Chỉ đọc, không ghi. `next dev` và `wrangler deploy` không dùng env này.

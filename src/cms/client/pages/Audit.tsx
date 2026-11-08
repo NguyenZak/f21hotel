@@ -7,7 +7,7 @@ import { formatTime } from "@/cms/client/ui";
 // Nhật ký thao tác (Chủ, Quản lý): ai thêm, sửa, xoá gì, lúc nào
 type Log = { id: number; action: string; target: string; doc_id: string | null; title: string | null; created_at: string; user_name: string | null };
 
-const ACTIONS: Record<string, string> = { create: "Thêm", update: "Sửa", delete: "Xoá" };
+const ACTIONS: Record<string, string> = { create: "Thêm", update: "Sửa", delete: "Xoá", draft: "Lưu nháp" };
 const TARGETS: Record<string, string> = {
   users: "Tài khoản",
   bookings: "Đặt phòng",
@@ -24,7 +24,7 @@ const TARGETS: Record<string, string> = {
   "theme-settings": "Giao diện",
   posts: "Bài viết",
   places: "Tiện ích xung quanh",
-  publish: "Bản xuất bản website",
+  publish: "Bản cập nhật website",
 };
 
 export function AuditPage() {

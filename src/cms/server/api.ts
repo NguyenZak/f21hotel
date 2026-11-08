@@ -8,7 +8,6 @@ import { reportRoutes } from "./reports";
 import { contentRoutes } from "./content";
 import { mediaRoutes } from "./media";
 import { pageRoutes } from "./pages";
-import { publishRoutes } from "./publish";
 import { hashPassword, needsRehash, readSession, signSession, verifyPassword } from "./crypto";
 import { audit, body, can, fail, json, ROLES, toUser, type CmsContext, type CmsUser, type Role } from "./http";
 
@@ -207,8 +206,6 @@ export const routes: Route[] = [
   ...contentRoutes,
   ...mediaRoutes,
   ...pageRoutes,
-  // Xuất bản website (Chủ, Quản lý)
-  ...publishRoutes,
 ];
 
 // Xử lý /api/cms/*. Trả null nếu không phải đường dẫn của API này.
