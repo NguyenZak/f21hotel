@@ -279,7 +279,7 @@ p { margin: 0; }
 /* Một lớp phủ màu đỏ mận đồng nhất, đậm hơn ở đáy cho thanh chọn ngày */
 .hero-visual::after {
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: linear-gradient(180deg, rgba(34, 7, 9, 0.5) 0%, rgba(34, 7, 9, 0.36) 42%, rgba(34, 7, 9, 0.8) 100%);
+  background: linear-gradient(180deg, rgba(34, 7, 9, 0.25) 0%, rgba(34, 7, 9, 0.18) 42%, rgba(34, 7, 9, 0.4) 100%);
 }
 .hero-body {
   display: grid; align-items: center; column-gap: 40px;
