@@ -62,7 +62,9 @@ export default async function RoomsPage() {
                   <tr key={room.slug}>
                     <th scope="row">
                       <a href={`#${room.slug}`}>{room.name}</a>
-                      <small>Phòng {room.roomNumbers.join(", ")}</small>
+                      <small>
+                        {room.roomNumbers.length} phòng ({room.roomNumbers.join(", ")})
+                      </small>
                     </th>
                     <td data-label="Nghỉ giờ (2 giờ đầu)">{formatVnd(room.prices.hourly)}</td>
                     <td data-label="Qua đêm (19:00 – 10:00)" className="hl">

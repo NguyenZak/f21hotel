@@ -6,7 +6,7 @@ export const site = {
   name: "F21 Hotel",
   tagline: "Ở khu biệt thự, giá khách sạn",
   description:
-    "F21 Hotel – khách sạn trong khu biệt thự Hoa Phượng, An Khánh, phía Tây Hà Nội. Yên tĩnh, cách Mỹ Đình khoảng 15–20 phút. Phòng qua đêm từ 600.000đ.",
+    "F21 Hotel – khách sạn trong khu biệt thự Hoa Phượng, An Khánh, phía Tây Hà Nội. Yên tĩnh, cách Mỹ Đình khoảng 15–20 phút. Phòng qua đêm từ 500.000đ.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://f21hotel.com.vn",
 
   phone: "0968740333",
@@ -35,7 +35,7 @@ export const site = {
   // Giờ nhận / trả phòng của hình thức nghỉ ngày đêm
   checkIn: "14:00",
   checkOut: "12:00",
-  priceFrom: 600000, // giá qua đêm thấp nhất
+  priceFrom: 500000, // giá qua đêm thấp nhất
 
   social: {
     facebook: "" as string, // TODO
@@ -163,10 +163,10 @@ export const rooms: Room[] = [
     name: "Phòng Đơn",
     short: "Phòng cho một hoặc hai người, đủ cho chuyến công tác hay một đêm đi xem sự kiện ở Mỹ Đình.",
     description:
-      "Hạng phòng nhiều nhất của F21, có ở tất cả các tầng. Lựa chọn hợp lý khi bạn cần một chỗ nghỉ sạch sẽ, yên tĩnh ở phía Tây Hà Nội.",
-    roomNumbers: ["103", "104", "204", "205", "304", "305", "404", "405"],
+      "Mỗi tầng có một phòng Đơn ở trục 4. Lựa chọn hợp lý khi bạn cần một chỗ nghỉ sạch sẽ, yên tĩnh ở phía Tây Hà Nội.",
+    roomNumbers: ["103", "204", "304", "404"],
     guests: 2,
-    prices: { hourly: 300000, overnight: 600000, fullDay: 900000, extraHour: 50000 },
+    prices: { hourly: 250000, overnight: 500000, fullDay: 700000, extraHour: 50000 },
     amenities: baseAmenities,
     photos: [
       { src: "/img/anh/don-1.webp", alt: "Phòng Đơn với giường đôi và vách kính phòng tắm", w: 1600, h: 1067 },
@@ -179,10 +179,10 @@ export const rooms: Room[] = [
     name: "Phòng Đơn VIP",
     short: "Phòng đơn hạng cao hơn cho hai người muốn thêm chút thoải mái.",
     description:
-      "Mỗi tầng có một phòng Đơn VIP. Phù hợp cho cặp đôi nghỉ cuối tuần hoặc khách công tác muốn không gian rộng rãi hơn.",
-    roomNumbers: ["101", "201", "301", "401"],
+      "Hạng phòng nhiều nhất của F21, nằm ở trục 1 và trục 5 của các tầng. Phù hợp cho cặp đôi nghỉ cuối tuần hoặc khách công tác muốn không gian rộng rãi hơn.",
+    roomNumbers: ["101", "104", "201", "205", "301", "305", "401", "405"],
     guests: 2,
-    prices: { hourly: 350000, overnight: 700000, fullDay: 1000000, extraHour: 50000 },
+    prices: { hourly: 300000, overnight: 600000, fullDay: 800000, extraHour: 50000 },
     amenities: baseAmenities,
     photos: [
       { src: "/img/anh/don-vip-1.webp", alt: "Phòng Đơn VIP với bồn tắm sau vách kính", w: 1536, h: 1024 },
@@ -198,7 +198,7 @@ export const rooms: Room[] = [
       "Đủ chỗ cho ba khách. Hạng phòng hợp với nhóm nhỏ đi xem concert, đi công tác hoặc gia đình ba người.",
     roomNumbers: ["202", "302", "402"],
     guests: 3,
-    prices: { hourly: 400000, overnight: 750000, fullDay: 1100000, extraHour: 70000 },
+    prices: { hourly: 350000, overnight: 700000, fullDay: 900000, extraHour: 70000 },
     amenities: baseAmenities,
     photos: [
       { src: "/img/anh/doi-1.webp", alt: "Phòng Đôi hai giường", w: 1600, h: 1067 },
@@ -214,7 +214,7 @@ export const rooms: Room[] = [
       "Đủ chỗ cho ông bà, bố mẹ và các cháu từ quê lên dự cưới, hay nhóm bạn đi xem sự kiện ở Mỹ Đình.",
     roomNumbers: ["102", "203", "303", "403"],
     guests: 4,
-    prices: { hourly: 450000, overnight: 800000, fullDay: 1200000, extraHour: 100000 },
+    prices: { hourly: 400000, overnight: 800000, fullDay: 1000000, extraHour: 70000 },
     amenities: baseAmenities,
     photos: [
       { src: "/img/anh/doi-4-1.webp", alt: "Phòng Đôi 4 người với hai giường lớn", w: 1600, h: 1067 },
@@ -246,7 +246,7 @@ export const heroSlides: HeroSlide[] = [
     bold: "F21 Hotel",
     light: "ở khu biệt thự",
     sub: "Giá bình dân, cách Sân vận động Mỹ Đình 15–20 phút",
-    cost: { value: formatVnd(300000), label: `Theo giờ từ · qua đêm từ ${formatVnd(600000)}`, href: "/phong" },
+    cost: { value: formatVnd(250000), label: `Theo giờ từ · qua đêm từ ${formatVnd(500000)}`, href: "/phong" },
     book: { label: "Đặt phòng", href: "/dat-phong" },
   },
   {
@@ -257,7 +257,7 @@ export const heroSlides: HeroSlide[] = [
     bold: "Phòng nghỉ",
     light: "sáng & yên tĩnh",
     sub: "Cửa sổ vòm, rèm voan, sàn gỗ. Phòng cho 2, 3 hoặc 4 người",
-    cost: { value: formatVnd(900000), label: "Ngày đêm từ · 14:00 – 12:00", href: "/phong" },
+    cost: { value: formatVnd(700000), label: "Ngày đêm từ · 14:00 – 12:00", href: "/phong" },
     book: { label: "Xem phòng", href: "/phong" },
   },
   {
@@ -351,7 +351,7 @@ export const offers: Offer[] = [
     code: "10FEST",
     details: [
       "Trả phòng muộn tới 14:00 khi nhắn mã 10FEST qua Zalo hoặc form đặt phòng", // TODO: khách sạn duyệt ưu đãi
-      "Phòng cho 2, 3 hoặc 4 người, qua đêm từ 600.000đ",
+      "Phòng cho 2, 3 hoặc 4 người, qua đêm từ 500.000đ",
       "Áp dụng cho các đêm 6, 7 và 8/11/2026, tuỳ phòng trống",
     ],
     featured: true,
@@ -383,7 +383,7 @@ export const offers: Offer[] = [
     summary: "Phòng Đơn VIP cho hai người, nghỉ yên tĩnh trong khu biệt thự sau một tối đi chơi phố.",
     when: "24–25/12/2026",
     code: "NOEL",
-    details: ["Phòng Đơn VIP qua đêm từ 700.000đ", "Trang trí Noel nhỏ trong phòng"], // TODO: khách sạn duyệt ưu đãi
+    details: ["Phòng Đơn VIP qua đêm từ 600.000đ", "Trang trí Noel nhỏ trong phòng"], // TODO: khách sạn duyệt ưu đãi
   },
   {
     slug: "tat-nien",
