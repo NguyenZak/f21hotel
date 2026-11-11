@@ -80,3 +80,7 @@ UPDATE offers_details
 SET text = replace(text, 'Phòng Đơn VIP qua đêm từ 700.000đ', 'Phòng Đơn VIP qua đêm từ 600.000đ')
 WHERE instr(text, 'Phòng Đơn VIP qua đêm từ 700.000đ') > 0;
 
+INSERT INTO audit_logs (user_id, action, target, doc_id, title)
+VALUES (null, 'update', 'room-types', '1', 'Cập nhật bảng giá phòng mới');
+
+
