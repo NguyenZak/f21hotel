@@ -42,9 +42,11 @@ export function CollectionListPage({ path }: { path: string }) {
   const def = collectionByPath(path)!;
   const { user } = useSession();
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [tab, setTab] = useState("all");
   const [filter, setFilter] = useState("");
   const [refs, setRefs] = useState<Record<number, string>>({});
   const [error, setError] = useState("");
+  const tabField = def.tabColumn ? (scalarByColumn(def, def.tabColumn) as Extract<Field, { type: "select" }> | undefined) : undefined;
   useEffect(() => {
     api<{ rows: Row[] }>(`c/${def.slug}`)
       .then((r) => setRows(r.rows))
@@ -78,8 +80,13 @@ export function CollectionListPage({ path }: { path: string }) {
       }),
     [def, refs],
   );
+  const shown = useMemo(
+    () => (!rows ? null : !def.tabColumn || tab === "all" ? rows : rows.filter((r) => String(r[def.tabColumn!]) === tab)),
+    [rows, def.tabColumn, tab],
+  );
   if (user && !hasRole(user, ...def.read)) return <Denied />;
   const canWrite = hasRole(user, ...def.write);
+  const addHref = `/quan-tri/${def.path}/sua${tabField && tab !== "all" ? `?${tabField.name}=${encodeURIComponent(tab)}` : ""}`;
   return (
     <>
       <div className="c-page__head">
@@ -88,12 +95,42 @@ export function CollectionListPage({ path }: { path: string }) {
           {def.intro ? <p>{def.intro}</p> : null}
         </div>
         {canWrite ? (
-          <Link className="c-btn c-btn--primary" href={`/quan-tri/${def.path}/sua`}>
+          <Link className="c-btn c-btn--primary" href={addHref}>
             + Thêm
           </Link>
         ) : null}
       </div>
       {error ? <p className="c-alert c-alert--error">{error}</p> : null}
+      {rows && tabField ? (
+        <nav className="c-chips" role="tablist" aria-label={tabField.label} style={{ marginBottom: 14 }}>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "all"}
+            className={`c-chip${tab === "all" ? " is-active" : ""}`}
+            onClick={() => setTab("all")}
+          >
+            Tất cả
+            <span className="c-chip__n">{rows.length}</span>
+          </button>
+          {tabField.options.map((o) => {
+            const n = rows.filter((r) => String(r[def.tabColumn!]) === o.value).length;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                role="tab"
+                aria-selected={tab === o.value}
+                className={`c-chip${tab === o.value ? " is-active" : ""}`}
+                onClick={() => setTab(o.value)}
+              >
+                {o.label}
+                <span className="c-chip__n">{n}</span>
+              </button>
+            );
+          })}
+        </nav>
+      ) : null}
       {rows && rows.length > 6 ? (
         <div className="c-toolbar">
           <input
@@ -104,17 +141,17 @@ export function CollectionListPage({ path }: { path: string }) {
             placeholder={`Lọc ${def.label.toLowerCase()}…`}
             aria-label={`Lọc ${def.label}`}
           />
-          <span className="c-muted">{rows.length} mục · bấm tiêu đề cột để sắp xếp</span>
+          <span className="c-muted">{shown?.length ?? 0} mục · bấm tiêu đề cột để sắp xếp</span>
         </div>
       ) : null}
       <div className="c-card c-table-wrap">
-        {!rows ? (
+        {!shown ? (
           <p className="c-empty">Đang tải…</p>
-        ) : !rows.length ? (
+        ) : !shown.length ? (
           <p className="c-empty">Chưa có mục nào.</p>
         ) : (
           <DataTable
-            data={rows}
+            data={shown}
             columns={columns}
             filter={filter}
             rowHref={(r) => `/quan-tri/${def.path}/sua?id=${r.id}`}
@@ -127,11 +164,15 @@ export function CollectionListPage({ path }: { path: string }) {
 }
 
 // Giá trị ban đầu khi thêm mới
-const blank = (def: CollectionDef) =>
+const blank = (def: CollectionDef, params?: URLSearchParams) =>
   Object.fromEntries(
     def.fields
       .filter((f) => f.type !== "section")
-      .map((f) => [f.name, f.type === "bool" ? (f.default ?? false) : f.type === "rows" || f.type === "refs" || f.type === "media" || f.type === "multi" ? [] : null]),
+      .map((f) => [
+        f.name,
+        params?.get(f.name) ??
+          (f.type === "bool" ? (f.default ?? false) : f.type === "rows" || f.type === "refs" || f.type === "media" || f.type === "multi" ? [] : null),
+      ]),
   );
 
 export function CollectionEditPage({ path }: { path: string }) {
@@ -140,7 +181,7 @@ export function CollectionEditPage({ path }: { path: string }) {
   const router = useRouter();
   const { user } = useSession();
   const id = def.global ? null : Number(params.get("id")) || null;
-  const [doc, setDoc] = useState<Row | null>(def.global || id ? null : blank(def));
+  const [doc, setDoc] = useState<Row | null>(def.global || id ? null : blank(def, params));
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");

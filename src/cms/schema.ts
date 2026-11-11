@@ -33,6 +33,8 @@ export type CollectionDef = {
   global?: boolean;
   titleField: string;
   listColumns?: string[];
+  // Cột kiểu "select" dùng để chia tab lọc nhanh ở trang danh sách
+  tabColumn?: string;
   order?: string;
   // Ai được xem / sửa / xoá
   read: Role[];
@@ -238,6 +240,7 @@ export const COLLECTIONS: CollectionDef[] = [
     group: "Website",
     titleField: "name",
     listColumns: ["name", "category", "time", "published"],
+    tabColumn: "category",
     order: 'category, "order", id',
     read: MANAGE,
     write: MANAGE,
