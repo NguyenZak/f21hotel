@@ -246,7 +246,7 @@ export const heroSlides: HeroSlide[] = [
     bold: "F21 Hotel",
     light: "ở khu biệt thự",
     sub: "Giá bình dân, cách Sân vận động Mỹ Đình 15–20 phút",
-    cost: { value: formatVnd(250000), label: `Theo giờ từ · qua đêm từ ${formatVnd(500000)}`, href: "/phong" },
+    cost: { value: formatVnd(250000), label: `Nghỉ giờ từ (2 giờ đầu) · qua đêm từ ${formatVnd(500000)}`, href: "/phong" },
     book: { label: "Đặt phòng", href: "/dat-phong" },
   },
   {
@@ -275,12 +275,12 @@ export const heroSlides: HeroSlide[] = [
     src: "/img/anh/hero-phong-doi.webp",
     srcMobile: "/img/anh/hero-phong-doi-1200.webp",
     alt: "Phòng hai giường cạnh cửa sổ vòm",
-    kicker: "Sự kiện Mỹ Đình · 7–8/11/2026",
-    bold: "Đi xem 10Fest",
-    light: "nghỉ ở F21",
-    sub: "Cách sân 15–20 phút, giá vẫn như ngày thường. Phòng 2–4 người",
-    cost: { value: "10FEST", label: "Mã ưu đãi khi đặt phòng", href: "/uu-dai#su-kien-my-dinh" },
-    book: { label: "Dùng ưu đãi", href: "/dat-phong?code=10FEST" },
+    kicker: "Đi nhóm, đi gia đình",
+    bold: "Phòng nhóm",
+    light: "cho 3–4 người",
+    sub: "Phòng Đôi cho 3 người, Phòng Đôi 4 người cho cả nhóm ở chung một phòng",
+    cost: { value: formatVnd(700000), label: "Qua đêm từ · phòng 3–4 người", href: "/phong" },
+    book: { label: "Xem phòng", href: "/phong" },
   },
 ];
 
