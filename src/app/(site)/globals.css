@@ -281,8 +281,8 @@ p { margin: 0; }
 .hero-visual::after {
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(34, 7, 9, 0.5) 0%, rgba(34, 7, 9, 0.28) 45%, rgba(34, 7, 9, 0) 72%),
-    linear-gradient(180deg, rgba(34, 7, 9, 0.28) 0%, rgba(34, 7, 9, 0.2) 40%, rgba(34, 7, 9, 0.6) 100%);
+    linear-gradient(90deg, rgba(34, 7, 9, 0.25) 0%, rgba(34, 7, 9, 0.14) 45%, rgba(34, 7, 9, 0) 72%),
+    linear-gradient(180deg, rgba(34, 7, 9, 0.14) 0%, rgba(34, 7, 9, 0.1) 40%, rgba(34, 7, 9, 0.3) 100%);
 }
 /* Bóng mờ nhẹ sau chữ, phòng khi ảnh có mảng trắng ngay sau dòng chữ */
 .hero-kicker, .hero-title, .hero-sub, .hero-book, .hero-cost small, .hero-bar {
@@ -418,7 +418,7 @@ section[id] { scroll-margin-top: var(--header-h); }
   .hero-book { margin-bottom: 0; }
   .hero-cost small { font-size: 13px; letter-spacing: 0.02em; }
   .hero-visual::after {
-    background: linear-gradient(180deg, rgba(34, 7, 9, 0.3) 0%, rgba(34, 7, 9, 0.38) 35%, rgba(34, 7, 9, 0.72) 100%);
+    background: linear-gradient(180deg, rgba(34, 7, 9, 0.15) 0%, rgba(34, 7, 9, 0.19) 35%, rgba(34, 7, 9, 0.36) 100%);
   }
   .hero-bar { margin-inline: var(--gutter); flex-direction: column; align-items: stretch; gap: 18px; }
   .hero-search { border-bottom-width: 1px; }
