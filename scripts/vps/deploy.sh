@@ -10,7 +10,7 @@
 set -euo pipefail
 VPS="${F21_VPS:-root@180.93.127.106}"
 KEY="${F21_KEY:-$HOME/.ssh/f21_vps}"
-SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$VPS")
+SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ServerAliveCountMax=6 "$VPS")
 cd "$(dirname "$0")/../.."
 
 set_env() { # set_env KEY VALUE: ghi/đổi một dòng trong /srv/f21/.env trên VPS
