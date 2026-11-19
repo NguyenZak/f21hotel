@@ -1,6 +1,12 @@
 # Chạy website trên VPS
 
-Từ 11/2026 website có thể chạy trên VPS (Node.js + SQLite) thay cho Cloudflare Workers. Nhánh `vps`.
+Từ 19/11/2026 website f21hotel.com.vn chạy trên VPS 180.93.127.106 (Node.js + SQLite), không còn dùng Cloudflare Workers.
+
+- DNS: nameserver mặc định của Tenten (ns-a1/a2/a3.tenten.vn), bản ghi A `@` và `www` → 180.93.127.106.
+  Không còn Cloudflare đứng trước.
+- HTTPS: Caddy tự xin và gia hạn chứng chỉ Let's Encrypt (/etc/caddy/Caddyfile), www chuyển về tên miền chính.
+- Cloudflare: worker `f21hotel` và D1 vẫn còn nhưng không phục vụ tên miền nữa. Đừng push nhánh `production`
+  (Workers Builds sẽ build bản Cloudflare, không còn chạy được với code này).
 
 ## Khác gì so với Cloudflare
 

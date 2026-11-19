@@ -15,15 +15,17 @@ npm run dev                      # http://localhost:3000
 npm run preview                  # build và chạy trong workerd, giống môi trường Cloudflare
 ```
 
-## Deploy lên Cloudflare
+## Deploy (VPS)
+
+Từ 19/11/2026 website chạy trên VPS (Node.js + SQLite), không còn chạy trên Cloudflare Workers. Hướng dẫn đầy đủ: [docs/vps.md](docs/vps.md).
 
 ```sh
-npx wrangler login
-npx wrangler secret put BOOKING_WEBHOOK_URL   # URL Google Apps Script
-npm run deploy
+scripts/vps/deploy.sh                                   # build trên VPS và chạy bản mới (~10 phút)
+scripts/vps/deploy.sh --migrate db/migrations/00xx.sql  # chạy migration trên SQLite của VPS (tự sao lưu trước)
 ```
 
-Sau đó gắn tên miền trong Cloudflare Dashboard → Workers → `f21-hotel-web` → Settings → Domains & Routes, và sửa `url` trong [src/lib/site.ts](src/lib/site.ts) cho đúng tên miền.
+Sửa nội dung trong CMS thì website cập nhật ngay, không cần deploy. Các mục bên dưới nhắc tới D1 / Workers là
+cách làm cũ trên Cloudflare: trên VPS, D1 thay bằng file SQLite `/srv/f21/data/f21.db` (cùng cấu trúc).
 
 ## Sửa nội dung
 
