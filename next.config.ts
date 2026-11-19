@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
+  // Bản chạy trên VPS: gói gọn server + phần thư viện cần dùng vào .next/standalone (scripts/vps/deploy.sh)
+  output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
   // Ảnh đã được nén sẵn đúng kích thước trong /public/img
@@ -9,9 +10,7 @@ const nextConfig: NextConfig = {
   // Trang 404 chung cho đường dẫn không khớp trang nào (src/app/global-not-found.tsx): app có nhiều root layout
   experimental: {
     globalNotFound: true,
-    // Build dựng trang từ D1 thật qua mạng, D1 thỉnh thoảng trả "internal error" khi nhiều trang hỏi cùng lúc:
-    // thử lại trang lỗi và bớt số trang dựng song song thay vì hỏng cả bản build
-    staticGenerationRetryCount: 3,
+    // Bớt số trang dựng song song khi build: VPS ít RAM
     staticGenerationMaxConcurrency: 4,
   },
   // Cho phép mở `next dev` từ điện thoại cùng mạng Wi-Fi (http://192.168.x.x:3000).
@@ -33,6 +32,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-// Cho phép đọc binding Cloudflare khi chạy `next dev`
-initOpenNextCloudflareForDev();

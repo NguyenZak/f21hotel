@@ -48,3 +48,4 @@ next-env.d.ts
 
 # CMS: ảnh tải lên ở máy dev khi chưa cấu hình Cloudinary
 media-uploads/
+data/

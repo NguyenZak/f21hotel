@@ -1,10 +1,9 @@
-// Truy cập D1 trực tiếp (không qua Payload) cho phần website chạy trên Cloudflare Workers.
-// Gói Workers Free chỉ cho 10 ms CPU mỗi yêu cầu; khởi tạo Payload tốn hàng trăm ms nên website
-// đọc/ghi bằng câu lệnh SQL nhẹ. Bảng và cột: db/schema.sql (cấu trúc do CMS Payload tạo trước đây).
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+// Cơ sở dữ liệu của website: một file SQLite trên VPS (SQLITE_PATH), đọc/ghi qua lớp giả D1 (sqlite-d1.ts)
+// nên mọi câu lệnh viết theo API D1 vẫn chạy nguyên. Bảng và cột: db/schema.sql + db/migrations.
+import { sqliteD1 } from "./sqlite-d1";
 
 export async function db(): Promise<D1Database> {
-  return (await getCloudflareContext({ async: true })).env.D1;
+  return sqliteD1();
 }
 
 // Chạy nhiều câu đọc trong một lượt gọi D1, trả về mảng dòng của từng câu

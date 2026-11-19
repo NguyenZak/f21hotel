@@ -1,16 +1,15 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { handleCmsApi } from "@/cms/server/api";
 import { cloudinaryFrom } from "@/cms/server/media";
+import { db } from "@/lib/db";
 import { mailConfigFrom } from "@/lib/mailer";
 
-// API CMS khi chạy qua Next.js (`next dev`). Trên Cloudflare, worker.ts xử lý /api/cms/* trước khi nạp
-// Next.js nên route này chỉ là đường dự phòng.
+// API CMS. Lưu nội dung trong CMS thì đánh dấu nhãn trang liên quan (revalidateTag): website cập nhật ngay
+// ở lần truy cập sau, không cần build lại.
 async function handle(request: Request) {
-  const { env } = await getCloudflareContext({ async: true });
   const res = await handleCmsApi(request, {
-    d: env.D1,
+    d: await db(),
     secret: process.env.PAYLOAD_SECRET ?? "",
     revalidate: async (tags) => tags.forEach((t) => revalidateTag(t, { expire: 0 })),
     waitUntil: (p) => after(p),

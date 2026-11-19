@@ -2,10 +2,11 @@
 // Đặt trong .env.local: ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD (ít nhất 12 ký tự), rồi chạy:
 //   npm run create-admin          # D1 ở máy
 //   npm run create-admin:remote   # D1 thật trên Cloudflare
+//   node scripts/create-admin.mjs --sqlite   # file SQLite trên VPS (SQLITE_PATH, mặc định data/f21.db)
 // Mật khẩu băm giống src/cms/server/crypto.ts (pbkdf2-sha256-cf30k) và không bao giờ được in ra.
 // Xong thì xoá ADMIN_PASSWORD khỏi .env.local.
 import { pbkdf2Sync, randomBytes } from "node:crypto";
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -13,14 +14,14 @@ import { spawnSync } from "node:child_process";
 // Biến môi trường truyền khi chạy lệnh được ưu tiên hơn .env.local
 const env = {
   ...Object.fromEntries(
-    readFileSync(".env.local", "utf8")
+    (existsSync(".env.local") ? readFileSync(".env.local", "utf8") : "")
       .split("\n")
       .map((l) => l.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/))
       .filter(Boolean)
       .map(([, k, v]) => [k, v.replace(/^["']|["']$/g, "")]),
   ),
   ...Object.fromEntries(
-    Object.entries(process.env).filter(([k]) => k.startsWith("ADMIN_")),
+    Object.entries(process.env).filter(([k]) => k.startsWith("ADMIN_") || k === "SQLITE_PATH"),
   ),
 };
 const email = (env.ADMIN_EMAIL ?? "").trim().toLowerCase();
@@ -46,6 +47,17 @@ const sql = `insert into users (name, email, role, active, salt, hash, login_att
 values (${q(name)}, ${q(email)}, 'owner', 1, ${q(salt)}, ${q(hash)}, 0, ${q(now)}, ${q(now)})
 on conflict(email) do update set role = 'owner', active = 1, salt = excluded.salt, hash = excluded.hash,
   login_attempts = 0, lock_until = null, updated_at = excluded.updated_at;`;
+
+if (process.argv.includes("--sqlite")) {
+  const { DatabaseSync } = await import("node:sqlite");
+  const path = env.SQLITE_PATH || "data/f21.db";
+  const d = new DatabaseSync(path);
+  d.exec("pragma busy_timeout = 5000;");
+  d.exec(sql);
+  d.close();
+  console.log(`Đã tạo hoặc đặt lại tài khoản Chủ: ${email} (SQLite ${path}).`);
+  process.exit(0);
+}
 
 const file = join(tmpdir(), `f21-create-admin-${process.pid}.sql`);
 writeFileSync(file, sql, { mode: 0o600 });
