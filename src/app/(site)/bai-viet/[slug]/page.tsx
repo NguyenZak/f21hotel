@@ -4,9 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaBand } from "@/components/CtaBand";
 import { PageHero } from "@/components/ui";
-import { getPosts, getSite } from "@/lib/cms";
+import { getPlaces, getPosts, getSite } from "@/lib/cms";
 import { formatViDate } from "@/lib/dates";
-import { readingMinutes, renderMarkdown } from "@/lib/markdown";
+import { publishedLinks, readingMinutes, renderMarkdown } from "@/lib/markdown";
 import { articleJsonLd, breadcrumbTrailJsonLd, faqJsonLd, JsonLd, postOgImages } from "@/lib/seo";
 import { postTopicLabel } from "@/lib/site";
 
@@ -51,10 +51,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const [post, site, posts] = await Promise.all([findPost(params), getSite(), getPosts()]);
+  const [post, site, posts, places] = await Promise.all([findPost(params), getSite(), getPosts(), getPlaces()]);
   if (!post) notFound();
   const path = `/bai-viet/${post.slug}`;
-  const { html, headings } = renderMarkdown(post.body);
+  const { html, headings } = renderMarkdown(
+    post.body,
+    publishedLinks(
+      posts.map((p) => p.slug),
+      places.map((p) => p.slug),
+    ),
+  );
   const toc = headings.filter((h) => h.level === 2);
   // Bài liên quan: cùng chủ đề trước, rồi các bài mới nhất
   const related = posts

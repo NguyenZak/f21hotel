@@ -23,12 +23,29 @@ export const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-function inline(raw: string) {
+// Kiểm tra link nội bộ: trả false thì chỉ giữ chữ, bỏ link (vd. link tới bài viết còn nháp)
+export type LinkCheck = (url: string) => boolean;
+
+// Link tới /bai-viet/<mã> hoặc /tien-ich/<mã> chỉ giữ khi trang đó đang đăng; link khác giữ nguyên
+export function publishedLinks(postSlugs: Iterable<string>, placeSlugs: Iterable<string>): LinkCheck {
+  const live = { "bai-viet": new Set(postSlugs), "tien-ich": new Set(placeSlugs) };
+  return (url) => {
+    const m = /^\/(bai-viet|tien-ich)\/([^/?#]+)\/?(?:[?#].*)?$/.exec(url);
+    if (!m) return true;
+    let slug = m[2];
+    try {
+      slug = decodeURIComponent(slug);
+    } catch {}
+    return live[m[1] as keyof typeof live].has(slug);
+  };
+}
+
+function inline(raw: string, linkOk?: LinkCheck) {
   let s = escape(raw);
   // Liên kết trước (chữ trong [] đã escape), rồi đậm, nghiêng
   s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (all, text: string, href: string) => {
     const url = href.replace(/&amp;/g, "&");
-    if (!SAFE_HREF.test(url)) return text;
+    if (!SAFE_HREF.test(url) || (linkOk && !linkOk(url))) return text;
     const external = /^https?:\/\//i.test(url);
     return `<a href="${escape(url)}"${external ? ' target="_blank" rel="noopener"' : ""}>${text}</a>`;
   });
@@ -47,7 +64,8 @@ const cells = (line: string) =>
 
 export type Heading = { id: string; text: string; level: 2 | 3 };
 
-export function renderMarkdown(md: string): { html: string; headings: Heading[] } {
+export function renderMarkdown(md: string, linkOk?: LinkCheck): { html: string; headings: Heading[] } {
+  const inl = (x: string) => inline(x, linkOk);
   const lines = md.replace(/\r\n?/g, "\n").split("\n");
   const out: string[] = [];
   const headings: Heading[] = [];
@@ -68,7 +86,7 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
       while (used.has(id)) id += "-2";
       used.add(id);
       headings.push({ id, text, level });
-      out.push(`<h${level} id="${id}">${inline(text)}</h${level}>`);
+      out.push(`<h${level} id="${id}">${inl(text)}</h${level}>`);
       i++;
       continue;
     }
@@ -91,8 +109,8 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
       const rows: string[][] = [];
       while (i < lines.length && lines[i].trim().startsWith("|")) rows.push(cells(lines[i++]));
       out.push(
-        `<div class="post-table"><table><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${rows
-          .map((r) => `<tr>${head.map((_, k) => `<td>${inline(r[k] ?? "")}</td>`).join("")}</tr>`)
+        `<div class="post-table"><table><thead><tr>${head.map((c) => `<th>${inl(c)}</th>`).join("")}</tr></thead><tbody>${rows
+          .map((r) => `<tr>${head.map((_, k) => `<td>${inl(r[k] ?? "")}</td>`).join("")}</tr>`)
           .join("")}</tbody></table></div>`,
       );
       continue;
@@ -108,13 +126,13 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
         i++;
       }
       const tag = ordered ? "ol" : "ul";
-      out.push(`<${tag}>${items.map((x) => `<li>${inline(x)}</li>`).join("")}</${tag}>`);
+      out.push(`<${tag}>${items.map((x) => `<li>${inl(x)}</li>`).join("")}</${tag}>`);
       continue;
     }
     if (t.startsWith(">")) {
       const quote: string[] = [];
       while (i < lines.length && lines[i].trim().startsWith(">")) quote.push(lines[i++].trim().replace(/^>\s?/, ""));
-      out.push(`<blockquote><p>${quote.map(inline).join("<br>")}</p></blockquote>`);
+      out.push(`<blockquote><p>${quote.map(inl).join("<br>")}</p></blockquote>`);
       continue;
     }
     // Đoạn văn: gộp các dòng liền nhau tới dòng trống hoặc khối khác
@@ -125,7 +143,7 @@ export function renderMarkdown(md: string): { html: string; headings: Heading[] 
       para.push(x);
       i++;
     }
-    out.push(`<p>${para.map(inline).join("<br>")}</p>`);
+    out.push(`<p>${para.map(inl).join("<br>")}</p>`);
   }
   return { html: out.join("\n"), headings };
 }

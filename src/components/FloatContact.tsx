@@ -6,7 +6,7 @@ import { track } from "@/lib/track";
 // Trên điện thoại thanh liên hệ dưới cùng (ContactBar) đã có Zalo, nên chỉ còn nút Facebook nổi.
 export function FloatContact({ zaloLink, facebook }: { zaloLink: string; facebook: string }) {
   return (
-    <div className="float-contact" aria-label="Nhắn tin cho khách sạn">
+    <div className="float-contact" role="group" aria-label="Nhắn tin cho khách sạn">
       {facebook ? (
         <a href={facebook} target="_blank" rel="noopener" title="Facebook" onClick={() => track("click_facebook", { from: "float" })}>
           <img src="/img/logo-facebook.svg" alt="Facebook" width={50} height={50} />

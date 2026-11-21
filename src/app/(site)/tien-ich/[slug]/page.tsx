@@ -6,8 +6,8 @@ import { Gallery } from "@/components/Gallery";
 import { IconClock, IconPin } from "@/components/Icons";
 import { PhotoCredit, PlaceMosaic } from "@/components/PlaceMosaic";
 import { PageHero } from "@/components/ui";
-import { getPlaces, getSite } from "@/lib/cms";
-import { renderMarkdown } from "@/lib/markdown";
+import { getPlaces, getPosts, getSite } from "@/lib/cms";
+import { publishedLinks, renderMarkdown } from "@/lib/markdown";
 import { breadcrumbTrailJsonLd, JsonLd, OG_IMAGES, ogImageMeta } from "@/lib/seo";
 import { placeCategory, placeIndexable } from "@/lib/site";
 
@@ -42,11 +42,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {
-  const [place, site, places] = await Promise.all([findPlace(params), getSite(), getPlaces()]);
+  const [place, site, places, posts] = await Promise.all([findPlace(params), getSite(), getPlaces(), getPosts()]);
   if (!place) notFound();
   const path = `/tien-ich/${place.slug}`;
   const cat = placeCategory(place.category);
-  const body = place.body.trim() ? renderMarkdown(place.body).html : "";
+  const body = place.body.trim() ? renderMarkdown(
+        place.body,
+        publishedLinks(
+          posts.map((p) => p.slug),
+          places.map((p) => p.slug),
+        ),
+      ).html : "";
   const others = places.filter((p) => p.category === place.category && p.slug !== place.slug).slice(0, 5);
   const embed = `https://maps.google.com/maps?q=${encodeURIComponent(place.embed)}&z=16&hl=vi&output=embed`;
 

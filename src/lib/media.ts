@@ -8,5 +8,6 @@ export function mediaUrl(m: { filename?: unknown; prefix?: unknown; url?: unknow
   const folder = process.env.CLOUDINARY_FOLDER || "f21-hotel";
   const path = m.prefix ? `${m.prefix}/${filename}` : filename;
   const ext = path.match(/\.([^./]+)$/)?.[1] ?? "jpg";
-  return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto/${folder}/${path.replace(/\.[^./]+$/, "")}.${ext}`;
+  // c_limit,w_2400: ảnh gốc từ máy ảnh rất lớn; 2400px đủ cho màn hình to nhất mà file nhẹ hơn nhiều
+  return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto,c_limit,w_2400/${folder}/${path.replace(/\.[^./]+$/, "")}.${ext}`;
 }

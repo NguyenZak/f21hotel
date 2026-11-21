@@ -24,7 +24,7 @@ export const OG_IMAGES = {
 // Ảnh bìa bài viết (Cloudinary) cắt 1200×630 JPG làm ảnh xem trước; bài chưa có ảnh bìa dùng ảnh trang Vị trí
 export function postOgImages(post: Post) {
   if (!post.cover) return ogImageMeta(OG_IMAGES.location);
-  const url = post.cover.src.replace("/image/upload/f_auto,q_auto/", "/image/upload/c_fill,g_auto,w_1200,h_630,q_auto,f_jpg/");
+  const url = post.cover.src.replace(/\/image\/upload\/f_auto,q_auto(,c_limit,w_2400)?\//, "/image/upload/c_fill,g_auto,w_1200,h_630,q_auto,f_jpg/");
   return {
     images: [{ url, width: 1200, height: 630, alt: post.cover.alt, type: "image/jpeg" }],
     twitter: { card: "summary_large_image" as const, images: [{ url, alt: post.cover.alt }] },

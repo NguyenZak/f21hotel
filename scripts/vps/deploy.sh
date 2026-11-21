@@ -70,6 +70,9 @@ mkdir -p "$rel"
 cp -a .next/standalone/. "$rel/"
 cp -a .next/static "$rel/.next/static"
 cp -a public "$rel/public"
+# Ảnh đã thu nhỏ (Next.js image) dùng chung giữa các bản, không phải làm lại sau mỗi lần deploy
+mkdir -p /srv/f21/cache/images "$rel/.next/cache" && chown -R f21:f21 /srv/f21/cache
+rm -rf "$rel/.next/cache/images" && ln -s /srv/f21/cache/images "$rel/.next/cache/images"
 chown -R f21:f21 "$rel"
 prev=$(readlink -f /srv/f21/current 2>/dev/null || true)
 ln -sfn "$rel" /srv/f21/current

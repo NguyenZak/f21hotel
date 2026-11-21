@@ -22,14 +22,28 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   // Tăng mỗi lần chạy tiếp để thanh thời gian bắt đầu lại từ đầu
   const [run, setRun] = useState(0);
   const touch = useRef<{ x: number; y: number } | null>(null);
+  // Ảnh các slide sau chỉ tải khi trang đã tải xong (hoặc khi khách tự chuyển slide),
+  // để không tranh băng thông với ảnh đầu tiên trên điện thoại
+  const [restReady, setRestReady] = useState(false);
+  useEffect(() => {
+    const ready = () => setRestReady(true);
+    if (document.readyState === "complete") {
+      const id = requestAnimationFrame(ready);
+      return () => cancelAnimationFrame(id);
+    }
+    window.addEventListener("load", ready, { once: true });
+    return () => window.removeEventListener("load", ready);
+  }, []);
 
   // Lùi/tiến d slide, luôn tính từ slide hiện tại (bấm nhanh nhiều lần vẫn đúng)
   const step = useCallback(
-    (d: number) =>
+    (d: number) => {
+      setRestReady(true);
       setSlide((s) => {
         const next = (s.active + d + slides.length) % slides.length;
         return next === s.active ? s : { active: next, prev: s.active, changed: true };
-      }),
+      });
+    },
     [slides.length],
   );
 
@@ -86,15 +100,19 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
         <div className="hero-media" data-paused={paused || undefined}>
           {slides.map((s, i) => (
             <picture key={s.src} className={`hero-slide${i === active ? " active" : i === prev ? " prev" : ""}`}>
-              <source media="(max-width: 900px)" srcSet={s.srcMobile} />
-              {/* Dùng <picture> để điện thoại tải ảnh nhỏ hơn */}
-              <img
-                src={s.src}
-                // Chỉ ảnh đang hiện mới có mô tả cho trình đọc màn hình
-                alt={i === active ? s.alt : ""}
-                fetchPriority={i === 0 ? "high" : "low"}
-                decoding="async"
-              />
+              {i === 0 || restReady ? (
+                <>
+                  <source media="(max-width: 900px)" srcSet={s.srcMobile} />
+                  {/* Dùng <picture> để điện thoại tải ảnh nhỏ hơn */}
+                  <img
+                    src={s.src}
+                    // Chỉ ảnh đang hiện mới có mô tả cho trình đọc màn hình
+                    alt={i === active ? s.alt : ""}
+                    fetchPriority={i === 0 ? "high" : "low"}
+                    decoding="async"
+                  />
+                </>
+              ) : null}
             </picture>
           ))}
         </div>

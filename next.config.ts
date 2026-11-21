@@ -5,8 +5,12 @@ const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
-  // Ảnh đã được nén sẵn đúng kích thước trong /public/img
-  images: { unoptimized: true },
+  // Next.js thu nhỏ ảnh theo màn hình (sharp trên VPS, lưu đệm ở .next/cache/images, deploy.sh giữ lại giữa các bản).
+  // Ảnh Cloudinary là ảnh gốc từ máy ảnh (tới 5472px), điện thoại chỉ cần bản 400–800px.
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
+    minimumCacheTTL: 2592000,
+  },
   // Trang 404 chung cho đường dẫn không khớp trang nào (src/app/global-not-found.tsx): app có nhiều root layout
   experimental: {
     globalNotFound: true,
