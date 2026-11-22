@@ -32,7 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const path = `/bai-viet/${post.slug}`;
   const og = postOgImages(post);
   return {
-    title: post.title,
+    // Tiêu đề dài thì bỏ đuôi " | F21 Hotel" để Google không cắt mất phần cuối câu hỏi
+    title: post.title.length > 58 ? { absolute: post.title } : post.title,
     description: post.excerpt,
     alternates: { canonical: path },
     openGraph: {

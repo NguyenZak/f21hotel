@@ -55,7 +55,17 @@ export function pageMeta(site: SiteData, path: string, title: string, descriptio
 }
 
 // Mọi tiện nghi có trong ít nhất một hạng phòng, cộng chỗ đỗ xe trước khách sạn
-const amenities = (rooms: Room[]) => [...new Set([...rooms.flatMap((r) => r.amenities), "Chỗ đỗ ô tô"])];
+// Tiện nghi chung của các hạng phòng, bỏ trùng kiểu "Chỗ để xe rộng rãi" / "Chỗ đỗ xe rộng rãi"
+const amenities = (rooms: Room[]) => {
+  const key = (s: string) => s.trim().toLowerCase().replace(/để xe/g, "đỗ xe");
+  const seen = new Map<string, string>();
+  for (const a of rooms.flatMap((r) => r.amenities)) if (a.trim() && !seen.has(key(a))) seen.set(key(a), a.trim());
+  if (![...seen.keys()].some((k) => k.includes("đỗ"))) seen.set("ô tô", "Chỗ đỗ ô tô");
+  return [...seen.values()];
+};
+
+// Số điện thoại dạng quốc tế cho schema: 0968740333 → +84968740333
+const intlPhone = (phone: string) => (phone.startsWith("0") ? `+84${phone.slice(1)}` : phone);
 
 const priceRange = (rooms: Room[]) => {
   const all = rooms.flatMap((r) => [r.prices.hourly, r.prices.fullDay]).filter((n) => n > 0);
@@ -80,7 +90,7 @@ export function hotelJsonLd(site: SiteData, rooms: Room[]) {
       absUrl(site, p),
     ),
     logo: absUrl(site, "/img/logo-ngang.png"),
-    telephone: site.phone,
+    telephone: intlPhone(site.phone),
     ...(site.email ? { email: site.email } : {}),
     ...(priceRange(rooms) ? { priceRange: priceRange(rooms) } : {}),
     currenciesAccepted: "VND",
