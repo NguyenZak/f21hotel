@@ -215,7 +215,7 @@ export const COLLECTIONS: CollectionDef[] = [
         column: "body",
         label: "Nội dung",
         required: true,
-        help: "## Tiêu đề mục · ### Mục nhỏ · **đậm** · *nghiêng* · - danh sách · 1. danh sách số · [chữ](đường dẫn) · > trích dẫn · bảng | Cột | Cột |. Mỗi mục nên mở đầu bằng câu trả lời ngắn gọn.",
+        help: "## Tiêu đề mục · ### Mục nhỏ · **đậm** · *nghiêng* · - danh sách · 1. danh sách số · [chữ](đường dẫn) · > trích dẫn · bảng | Cột | Cột |. Mỗi mục nên mở đầu bằng câu trả lời ngắn gọn. Giá phòng: gõ {{gia:don:qua-dem}} thay cho con số, website tự điền giá đang để ở Hạng phòng (mã hạng phòng: don, don-vip, doi, doi-4; hình thức: gio, them-gio, qua-dem, ngay-dem).",
       },
       {
         type: "rows",

@@ -5,6 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { BlockMeta } from "@/blocks/types";
 import { CMS_TAGS } from "./cms-tags";
 import { db } from "./db";
+import { fillPrices } from "./post-prices";
 import * as read from "./site-data";
 import type { Offer, Place, Review, Room } from "./site";
 import type { FontKey } from "./theme";
@@ -71,8 +72,18 @@ export async function getReviews(): Promise<Review[]> {
 export async function getPosts(): Promise<read.Post[]> {
   "use cache";
   cacheLife("max");
-  cacheTag(CMS_TAGS.posts);
-  return read.readPosts(await db());
+  // Bài viết có mã giá phòng ({{gia:don:qua-dem}}), nên dựng lại cả khi đổi giá ở Hạng phòng
+  cacheTag(CMS_TAGS.posts, CMS_TAGS.rooms);
+  const d = await db();
+  const [posts, rooms] = await Promise.all([read.readPosts(d), read.readRooms(d)]);
+  const fill = (t: string) => fillPrices(t, rooms);
+  return posts.map((p) => ({
+    ...p,
+    title: fill(p.title),
+    excerpt: fill(p.excerpt),
+    body: fill(p.body),
+    faqs: p.faqs.map((f) => ({ q: fill(f.q), a: fill(f.a) })),
+  }));
 }
 
 export async function getPlaces(): Promise<Place[]> {
