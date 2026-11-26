@@ -19,6 +19,7 @@ export const OG_IMAGES = {
   offers: { file: "uu-dai", alt: "Biển đèn F21 Hotel trên sân thượng buổi tối" },
   booking: { file: "dat-phong", alt: "Quầy lễ tân và sảnh F21 Hotel" },
   groups: { file: "doan-doanh-nghiep", alt: "Phòng hai giường cho khách đoàn tại F21 Hotel" },
+  anniversary: { file: "trang-tri-ky-niem", alt: "Phòng trang trí kỷ niệm với bóng bay đỏ bạc và chữ LOVE tại F21 Hotel" },
 } as const;
 
 // Ảnh bìa bài viết (Cloudinary) cắt 1200×630 JPG làm ảnh xem trước; bài chưa có ảnh bìa dùng ảnh trang Vị trí

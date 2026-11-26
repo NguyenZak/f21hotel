@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getPlaces, getPosts, getRooms, getSite } from "@/lib/cms";
-import { locationPhotos, nav, placeIndexable } from "@/lib/site";
+import { anniversaryPhotos, locationPhotos, nav, placeIndexable } from "@/lib/site";
 
 // Kèm ảnh của từng trang để ảnh phòng, mặt tiền xuất hiện trên Google Hình ảnh
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -10,8 +10,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/": ["/img/anh/mat-tien-ngay.webp", "/img/anh/mat-tien-dem.webp", "/img/anh/sanh-le-tan.webp"],
     "/phong": rooms.flatMap((r) => r.photos.map((p) => p.src)),
     "/vi-tri": locationPhotos.map((p) => p.src),
+    "/trang-tri-ky-niem": anniversaryPhotos.map((p) => p.src),
   };
-  const pages = [{ href: "/" }, { href: "/gioi-thieu" }, ...nav, { href: "/bai-viet" }, { href: "/tien-ich" }, { href: "/dieu-khoan" }, { href: "/chinh-sach-bao-mat" }].map(({ href }) => ({
+  const pages = [{ href: "/" }, { href: "/gioi-thieu" }, ...nav, { href: "/trang-tri-ky-niem" }, { href: "/bai-viet" }, { href: "/tien-ich" }, { href: "/dieu-khoan" }, { href: "/chinh-sach-bao-mat" }].map(({ href }) => ({
     url: abs(href),
     ...(images[href]?.length ? { images: [...new Set(images[href])].map(abs) } : {}),
   }));

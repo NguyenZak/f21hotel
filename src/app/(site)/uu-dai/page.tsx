@@ -4,7 +4,7 @@ import Link from "next/link";
 import { PageHero, SectionHead } from "@/components/ui";
 import { CtaBand } from "@/components/CtaBand";
 import { getOffers, getSite } from "@/lib/cms";
-import { directPerks } from "@/lib/site";
+import { directPerks, offerPages } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -46,12 +46,18 @@ export default async function OffersPage() {
                   <span className="code">Mã: {offer.code}</span>
                 ) : null}
               </div>
-              <Link
-                className="btn"
-                href={offer.code ? `/dat-phong?code=${offer.code}` : "/doan-doanh-nghiep"}
-              >
-                {offer.code ? "Dùng ưu đãi" : "Xin báo giá"}
-              </Link>
+              {offerPages[offer.slug] ? (
+                <Link className="btn" href={offerPages[offer.slug].href}>
+                  {offerPages[offer.slug].label}
+                </Link>
+              ) : (
+                <Link
+                  className="btn"
+                  href={offer.code ? `/dat-phong?code=${offer.code}` : "/doan-doanh-nghiep"}
+                >
+                  {offer.code ? "Dùng ưu đãi" : "Xin báo giá"}
+                </Link>
+              )}
             </article>
           ))}
         </div>

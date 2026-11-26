@@ -477,3 +477,34 @@ export const faqs = [
     a: "Đường trong khu biệt thự Hoa Phượng rộng, khách đỗ ô tô và xe máy ngay trước khách sạn. Đoàn đi nhiều xe vui lòng báo trước để lễ tân sắp chỗ.", // TODO
   },
 ];
+
+// Trang trí phòng kỷ niệm cho cặp đôi (trang /trang-tri-ky-niem). Ảnh chụp ở phòng Đơn VIP ngày 18/11/2026.
+// Nội dung gói (tóm tắt, danh sách, dòng giá) sửa ở CMS › Ưu đãi › "Trang trí phòng kỷ niệm";
+// chưa có ưu đãi đó trong CMS thì dùng anniversaryDefaults.
+export const ANNIVERSARY_SLUG = "trang-tri-ky-niem";
+
+export const anniversaryPhotos: Photo[] = [
+  { src: "/img/anh/ky-niem-tran-bong.webp", alt: "Phòng trang trí kỷ niệm: bóng bay đỏ bạc phủ trần, chữ LOVE phát sáng trên giường", w: 1448, h: 1086 },
+  { src: "/img/anh/ky-niem-bon-tam.webp", alt: "Bóng bay trên trần phòng Đơn VIP, phòng tắm có bồn sau vách kính", w: 1448, h: 1086 },
+  { src: "/img/anh/ky-niem-giuong-bong.webp", alt: "Bóng bay đỏ, trắng, bạc và cánh hoa hồng rải trên giường", w: 1448, h: 1086 },
+  { src: "/img/anh/ky-niem-ban-love.webp", alt: "Chữ LOVE đèn LED, hoa hồng và lịch ngày kỷ niệm trên bàn trang điểm", w: 869, h: 1086 },
+  { src: "/img/anh/ky-niem-giuong.webp", alt: "Giường trang trí bóng tim, chữ LOVE và cánh hoa hồng", w: 1448, h: 1086 },
+];
+
+export const anniversaryDefaults = {
+  summary: "Bóng bay, chữ LOVE phát sáng, hoa hồng và cánh hoa trên giường. F21 trang trí xong trước giờ hai bạn nhận phòng.",
+  details: [
+    "Bóng bay đỏ và bạc phủ trần, dây ruy băng thả xuống",
+    "Chùm bóng tim đỏ, bạc ở đầu giường và cạnh giường",
+    "Chữ LOVE đèn LED trên giường và trên bàn trang điểm",
+    "Hoa hồng và cánh hoa rải trên giường",
+    "Lịch để bàn lật đúng ngày kỷ niệm của hai bạn",
+    "Bóng bay đỏ, trắng, bạc trên giường và sàn phòng",
+    "Giá: báo theo ngày và hạng phòng, nhắn Zalo để nhận báo giá",
+  ],
+};
+
+// Ưu đãi có trang riêng: nút trên /uu-dai dẫn tới trang đó thay vì form đặt phòng
+export const offerPages: Record<string, { href: string; label: string }> = {
+  [ANNIVERSARY_SLUG]: { href: "/trang-tri-ky-niem", label: "Xem gói" },
+};
