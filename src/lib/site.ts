@@ -250,6 +250,17 @@ export const heroSlides: HeroSlide[] = [
     book: { label: "Đặt phòng", href: "/dat-phong" },
   },
   {
+    src: "/img/anh/hero-ky-niem.webp",
+    srcMobile: "/img/anh/hero-ky-niem-1200.webp",
+    alt: "Phòng trang trí kỷ niệm với bóng bay đỏ bạc phủ trần và chữ LOVE trên giường",
+    kicker: "Dành cho cặp đôi",
+    bold: "Phòng kỷ niệm",
+    light: "trang trí sẵn",
+    sub: "Bóng bay phủ trần, chữ LOVE phát sáng, hoa hồng. Đổi được chữ, màu bóng",
+    cost: { value: "1–2 ngày", label: "Báo trước, F21 trang trí sẵn", href: "/trang-tri-ky-niem" },
+    book: { label: "Xem gói trang trí", href: "/trang-tri-ky-niem" },
+  },
+  {
     src: "/img/anh/hero-cua-vom.webp",
     srcMobile: "/img/anh/hero-cua-vom-1200.webp",
     alt: "Góc ghế bên cửa sổ vòm trong phòng",
