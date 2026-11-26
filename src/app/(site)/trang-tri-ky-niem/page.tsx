@@ -24,11 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 }
 
-// TODO: khách sạn xác nhận thời gian cần báo trước và việc đổi chữ, màu bóng
 const faqs = [
   {
     q: "Trang trí phòng kỷ niệm ở F21 gồm những gì?",
-    a: "Bóng bay đỏ, bạc phủ trần, chùm bóng tim ở đầu giường, chữ LOVE đèn LED, hoa hồng, cánh hoa rải giường và lịch để bàn ghi ngày kỷ niệm. Ảnh trên trang này chụp thật tại F21.",
+    a: "Bóng bay đỏ, bạc phủ trần, chùm bóng tim ở đầu giường, chữ LOVE đèn LED, hoa hồng, cánh hoa rải giường và lịch để bàn lật đúng ngày kỷ niệm. Ảnh trên trang này chụp thật tại F21.",
   },
   {
     q: "Giá trang trí tính thế nào?",
@@ -36,15 +35,15 @@ const faqs = [
   },
   {
     q: "Cần đặt trước bao lâu?",
-    a: "Nên nhắn càng sớm càng tốt để F21 chuẩn bị bóng và hoa. Lễ tân sẽ báo thời gian cần có khi bạn nhắn.",
+    a: "Báo trước 1–2 ngày để F21 chuẩn bị bóng, hoa và chữ theo yêu cầu của hai bạn.",
   },
   {
     q: "Có đổi chữ hoặc màu bóng được không?",
-    a: "Bạn nhắn yêu cầu qua Zalo (ví dụ chữ khác cho sinh nhật, màu bóng khác), lễ tân sẽ báo lại có làm được không.",
+    a: "Được. Khi đặt, bạn nhắn chữ muốn hiện (ví dụ cho sinh nhật) và màu bóng muốn đổi, F21 trang trí theo yêu cầu.",
   },
   {
     q: "Nên chọn phòng nào để trang trí?",
-    a: "Ảnh mẫu chụp ở Phòng Đơn VIP: giường đôi, bồn tắm sau vách kính, rộng hơn Phòng Đơn. Muốn trang trí ở hạng phòng khác, nhắn F21 để hỏi.",
+    a: "F21 trang trí được ở các hạng phòng khác, không chỉ phòng trong ảnh. Ảnh mẫu chụp ở Phòng Đơn VIP: giường đôi, bồn tắm sau vách kính, hợp nhất nếu hai bạn muốn có bồn tắm.",
   },
 ];
 
@@ -114,11 +113,11 @@ export default async function AnniversaryPage() {
           <div className="policy reveal-stagger">
             <div>
               <h3>1. Chọn ngày và phòng</h3>
-              <p>Đặt phòng trên website, gọi hotline hoặc nhắn Zalo. Ghi chú “trang trí kỷ niệm” khi đặt.</p>
+              <p>Đặt phòng trước 1–2 ngày trên website, qua hotline hoặc Zalo. Ghi chú “trang trí kỷ niệm” khi đặt.</p>
             </div>
             <div>
               <h3>2. Nhắn F21 dịp của hai bạn</h3>
-              <p>Kỷ niệm ngày yêu, sinh nhật hay cầu hôn, ngày cần hiện trên lịch và giờ dự kiến nhận phòng.</p>
+              <p>Kỷ niệm ngày yêu, sinh nhật hay cầu hôn, ngày cần hiện trên lịch, chữ và màu bóng muốn đổi, giờ dự kiến nhận phòng.</p>
             </div>
             <div>
               <h3>3. Nhận phòng đã trang trí</h3>

@@ -500,6 +500,7 @@ export const anniversaryDefaults = {
     "Hoa hồng và cánh hoa rải trên giường",
     "Lịch để bàn lật đúng ngày kỷ niệm của hai bạn",
     "Bóng bay đỏ, trắng, bạc trên giường và sàn phòng",
+    "Đổi được chữ, màu bóng; trang trí được ở các hạng phòng khác. Báo trước 1–2 ngày",
     "Giá: báo theo ngày và hạng phòng, nhắn Zalo để nhận báo giá",
   ],
 };
