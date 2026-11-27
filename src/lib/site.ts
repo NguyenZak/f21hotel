@@ -257,7 +257,7 @@ export const heroSlides: HeroSlide[] = [
     bold: "Phòng kỷ niệm",
     light: "trang trí sẵn",
     sub: "Bóng bay phủ trần, chữ LOVE phát sáng, hoa hồng. Đổi được chữ, màu bóng",
-    cost: { value: "1–2 ngày", label: "Báo trước, F21 trang trí sẵn", href: "/trang-tri-ky-niem" },
+    cost: { value: "", label: "", href: "" },
     book: { label: "Xem gói trang trí", href: "/trang-tri-ky-niem" },
   },
   {

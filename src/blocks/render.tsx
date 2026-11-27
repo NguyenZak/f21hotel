@@ -113,6 +113,8 @@ export function HeroBlock({ heading, slides, search, tabs, puck }: P<HeroProps>)
 export type IntroProps = Section & {
   // Khung bên trái: bản đồ 3D (mặc định) hoặc ảnh vòm
   media?: "map" | "photo";
+  // Khung ảnh/bản đồ nằm bên trái (mặc định) hay bên phải
+  mediaSide?: "left" | "right";
   photos: PhotoItem[];
   badgeValue: string;
   badgeLabel: string;
@@ -123,6 +125,9 @@ export type IntroProps = Section & {
   points: { icon: IconName; title: string; text: string }[];
   linkLabel: string;
   linkHref: string;
+  // Nút chính, không bắt buộc (để trống chữ là ẩn)
+  buttonLabel?: string;
+  buttonHref?: string;
 };
 
 export function IntroBlock(p: P<IntroProps>) {
@@ -130,7 +135,7 @@ export function IntroBlock(p: P<IntroProps>) {
   const href = p.linkHref || mapsUrl(meta(p.puck).site.mapQuery);
   return (
     <section {...sectionProps(p)}>
-      <div className="wrap intro">
+      <div className={p.mediaSide === "right" ? "wrap intro intro-flip" : "wrap intro"}>
         <div className="intro-media reveal">
           {p.media === "photo" ? (
             photos.length ? (
@@ -176,10 +181,19 @@ export function IntroBlock(p: P<IntroProps>) {
               })}
             </ul>
           ) : null}
-          {p.linkLabel && href ? (
-            <a className="link-arrow" href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener">
-              {p.linkLabel}
-            </a>
+          {(p.buttonLabel && p.buttonHref) || (p.linkLabel && href) ? (
+            <div className="intro-actions">
+              {p.buttonLabel && p.buttonHref ? (
+                <Link className="btn" href={p.buttonHref}>
+                  {p.buttonLabel}
+                </Link>
+              ) : null}
+              {p.linkLabel && href ? (
+                <a className="link-arrow" href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener">
+                  {p.linkLabel}
+                </a>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>

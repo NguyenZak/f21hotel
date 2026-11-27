@@ -297,6 +297,8 @@ p { margin: 0; }
   padding: clamp(56px, 8vw, 110px) var(--hero-x) 36px;
 }
 .hero-main { grid-area: main; display: grid; gap: 18px; }
+/* Slide không có ô giá: nút xuống ngang dòng mô tả */
+.hero-body:not(:has(.hero-cost)) { grid-template-areas: "main book"; }
 .hero-kicker {
   position: relative; margin: 0; padding-left: 2px;
   font-size: 13.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #fff;
@@ -414,6 +416,7 @@ section[id] { scroll-margin-top: var(--header-h); }
   .hero-kicker { font-size: 12.5px; letter-spacing: 0.16em; }
   .hero-title { text-wrap: wrap; }
   .hero-book, .hero-cost { justify-self: start; }
+  .hero-body:not(:has(.hero-cost)) { grid-template-areas: "main" "book"; }
   .hero-body { row-gap: 16px; }
   .hero-book { margin-bottom: 0; }
   .hero-cost small { font-size: 13px; letter-spacing: 0.02em; }
@@ -502,6 +505,12 @@ section[id] { scroll-margin-top: var(--header-h); }
 }
 .intro-media .badge strong { font-family: var(--font-title); font-weight: 700; font-size: 34px; color: var(--maroon); line-height: 1; }
 .intro-media .badge span { font-size: 14px; color: var(--muted); }
+/* Khung ảnh bên phải (khối Phòng kỷ niệm), huy hiệu chuyển sang góc trái */
+.intro-flip { grid-template-columns: 1fr 1.05fr; }
+.intro-flip .intro-media { order: 2; }
+.intro-flip .intro-media .badge { right: auto; left: -18px; }
+.intro-flip .arch.gallery-slider .gs-count { left: auto; right: 16px; }
+.intro-actions { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
 .intro-copy { display: grid; gap: 22px; }
 .intro-copy p { color: var(--muted); }
 .intro-copy .lead { font-size: 21px; color: var(--ink); line-height: 1.55; font-style: italic; }
@@ -510,6 +519,9 @@ section[id] { scroll-margin-top: var(--header-h); }
   .intro { grid-template-columns: 1fr; }
   .intro-media { max-width: 460px; width: 100%; margin-inline: auto; }
   .intro-media .badge { right: 12px; bottom: 24px; }
+  .intro-flip .intro-media { order: 0; }
+  .intro-flip .intro-media .badge { left: auto; right: 12px; }
+  .intro-flip .arch.gallery-slider .gs-count { right: auto; left: 16px; }
 }
 .points { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 18px; }
 .points li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }

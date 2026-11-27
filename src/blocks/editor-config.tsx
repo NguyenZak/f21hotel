@@ -99,6 +99,14 @@ const components = {
           { label: "Ảnh vòm", value: "photo" },
         ],
       },
+      mediaSide: {
+        type: "radio",
+        label: "Vị trí khung ảnh",
+        options: [
+          { label: "Bên trái", value: "left" },
+          { label: "Bên phải", value: "right" },
+        ],
+      },
       photos: photoList("Album ảnh (khi chọn Ảnh vòm: chạy thành slider trong khung vòm)"),
       badgeValue: text("Huy hiệu: số"),
       badgeLabel: text("Huy hiệu: chú thích"),
@@ -115,6 +123,7 @@ const components = {
       },
       linkLabel: text("Liên kết: chữ"),
       linkHref: text("Liên kết: đường dẫn (trống = Google Maps)"),
+      ...linkFields(),
       ...sectionFields,
     },
     defaultProps: D.introDefaults,

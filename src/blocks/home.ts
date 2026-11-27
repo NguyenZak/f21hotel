@@ -51,6 +51,37 @@ export const introDefaults: B.IntroProps = {
   linkHref: "",
 };
 
+// Phòng trang trí kỷ niệm (gói ở /trang-tri-ky-niem): khối Giới thiệu, ảnh vòm bên phải
+const kyNiemAlt = [
+  "Giường trang trí chữ LOVE, bóng bay đỏ bạc phủ trần",
+  "Chữ LOVE và bóng bay đỏ trên giường rải cánh hoa hồng",
+  "Chữ LOVE đèn LED, chùm bóng tim và lịch ngày kỷ niệm trên bàn trang điểm",
+  "Bóng bay phủ trần phòng Đơn VIP, bồn tắm sau vách kính",
+];
+
+export const anniversaryIntroDefaults: B.IntroProps = {
+  anchor: "ky-niem",
+  background: "",
+  media: "photo",
+  mediaSide: "right",
+  photos: kyNiemAlt.map((alt, i) => photo({ src: `/img/anh/ky-niem-vom-${i + 1}.webp`, alt, w: 900, h: 1200 })),
+  badgeValue: "",
+  badgeLabel: "",
+  eyebrow: "Dành cho cặp đôi",
+  title: "Phòng trang trí cho ngày kỷ niệm",
+  lead: "Hai bạn chọn ngày, F21 trang trí xong trước giờ nhận phòng.",
+  text: "Bóng bay đỏ, bạc phủ kín trần, chùm bóng tim đầu giường, chữ LOVE đèn LED, hoa hồng rải giường và lịch để bàn lật đúng ngày của hai bạn. Ảnh chụp thật tại F21.",
+  points: [
+    { icon: "rings", title: "Theo dịp của hai bạn", text: "Kỷ niệm ngày yêu, sinh nhật hay cầu hôn: đổi được chữ và màu bóng." },
+    { icon: "bed", title: "Hạng phòng nào cũng được", text: "Ảnh mẫu ở Phòng Đơn VIP có bồn tắm, các hạng phòng khác cũng trang trí được." },
+    { icon: "heart", title: "Nhắn Zalo nhận báo giá", text: "Gửi ngày, giờ nhận phòng và hạng phòng, lễ tân báo giá trang trí." },
+  ],
+  linkLabel: "",
+  linkHref: "",
+  buttonLabel: "Xem gói trang trí",
+  buttonHref: "/trang-tri-ky-niem",
+};
+
 export const roomsDefaults: B.RoomsProps = {
   anchor: "phong",
   background: "cream",
@@ -188,6 +219,7 @@ export const defaultHome: Data = {
     block("Location", 1, locationDefaults),
     block("Rooms", 1, roomsDefaults),
     block("Intro", 1, introDefaults),
+    block("Intro", 2, anniversaryIntroDefaults),
     block("Gallery", 1, galleryDefaults),
     block("Guests", 1, guestsDefaults),
     block("Nearby", 1, nearbyDefaults),

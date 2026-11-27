@@ -134,13 +134,16 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
           </svg>
         </Link>
 
-        <Link className="hero-cost" href={slide.cost.href}>
-          <span className="hero-cost-icon" aria-hidden="true">
-            i
-          </span>
-          <strong>{slide.cost.value}</strong>
-          <small>{slide.cost.label}</small>
-        </Link>
+        {/* Ô giá: để trống "Ô giá: số" trong CMS là ẩn */}
+        {slide.cost.value ? (
+          <Link className="hero-cost" href={slide.cost.href || "#"}>
+            <span className="hero-cost-icon" aria-hidden="true">
+              i
+            </span>
+            <strong>{slide.cost.value}</strong>
+            <small>{slide.cost.label}</small>
+          </Link>
+        ) : null}
       </div>
 
       {slides.length > 1 ? (
